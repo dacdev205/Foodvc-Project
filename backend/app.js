@@ -30,8 +30,8 @@ app.use("/reviews", require("./routes/reviewRoutes"))
 app.use("/inventory", require("./routes/inventoryRoutes"))
 app.use("/check-out", require("./routes/paymentRoutes"))
 app.use("/adminStats",require("./routes/adminStats"))
-app.use("/order", require("./routes/ordersRoute"))
-app.use("/address", require("./routes/addressRoute"))
+app.use("/order", require("./routes/ordersRoutes"))
+app.use("/address", require("./routes/addressRoutes"))
 
 app.post('/jwt', async(req, res) => {
     const user = req.body;

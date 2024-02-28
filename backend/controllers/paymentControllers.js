@@ -1,6 +1,4 @@
 const Payment = require('../models/payment');
-const fs = require("fs");
-const Cart = require('../models/cart');
 
 module.exports = class PaymentAPI {
     static async createPayment(req, res) {

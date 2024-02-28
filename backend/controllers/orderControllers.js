@@ -1,7 +1,6 @@
 const Cart = require('../models/cart');
 const Menu = require('../models/menu');
 const Order = require('../models/order');
-const fs = require("fs");
 
 module.exports = class orderAPI {
     static async createOrder(req, res) {

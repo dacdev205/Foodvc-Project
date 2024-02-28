@@ -2,7 +2,6 @@ const User = require("../models/user");
 const Menu = require("../models/menu");
 const Payment = require("../models/payment");
 const Order = require("../models/order");
-const fs = require("fs");
 
 module.exports = class StatsAPI {
     static async getAllDataForStats(req, res) {

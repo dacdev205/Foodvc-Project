@@ -1,6 +1,7 @@
 const User = require("../models/user");
 const fs = require("fs");
 module.exports = class usersAPI {
+  
   // get all users
     static async getAllUsers (req, res) {
         try {

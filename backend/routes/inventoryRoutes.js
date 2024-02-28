@@ -1,5 +1,4 @@
 const inventoryAPI = require("../controllers/inventoryControllers");
-const express = require("express");
 const router = require("express").Router();
 const multer = require("multer");
 //multer middleware

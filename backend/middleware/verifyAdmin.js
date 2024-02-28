@@ -1,7 +1,4 @@
-// Importing necessary libraries and modules
-const jwt = require('jsonwebtoken');
 const User = require('../models/user');
-// Middleware function for verifying admin privileges
 const verifyAdmin = async (req, res, next) => {
     // Extracting user's email from the decoded JWT in the request
     const email = req.decoded.email;
@@ -14,8 +11,6 @@ const verifyAdmin = async (req, res, next) => {
     if (!isAdmin) {
         return res.status(403).send({ message: "forbidden access!" });
     }
-    // Passing control to the next middleware in the stack
     next();
 };
-// Exporting the verifyAdmin middleware for use in other parts of the application
 module.exports = verifyAdmin;

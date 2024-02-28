@@ -1,7 +1,4 @@
 const Cart = require("../models/cart");
-const fs = require("fs");
-const axios = require("axios");
-const cart = require("../models/cart");
 module.exports = class cartAPI {
     //fetch all product
     static async fetchAllProductWithEmail(req, res) {

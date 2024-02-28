@@ -1,6 +1,4 @@
-// Importing the necessary library for working with JSON Web Tokens (JWT)
 const jwt = require('jsonwebtoken');
-// Middleware function for verifying JWT token in the request
 const verifyToken = (req, res, next) => {
     // Checking if the request has the 'Authorization' header
     if (!req.headers.authorization) {
@@ -21,5 +19,4 @@ const verifyToken = (req, res, next) => {
         next();
     });
 };
-// Exporting the verifyToken middleware for use in other parts of the application
 module.exports = verifyToken;

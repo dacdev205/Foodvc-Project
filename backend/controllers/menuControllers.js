@@ -1,10 +1,10 @@
 const Menu = require("../models/menu");
 const fs = require("fs");
 const Inventory = require("../models/inventory");
-const axios = require('axios');
 
 module.exports = class menuAPI {
     //fetch all menu
+
     static async fetchAllMenu(req, res) {
         try {
             const menus = await Menu.find();

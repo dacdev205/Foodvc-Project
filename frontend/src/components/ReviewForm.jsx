@@ -1,0 +1,123 @@
+/* eslint-disable react/prop-types */
+import React, { useContext, useState } from "react";
+import { FaStar } from "react-icons/fa";
+import { AuthContext } from "../context/AuthProvider";
+import "../style.css";
+import { useForm } from "react-hook-form";
+const ReviewForm = ({ productId, userId, userName, onSubmit }) => {
+  const [rating, setRating] = useState(0);
+  const [comment, setComment] = useState("");
+  const [ratingError, setRatingError] = useState(false);
+  const { user } = useContext(AuthContext);
+  const handleSubmit = (e) => {
+    if (user && user?.email) {
+      e.preventDefault();
+      if (rating === 0) {
+        setRatingError(true);
+        return;
+      }
+      onSubmit({ productId, userId, userName, rating, comment });
+      setRating(0); // Reset the rating to 0
+      setComment(""); // Reset the comment to an empty string
+      setRatingError(false); // Reset the rating error state
+      document.getElementById("modal-review").close();
+      alert("Cảm ơn bạn đã gửi đánh giá!");
+    } else {
+      setRating(0); // Reset the rating to 0
+      setComment(""); // Reset the comment to an empty string
+      document.getElementById("modal-login").showModal();
+    }
+  };
+  const handleCloseModal = () => {
+    setRating(0); // Reset the rating to 0
+    setComment(""); // Reset the comment to an empty string
+    setRatingError(false); // Reset the rating error state
+    document.getElementById("modal-review").close();
+  };
+  const handleRatingClick = (selectedRating) => {
+    setRatingError(false);
+    setRating(selectedRating);
+  };
+
+  const renderStars = () => {
+    const stars = [];
+    for (let i = 1; i <= 5; i++) {
+      stars.push(
+        <span
+          key={i}
+          onClick={() => handleRatingClick(i)}
+          style={{
+            cursor: "pointer",
+            fontSize: "24px",
+            color: i <= rating ? "#ffc107" : "#e0e0e0",
+            display: "inline-block",
+          }}
+        >
+          <FaStar></FaStar>
+        </span>
+      );
+    }
+    return stars;
+  };
+
+  return (
+    <div>
+      <div className="flex items-center justify-center">
+        <button
+          className="btn bg-green w-full"
+          onClick={() => document.getElementById("modal-review").showModal()}
+        >
+          <span className="text-white">Viết đánh giá</span>
+        </button>
+      </div>
+      <dialog id="modal-review" className="modal modal-bottom sm:modal-middle">
+        <div className="modal-box">
+          <span className="flex items-center justify-center font-bold text-lg">
+            Đánh giá sản phẩm
+          </span>
+          <div className="modal-action m-0">
+            <form className="card-body" onSubmit={handleSubmit} method="dialog">
+              <div className="form-control">
+                <label className="label">{renderStars()}</label>
+                {ratingError && (
+                  <span
+                    style={{ color: "red" }}
+                    size="100px"
+                    className="flex justify-center"
+                    id="ratingError"
+                  >
+                    {" "}
+                    Please select a rating.
+                  </span>
+                )}
+              </div>
+              <div className="form-control">
+                <textarea
+                  className="textarea-content mt-3"
+                  rows={10}
+                  value={comment}
+                  placeholder="Mời bạn chia sẻ cảm nhận..."
+                  onChange={(e) => setComment(e.target.value)}
+                />
+              </div>
+              <div className="form-control mt-6">
+                <button type="submit" className="btn bg-green">
+                  <span className="text-white">Gửi đánh giá</span>
+                </button>
+              </div>
+            </form>
+            <button
+              htmlFor="modal-review"
+              onClick={handleCloseModal}
+              className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
+            >
+              ✕
+            </button>
+          </div>
+        </div>
+      </dialog>
+    </div>
+  );
+};
+
+export default ReviewForm;

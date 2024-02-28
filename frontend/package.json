@@ -1,0 +1,53 @@
+{
+  "name": "frontend",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@react-pdf/renderer": "^3.3.8",
+    "@tanstack/react-query": "^5.17.15",
+    "axios": "^1.6.5",
+    "bson-objectid": "^2.0.4",
+    "chart.js": "^4.4.1",
+    "firebase": "^10.7.1",
+    "html2canvas": "^1.4.1",
+    "jspdf": "^2.5.1",
+    "localforage": "^1.10.0",
+    "match-sorter": "^6.3.1",
+    "mongodb": "^6.3.0",
+    "react": "^18.2.0",
+    "react-barcode": "^1.4.6",
+    "react-dom": "^18.2.0",
+    "react-error-boundary": "^4.0.12",
+    "react-hook-form": "^7.49.3",
+    "react-icons": "^4.12.0",
+    "react-quill": "^2.0.0",
+    "react-quill-image-uploader": "^0.1.1",
+    "react-router-dom": "^6.21.1",
+    "react-select": "^5.8.0",
+    "react-slick": "^0.29.0",
+    "slick-carousel": "^1.8.1",
+    "sort-by": "^1.2.0",
+    "sweetalert2": "^11.10.4"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.43",
+    "@types/react-dom": "^18.2.17",
+    "@vitejs/plugin-react": "^4.2.1",
+    "autoprefixer": "^10.4.16",
+    "daisyui": "^4.5.0",
+    "eslint": "^8.55.0",
+    "eslint-plugin-react": "^7.33.2",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.4.5",
+    "postcss": "^8.4.33",
+    "tailwindcss": "^3.4.1",
+    "vite": "^5.0.8"
+  }
+}

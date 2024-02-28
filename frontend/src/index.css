@@ -1,0 +1,13 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.custom-html-content {
+  @apply prose;
+  all: unset;
+}
+
+.ql-content {
+  background-color: white;
+  all: unset;
+}

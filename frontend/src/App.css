@@ -1,0 +1,33 @@
+.section-container {
+  @apply max-w-screen-2xl container mx-auto xl:px-24 px-4 bg-white;
+}
+
+.subtitle {
+  @apply text-red uppercase tracking-wide font-medium text-lg;
+}
+
+.title {
+  @apply text-4xl md:text-5xl font-bold my-2 md:leading-snug leading-snug text-black;
+}
+
+.active {
+  @apply text-green;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+.custom-html-content {
+  @apply prose;
+  all: unset;
+}
+.ql-content {
+  all: unset;
+}

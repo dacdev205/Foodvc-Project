@@ -1,6 +1,5 @@
 const mongoose = require('mongoose')
-
-// schema model
+// 
 const reviewSchema  = mongoose.Schema(
   {
     productId: { type: mongoose.Schema.Types.ObjectId, ref: 'Menu' },

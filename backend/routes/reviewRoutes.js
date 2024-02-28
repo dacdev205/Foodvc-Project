@@ -1,7 +1,6 @@
 const express = require('express');
 const router = express.Router();
 const reviewAPI = require('../controllers/reviewControllers');
-const verifyToken = require("../middleware/verifyToken");
 
 router.post('/', reviewAPI.addReview);
 router.get('/:productId', reviewAPI.getReviewsByProductId);

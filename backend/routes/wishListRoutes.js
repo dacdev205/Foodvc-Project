@@ -1,6 +1,4 @@
-const { verify } = require("jsonwebtoken");
 const favoritePdAPI = require("../controllers/favoritePd")
-const express = require("express");
 const verifyToken = require("../middleware/verifyToken");
 const router = require("express").Router();
 //middleware

@@ -1,5 +1,4 @@
 const WishList = require("../models/favoritePd");
-const fs = require("fs");
 module.exports = class favoritePdAPI {
     //fetch all product
     static async fetchAllWishListProductWithEmail(req, res) {

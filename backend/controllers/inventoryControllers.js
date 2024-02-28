@@ -34,8 +34,6 @@ module.exports = class inventoryAPI {
             res.status(400).json({message: err.message});
         }
     }
-
-
     // post product to menu
     static async postProductToMenu(req, res) {
       try {

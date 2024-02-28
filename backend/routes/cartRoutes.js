@@ -1,6 +1,4 @@
-const { verify } = require("jsonwebtoken");
 const cartAPI = require("../controllers/cartControllers")
-const express = require("express");
 const verifyToken = require("../middleware/verifyToken");
 const router = require("express").Router();
 //middleware

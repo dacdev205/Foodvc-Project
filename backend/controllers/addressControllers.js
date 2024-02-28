@@ -3,7 +3,6 @@ const Payment = require('../models/payment');
 module.exports = class AddressAPI {
     static async createAddress(req, res) {
         const { paymentId, fullName, phone, street, city, district, ward, email } = req.body;
-    
         try {
             const address = new Address({ paymentId, fullName, phone, street, city, district, ward, email });
             await address.save();

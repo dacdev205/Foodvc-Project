@@ -1,5 +1,4 @@
 const menuAPI = require("../controllers/menuControllers");
-const express = require("express");
 const router = require("express").Router();
 const multer = require("multer");
 //multer middleware

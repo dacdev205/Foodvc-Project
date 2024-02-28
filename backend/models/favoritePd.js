@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+// 
 const favoriteSchema = mongoose.Schema({
   email: String,
   name: String,

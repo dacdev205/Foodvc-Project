@@ -6,7 +6,7 @@ import { MdGroups } from "react-icons/md";
 import { CiDollar } from "react-icons/ci";
 import { FaBook, FaShoppingCart } from "react-icons/fa";
 import FormattedPrice from "../../../components/FormatedPriece";
-import ChartComponent from "../../../components/ChartComponent";
+import ChartMonthlyRevenue from "../../../components/ChartMonthlyRevenue";
 const Dashboard = () => {
   const { user } = useAuth();
   const axiosSecure = useAxiosSecure();
@@ -30,7 +30,9 @@ const Dashboard = () => {
           <div className="stat-value">
             <FormattedPrice price={stats.revenue} />
           </div>
-          <div className="stat-desc">Jan 1st - Feb 1st</div>
+          <div className="stat-desc">
+            {stats.oldestMonth} - {stats.newestMonth}
+          </div>
         </div>
 
         <div className="stat">
@@ -59,7 +61,13 @@ const Dashboard = () => {
           <div className="stat-desc">↘︎ 90 (14%)</div>
         </div>
       </div>
-      <ChartComponent data={stats} />
+      <div className="grid grid-cols-2 gap-4 mt-8">
+        {/* Thêm các biểu đồ vào đây */}
+        <div>
+          <ChartMonthlyRevenue data={stats} />
+        </div>
+        <div> </div>
+      </div>
     </div>
   );
 };

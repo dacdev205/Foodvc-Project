@@ -10,14 +10,11 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@react-pdf/renderer": "^3.3.8",
     "@tanstack/react-query": "^5.17.15",
     "axios": "^1.6.5",
     "bson-objectid": "^2.0.4",
     "chart.js": "^4.4.1",
     "firebase": "^10.7.1",
-    "html2canvas": "^1.4.1",
-    "jspdf": "^2.5.1",
     "localforage": "^1.10.0",
     "match-sorter": "^6.3.1",
     "mongodb": "^6.3.0",

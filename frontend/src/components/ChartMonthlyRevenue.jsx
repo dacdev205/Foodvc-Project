@@ -3,17 +3,17 @@
 import React, { useEffect, useRef, useState } from "react";
 import Chart from "chart.js/auto";
 
-const ChartMonthlyRevenue = ({ data }) => {
+const ChartMonthlyRevenue = ({ data, selectedYear }) => {
   const chartRef = useRef(null);
   const [chartInstance, setChartInstance] = useState(null);
 
   useEffect(() => {
     let newChartInstance = null;
-
     if (chartInstance) {
       chartInstance.destroy();
     }
-    if (chartRef.current && data.monthlyRevenue) {
+
+    if (chartRef.current) {
       const ctx = chartRef.current.getContext("2d");
       const monthNames = [
         "Tháng 1",
@@ -36,10 +36,12 @@ const ChartMonthlyRevenue = ({ data }) => {
       );
       const values = Array.from({ length: 12 }, () => null);
 
-      data.monthlyRevenue.forEach((item) => {
-        const monthIndex = item._id - 1;
-        values[monthIndex] = item.totalAmount;
-      });
+      if (data && data.monthlyRevenue) {
+        data.monthlyRevenue.forEach((item) => {
+          const monthIndex = item._id - 1;
+          values[monthIndex] = item.totalAmount;
+        });
+      }
 
       newChartInstance = new Chart(ctx, {
         type: "line",
@@ -47,7 +49,7 @@ const ChartMonthlyRevenue = ({ data }) => {
           labels: labels,
           datasets: [
             {
-              label: "Doanh Thu",
+              label: `Doanh Thu ${selectedYear}`,
               data: values,
               backgroundColor: "rgba(75, 192, 192, 0.2)",
               borderColor: "rgba(75, 192, 192, 1)",
@@ -73,14 +75,11 @@ const ChartMonthlyRevenue = ({ data }) => {
         newChartInstance.destroy();
       }
     };
-  }, [data]);
+  }, [data, selectedYear]);
 
   return (
     <div>
-      <canvas
-        ref={chartRef}
-        style={{ width: "100%", height: "250px" }}
-      ></canvas>
+      <canvas ref={chartRef}></canvas>
     </div>
   );
 };

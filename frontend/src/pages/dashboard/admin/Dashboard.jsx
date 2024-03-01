@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import useAuth from "../../../hooks/useAuth";
 import { useQuery } from "@tanstack/react-query";
 import useAxiosSecure from "../../../hooks/useAxiosSecure";
@@ -7,9 +7,15 @@ import { CiDollar } from "react-icons/ci";
 import { FaBook, FaShoppingCart } from "react-icons/fa";
 import FormattedPrice from "../../../components/FormatedPriece";
 import ChartMonthlyRevenue from "../../../components/ChartMonthlyRevenue";
+import ChartProduct from "../../../components/ChartProduct";
+import statsAPI from "../../../api/statsAPI";
 const Dashboard = () => {
   const { user } = useAuth();
   const axiosSecure = useAxiosSecure();
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+  const [monthlyRevenueData, setMonthlyRevenueData] = useState([]);
+  const [productRevenueData, setProductRevenueData] = useState([]);
+
   const { refetch, data: stats = [] } = useQuery({
     queryKey: ["stats"],
     queryFn: async () => {
@@ -17,6 +23,21 @@ const Dashboard = () => {
       return res.data;
     },
   });
+  const handleYearChange = async (e) => {
+    const year = parseInt(e.target.value);
+    setSelectedYear(year);
+
+    // Gọi refetch để lấy dữ liệu mới từ server
+    await new Promise((resolve) => {
+      refetch().then(() => resolve());
+    });
+
+    // Sau khi refetch hoàn thành, gọi fetchDataByYear để lấy dữ liệu cho năm mới
+    const newData = await statsAPI.fetchDataByYear(year);
+    setMonthlyRevenueData(newData);
+    setProductRevenueData(newData);
+  };
+
   return (
     <div className="w-full mx-auto px-4">
       <h2 className="text-2xl font-bold my-4">Hi, {user.displayName}</h2>
@@ -30,9 +51,7 @@ const Dashboard = () => {
           <div className="stat-value">
             <FormattedPrice price={stats.revenue} />
           </div>
-          <div className="stat-desc">
-            {stats.oldestMonth} - {stats.newestMonth}
-          </div>
+          <div className="stat-desc"></div>
         </div>
 
         <div className="stat">
@@ -62,11 +81,20 @@ const Dashboard = () => {
         </div>
       </div>
       <div className="grid grid-cols-2 gap-4 mt-8">
-        {/* Thêm các biểu đồ vào đây */}
         <div>
-          <ChartMonthlyRevenue data={stats} />
+          <p className="text-lg font-bold">Xem thống kê doanh thu</p>
+          <select value={selectedYear} onChange={handleYearChange}>
+            <option value={new Date().getFullYear()}>Năm hiện tại</option>
+            <option value={"2021"}>Năm 2021</option>
+          </select>
+          <ChartMonthlyRevenue
+            data={monthlyRevenueData}
+            selectedYear={selectedYear}
+          />
         </div>
-        <div> </div>
+        <div>
+          <ChartProduct data={productRevenueData} />
+        </div>
       </div>
     </div>
   );

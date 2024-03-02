@@ -5,11 +5,10 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const app = express();
-const port = process.env.PORT || 3000;
+const port = process.env.PORT
 mongoose.set('strictQuery', true);
 const bodyParser = require('body-parser');
 const jwt = require('jsonwebtoken');
-const router = require("express").Router();
 //middleware
 app.use(bodyParser.json());
 app.use(cors());

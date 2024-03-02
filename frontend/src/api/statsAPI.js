@@ -19,4 +19,18 @@ export default class statsAPI {
             throw error;
         }
     }
+    static async fetchDataByMonth(selectedYear, selectedMonth) {
+        try {
+            const res = await axios.get(`${url}/${selectedYear}/${selectedMonth}`, {
+                params: {
+                    year: selectedYear,
+                    month: selectedMonth
+                }
+            });
+            return res.data;
+        } catch (error) {
+            console.error("Error fetching data by year:", error);
+            throw error;
+        }
+    }
 }

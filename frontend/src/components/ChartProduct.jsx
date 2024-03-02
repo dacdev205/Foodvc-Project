@@ -6,22 +6,23 @@ import Chart from "chart.js/auto";
 const ChartProduct = ({ data }) => {
   const chartRef = useRef(null);
   const [chartInstance, setChartInstance] = useState(null);
+
   useEffect(() => {
     let newChartInstance = null;
     if (chartInstance) {
       chartInstance.destroy();
     }
-    if (chartRef.current && data.categories) {
+    if (chartRef.current && data) {
+      // Kiểm tra nếu có dữ liệu
       const ctx = chartRef.current.getContext("2d");
-
       newChartInstance = new Chart(ctx, {
         type: "pie",
         data: {
-          labels: data.categories,
+          labels: Object.keys(data), // Sử dụng tên các danh mục làm nhãn
           datasets: [
             {
               label: "Doanh Thu",
-              data: data.monthlyRevenue.map((item) => item.totalAmount),
+              data: Object.values(data), // Sử dụng số lượng sản phẩm làm dữ liệu
               backgroundColor: [
                 "rgba(255, 99, 132, 0.2)",
                 "rgba(54, 162, 235, 0.2)",

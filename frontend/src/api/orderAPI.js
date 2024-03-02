@@ -1,5 +1,5 @@
 import axios from "axios";
-const url = "http://localhost:3000/order"
+const url = "https://foodvc-server.onrender.com/order"
 
 export default class orderAPI {
   static async getAllOrderWithEmail(email) {
@@ -23,7 +23,7 @@ export default class orderAPI {
     static async getUserOrders(userUid) {
       try {
         const userId = userUid;
-        const res = await axios.get(`http://localhost:3000/order/order-user/${userId}`);
+        const res = await axios.get(`https://foodvc-server.onrender.com/order/order-user/${userId}`);
         return res.data;
       } catch (error) {
         console.error(error);
@@ -35,7 +35,7 @@ export default class orderAPI {
       return res.data;
   }
   static async getAllOrder () {
-    const res = await axios.get(`http://localhost:3000/order/allOrder`);
+    const res = await axios.get(`https://foodvc-server.onrender.com/order/allOrder`);
     return res.data;
   }
   static async updateOrderStatus(orderId, status) {

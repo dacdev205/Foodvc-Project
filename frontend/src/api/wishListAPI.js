@@ -1,5 +1,5 @@
 import axios from "axios";
-const url = "http://localhost:3000/wish-list"
+const url = "https://foodvc-server.onrender.com/wish-list"
 
 export default class cartAPI {
   static async getAllWishList(email) {

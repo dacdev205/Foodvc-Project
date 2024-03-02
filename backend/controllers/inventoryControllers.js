@@ -41,7 +41,7 @@ module.exports = class inventoryAPI {
         const productInInventory = await Inventory.findById(productId);
         productInInventory.quantity -= quantity;
         await productInInventory.save();
-        await axios.post("http://localhost:3000/api/foodvc/add-to-menu", {
+        await axios.post("https://foodvc-server.onrender.com/api/foodvc/add-to-menu", {
           productId,
           quantity,
         });

@@ -16,11 +16,14 @@ const useOrders = () => {
       if (!email) {
         return [];
       }
-      const res = await fetch(`http://localhost:3000/order?email=${email}`, {
-        headers: {
-          authorization: `Bearer ${token}`,
-        },
-      });
+      const res = await fetch(
+        `https://foodvc-server.onrender.com/order?email=${email}`,
+        {
+          headers: {
+            authorization: `Bearer ${token}`,
+          },
+        }
+      );
       if (!res.ok) {
         return [];
       }

@@ -1,5 +1,5 @@
 import axios from "axios";
-const url = "http://localhost:3000/adminStats"
+const url = "https://foodvc-server.onrender.com/adminStats"
 
 export default class statsAPI {
     static async getAllStats(){

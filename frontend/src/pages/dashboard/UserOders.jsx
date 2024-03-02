@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import FormattedPrice from "../../components/FormatedPriece";
 import { Link } from "react-router-dom";
-const PF = "http://localhost:3000";
+const PF = "https://foodvc-server.onrender.com";
 import useOrders from "../../hooks/useOrders";
 const UserOders = () => {
   const [orders, refetch, isLoading] = useOrders();

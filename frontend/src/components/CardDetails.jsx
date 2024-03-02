@@ -22,7 +22,7 @@ const CardDetails = () => {
   const { user } = useContext(AuthContext);
   const [product, setProduct] = useState(null);
   const [reviews, setReviews] = useState([]);
-  const PF = "http://localhost:3000";
+  const PF = "https://foodvc-server.onrender.com";
   const { reset } = useForm();
   const [currentRating, setRating] = useState(0);
   const [quantityDefault, setQuantity] = useState(1);

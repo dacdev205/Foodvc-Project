@@ -24,7 +24,7 @@ const useWishList = () => {
         return [];
       }
       const res = await fetch(
-        `http://localhost:3000/wish-list?email=${email}`,
+        `https://foodvc-server.onrender.com/wish-list?email=${email}`,
         {
           headers: {
             authorization: `Bearer ${token}`,

@@ -7,7 +7,7 @@ import { Link } from "react-router-dom";
 import FormattedPrice from "../../components/FormatedPriece";
 const WishListPage = () => {
   const [wishList, refetchWishList, isLoading] = useWishList();
-  const PF = "http://localhost:3000";
+  const PF = "https://foodvc-server.onrender.com";
   const [heartFilledIds, setHeartFilledIds] = useState(
     JSON.parse(localStorage.getItem("heartFilledIds")) || []
   );

@@ -8,11 +8,14 @@ import { FaBook, FaShoppingCart } from "react-icons/fa";
 import FormattedPrice from "../../../components/FormatedPriece";
 import ChartMonthlyRevenue from "../../../components/ChartMonthlyRevenue";
 import ChartProduct from "../../../components/ChartProduct";
+// import ChartBar from "../../../components/ChartBar";
+
 import statsAPI from "../../../api/statsAPI";
 const Dashboard = () => {
   const { user } = useAuth();
   const axiosSecure = useAxiosSecure();
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+  const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
   const [monthlyRevenueData, setMonthlyRevenueData] = useState([]);
   const [productRevenueData, setProductRevenueData] = useState([]);
 
@@ -26,18 +29,16 @@ const Dashboard = () => {
   const handleYearChange = async (e) => {
     const year = parseInt(e.target.value);
     setSelectedYear(year);
-
-    // Gọi refetch để lấy dữ liệu mới từ server
-    await new Promise((resolve) => {
-      refetch().then(() => resolve());
-    });
-
     // Sau khi refetch hoàn thành, gọi fetchDataByYear để lấy dữ liệu cho năm mới
     const newData = await statsAPI.fetchDataByYear(year);
     setMonthlyRevenueData(newData);
+  };
+  const handleMonthChange = async (e) => {
+    const month = parseInt(e.target.value);
+    setSelectedMonth(month);
+    const newData = await statsAPI.fetchDataByMonth(selectedYear, month);
     setProductRevenueData(newData);
   };
-
   return (
     <div className="w-full mx-auto px-4">
       <h2 className="text-2xl font-bold my-4">Hi, {user.displayName}</h2>
@@ -91,8 +92,27 @@ const Dashboard = () => {
             data={monthlyRevenueData}
             selectedYear={selectedYear}
           />
+          <p className="text-lg font-bold">Các danh mục khác:</p>
+          {/* <ChartBar data={stats}></ChartBar> */}
         </div>
         <div>
+          <p className="text-lg font-bold">Danh mục sản phẩm bán được:</p>
+          <div>
+            <select value={selectedMonth} onChange={handleMonthChange}>
+              <option value={"1"}>Tháng 1</option>
+              <option value={"2"}>Tháng 2</option>
+              <option value={"3"}>Tháng 3</option>
+              <option value={"4"}>Tháng 4</option>
+              <option value={"5"}>Tháng 5</option>
+              <option value={"6"}>Tháng 6</option>
+              <option value={"7"}>Tháng 7</option>
+              <option value={"8"}>Tháng 8</option>
+              <option value={"9"}>Tháng 9</option>
+              <option value={"10"}>Tháng 10</option>
+              <option value={"11"}>Tháng 11</option>
+              <option value={"12"}>Tháng 12</option>
+            </select>
+          </div>
           <ChartProduct data={productRevenueData} />
         </div>
       </div>

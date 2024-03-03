@@ -13,7 +13,6 @@
 .active {
   @apply text-green;
 }
-
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
   -webkit-appearance: none;
@@ -24,10 +23,79 @@ input::-webkit-inner-spin-button {
 input[type="number"] {
   -moz-appearance: textfield;
 }
-.custom-html-content {
-  @apply prose;
-  all: unset;
-}
-.ql-content {
-  all: unset;
+/* CSS for mobile devices */
+@media only screen and (max-width: 768px) {
+  /* CartPageMobile.css */
+  .mobile-cart-items-container {
+    padding: 20px;
+  }
+  .cart-item-wrapper {
+    display: flex;
+    transition: transform 0.3s ease;
+  }
+  .cart-item {
+    display: flex;
+    align-items: center;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #eee;
+    transition: transform 0.3s ease;
+  }
+  .cart-item.editing {
+    transform: translateX(-50px);
+  }
+  .cart-item-buttons.editing {
+    transform: translateX(-25px);
+    visibility: visible;
+  }
+  .select-checkbox {
+    margin-right: 10px;
+  }
+
+  .cart-item-image img {
+    max-width: 100px;
+    height: auto;
+    border-radius: 5px;
+  }
+
+  .cart-item-details {
+    flex-grow: 1;
+    padding: 10px;
+  }
+
+  .cart-item-name {
+    font-weight: bold;
+  }
+
+  .cart-item-buttons {
+    display: flex;
+    transition: transform 0.3s ease;
+    visibility: hidden;
+    align-items: center;
+  }
+
+  .delete-button {
+    color: red;
+    cursor: pointer;
+  }
+
+  .checkout-container {
+    margin-top: 20px;
+  }
+  .checkout-total {
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+  }
+
+  .checkout-button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    display: block;
+  }
 }

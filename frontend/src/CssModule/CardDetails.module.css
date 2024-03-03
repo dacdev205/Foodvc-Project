@@ -1,0 +1,17 @@
+.customContentCardDetail ul {
+  list-style-type: disc;
+}
+.customContentCardDetail ol,
+.customContentCardDetail ul {
+  margin: unset;
+  padding: revert;
+}
+.customContentCardDetail ol {
+  list-style-type: decimal;
+}
+.customContentCardDetail h1 {
+  font-size: revert;
+}
+.customContentCardDetail h2 {
+  font-size: large;
+}

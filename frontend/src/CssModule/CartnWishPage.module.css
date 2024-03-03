@@ -1,0 +1,86 @@
+/* CSS for mobile devices */
+@media only screen and (max-width: 768px) {
+  /* CartPageMobile.css */
+  .mobileCartItemsContainer {
+    padding: 20px;
+  }
+  .cartItemWrapper {
+    display: flex;
+    transition: transform 0.3s ease;
+  }
+
+  .cartItem {
+    display: flex;
+    align-items: center;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #eee;
+    transition: transform 0.3s ease;
+  }
+  .cartItem {
+    display: flex;
+    align-items: center;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #eee;
+    transition: transform 0.3s ease;
+    &.editing {
+      transform: translateX(-50px);
+    }
+  }
+  .selectCheckbox {
+    margin-right: 10px;
+  }
+
+  .cartItemImage img {
+    max-width: 100px;
+    height: auto;
+    border-radius: 5px;
+  }
+
+  .cartItemDetails {
+    flex-grow: 1;
+    padding: 10px;
+  }
+
+  .cartItemName {
+    font-weight: bold;
+    color: black;
+  }
+
+  .cartItemButtons {
+    display: flex;
+    transition: transform 0.3s ease;
+    visibility: hidden;
+    align-items: center;
+    &.editing {
+      transform: translateX(-25px);
+      visibility: visible;
+    }
+  }
+
+  .deleteButton {
+    color: red;
+    cursor: pointer;
+  }
+
+  .checkoutContainer {
+    margin-top: 20px;
+  }
+  .checkoutTotal {
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+  }
+
+  .checkoutButton {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    display: block;
+  }
+}

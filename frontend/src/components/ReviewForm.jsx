@@ -2,7 +2,8 @@
 import React, { useContext, useState } from "react";
 import { FaStar } from "react-icons/fa";
 import { AuthContext } from "../context/AuthProvider";
-import "../style.css";
+import styles from "../CssModule/ReviewForm.module.css";
+
 const ReviewForm = ({ productId, userId, userName, onSubmit }) => {
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState("");
@@ -92,7 +93,7 @@ const ReviewForm = ({ productId, userId, userName, onSubmit }) => {
               </div>
               <div className="form-control">
                 <textarea
-                  className="textarea-content mt-3"
+                  className={styles.textareaContent}
                   rows={10}
                   value={comment}
                   placeholder="Mời bạn chia sẻ cảm nhận..."

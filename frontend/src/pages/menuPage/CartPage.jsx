@@ -1,4 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
+import styles from "../../CssModule/CartnWishPage.module.css";
 import useCart from "../../hooks/useCart";
 import { FaTrash } from "react-icons/fa";
 import cartAPI from "../../api/cartAPI";
@@ -362,107 +363,116 @@ const CartPage = () => {
             {/* End PC devices */}
 
             {/* Mobile Devices */}
-            <div className="md:hidden mobile-cart-items-container">
-              <div className="flex justify-between">
-                <div className="mb-8">
-                  <input
-                    type="checkbox"
-                    checked={selectAll}
-                    onChange={toggleSelectAll}
-                  />{" "}
-                  <span className="text-black">Chọn toàn bộ</span>
-                </div>
-                <button
-                  className="btn btn-sm bg-slate-200 text-black hover:bg-slate-300"
-                  onClick={handleEditClick}
-                >
-                  {isEditing ? "Xong" : "Sửa"}
-                </button>
-              </div>
-              {cart.map((item, index) => (
-                <div className="cart-item-wrapper" key={index}>
-                  <div className={`cart-item ${isEditing ? "editing" : ""}`}>
+            <div className="md:hidden">
+              <div className={styles.mobileCartItemsContainer}>
+                <div className="flex justify-between">
+                  <div className="mb-8">
                     <input
                       type="checkbox"
-                      checked={selectedItems.includes(item._id)}
-                      onChange={() => toggleItemSelection(item._id)}
-                      className="select-checkbox"
-                    />
-                    <div className="cart-item-image">
-                      <Link to={`/product/${item._id}`}>
-                        <img src={PF + "/" + item.image} alt="product" />
-                      </Link>
-                    </div>
-                    <div className="cart-item-details">
-                      <div className="cart-item-name text-black">
-                        {item.name.slice(0, 20)}...
-                      </div>
-                      <div className="cart-item-price text-black">
-                        {/* <FormattedPrice price={calculatePrice(item)} /> */}
-                        {originalPrices[item._id] && (
-                          <span className="original-price">
-                            {formattedPrice(originalPrices[item._id])}
-                          </span>
-                        )}
-                      </div>
-                      <div>
-                        <button
-                          className="btn btn-xs bg-slate-200 hover:bg-slate-300 text-black"
-                          onClick={() => handleDecrease(item)}
-                        >
-                          -
-                        </button>
-                        <input
-                          type="number"
-                          value={item.quantity}
-                          onChange={(e) =>
-                            handleQuantityChange(item, parseInt(e.target.value))
-                          }
-                          className="w-10 mx-2 text-center overflow-hidden appearance-none text-black"
-                        />
-                        <button
-                          onClick={() => handleIncrease(item)}
-                          className="btn btn-xs bg-slate-200 hover:bg-slate-300 text-black"
-                        >
-                          +
-                        </button>
-                      </div>
-                    </div>
+                      checked={selectAll}
+                      onChange={toggleSelectAll}
+                    />{" "}
+                    <span className="text-black">Chọn toàn bộ</span>
                   </div>
-                  <div
-                    className={`cart-item-buttons ${
-                      isEditing ? "editing" : ""
-                    }`}
+                  <button
+                    className="btn btn-sm bg-slate-200 text-black hover:bg-slate-300"
+                    onClick={handleEditClick}
                   >
-                    <button
-                      className="delete-button"
-                      onClick={() => handleDelete(item)}
-                    >
-                      <FaTrash></FaTrash>
-                    </button>
-                  </div>
+                    {isEditing ? "Xong" : "Sửa"}
+                  </button>
                 </div>
-              ))}
-              <div className="checkout-container">
-                <div className="md:w-2/2 space-y-3">
-                  <div className="flex items-center">
-                    <p className="text-lg text-black">
-                      Tổng thanh toán ({selectedItems.length} Sản phẩm):{" "}
-                    </p>
-                    <FormattedPrice
-                      className="text-green text-lg"
-                      price={orderTotal.toFixed(2)}
-                    />
-                  </div>
-                  <Link to={"/check-out"}>
-                    <button
-                      className="btn bg-green text-white px-5 w-full hover:bg-green hover:opacity-80"
-                      disabled={selectedItems.length === 0}
-                      onClick={handleCheckOut}
+                {cart.map((item, index) => (
+                  <div className={styles.cartItemWrapper} key={index}>
+                    <div
+                      className={`${styles.cartItem} ${
+                        isEditing ? styles.editing : ""
+                      }`}
                     >
-                      Mua hàng
-                    </button>
-                  </Link>
+                      <input
+                        type="checkbox"
+                        checked={selectedItems.includes(item._id)}
+                        onChange={() => toggleItemSelection(item._id)}
+                        className={styles.selectCheckbox}
+                      />
+                      <div className={styles.cartItemImage}>
+                        <Link to={`/product/${item._id}`}>
+                          <img src={PF + "/" + item.image} alt="product" />
+                        </Link>
+                      </div>
+                      <div className={styles.cartItemDetails}>
+                        <div className={styles.cartItemName}>
+                          {item.name.slice(0, 20)}...
+                        </div>
+                        <div className="text-black">
+                          {/* <FormattedPrice price={calculatePrice(item)} /> */}
+                          {originalPrices[item._id] && (
+                            <span className="original-price">
+                              {formattedPrice(originalPrices[item._id])}
+                            </span>
+                          )}
+                        </div>
+                        <div>
+                          <button
+                            className="btn btn-xs bg-slate-200 hover:bg-slate-300 text-black"
+                            onClick={() => handleDecrease(item)}
+                          >
+                            -
+                          </button>
+                          <input
+                            type="number"
+                            value={item.quantity}
+                            onChange={(e) =>
+                              handleQuantityChange(
+                                item,
+                                parseInt(e.target.value)
+                              )
+                            }
+                            className="w-10 mx-2 text-center overflow-hidden appearance-none text-black"
+                          />
+                          <button
+                            onClick={() => handleIncrease(item)}
+                            className="btn btn-xs bg-slate-200 hover:bg-slate-300 text-black"
+                          >
+                            +
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      className={`${styles.cartItemButtons} ${
+                        isEditing ? styles.editing : ""
+                      }`}
+                    >
+                      <button
+                        className={styles.deleteButton}
+                        onClick={() => handleDelete(item)}
+                      >
+                        <FaTrash></FaTrash>
+                      </button>
+                    </div>
+                  </div>
+                ))}
+                <div className={styles.checkoutContainer}>
+                  <div className="md:w-2/2 space-y-3">
+                    <div className="flex items-center">
+                      <p className="text-lg text-black">
+                        Tổng thanh toán ({selectedItems.length} Sản phẩm):{" "}
+                      </p>
+                      <FormattedPrice
+                        className="text-green text-lg"
+                        price={orderTotal.toFixed(2)}
+                      />
+                    </div>
+                    <Link to={"/check-out"}>
+                      <button
+                        className="btn bg-green text-white px-5 w-full hover:bg-green hover:opacity-80"
+                        disabled={selectedItems.length === 0}
+                        onClick={handleCheckOut}
+                      >
+                        Mua hàng
+                      </button>
+                    </Link>
+                  </div>
                 </div>
               </div>
             </div>

@@ -166,7 +166,7 @@ const Navbar = () => {
                 onClick={() =>
                   document.getElementById("modal-login").showModal()
                 }
-                className="btn flex items-center gap-22 rounded-full px-6 bg-green text-white"
+                className="btn flex items-center gap-22 rounded-full px-6 bg-green text-white hover:bg-green hover:opacity-80"
               >
                 <FaUser /> Đăng nhập
               </button>

@@ -1,6 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useContext, useEffect, useRef, useState } from "react";
 import { Link, useParams, useNavigate } from "react-router-dom";
+import styles from "../CssModule/CardDetails.module.css";
 import menuAPI from "../api/menuAPI";
 import reviewAPI from "../api/reviewAPI";
 import ReviewForm from "../components/ReviewForm";
@@ -476,7 +477,7 @@ const CardDetails = () => {
             </tbody>
           </table>
           <h1 className="title font-bold mt-3">Chi tiết sản phẩm</h1>
-          <div className="custom-html-content">
+          <div className={styles.customContentCardDetail}>
             <div
               dangerouslySetInnerHTML={{
                 __html: isExpanded

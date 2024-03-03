@@ -6,13 +6,11 @@ import { AuthContext } from "../context/AuthProvider";
 import cartAPI from "../api/cartAPI";
 import wishListAPI from "../api/wishListAPI";
 import Swal from "sweetalert2";
-import "../style.css";
 import reviewAPI from "../api/reviewAPI";
 import useCart from "../hooks/useCart";
 import useWishList from "../hooks/useWishList";
 
 import { FaStar } from "react-icons/fa";
-import menuAPI from "../api/menuAPI";
 const Cards = ({ item }) => {
   const {
     name,

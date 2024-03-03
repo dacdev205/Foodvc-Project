@@ -89,7 +89,6 @@ const CartPage = () => {
   //handleDelete(item)
   const handleDelete = async (item) => {
     try {
-      // call deleteProduct
       await cartAPI.deleteProduct(item._id);
       Swal.fire({
         position: "center",

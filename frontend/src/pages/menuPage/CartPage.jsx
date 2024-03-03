@@ -17,6 +17,7 @@ const CartPage = () => {
   const [originalPrices, setOriginalPrices] = useState({});
   const [selectedItems, setSelectedItems] = useState([]);
   const [selectAll, setSelectAll] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
   const toggleSelectAll = () => {
     if (selectAll) {
       setSelectedItems([]);
@@ -100,6 +101,9 @@ const CartPage = () => {
     } catch (error) {
       console.error("Error deleting product:", error);
     }
+  };
+  const handleEditClick = () => {
+    setIsEditing(!isEditing);
   };
   const handleQuantityChange = async (item, newQuantity) => {
     try {
@@ -196,12 +200,6 @@ const CartPage = () => {
     refetchCart();
   };
 
-  useEffect(() => {
-    if (!isLoading) {
-      console.log();
-    }
-  }, [isLoading, cart]);
-
   if (isLoading) {
     return (
       <div>
@@ -242,11 +240,12 @@ const CartPage = () => {
         {/* table for the cart */}
         {cart.length ? (
           <div>
+            {/* PC devices */}
             <div className="overflow-x-auto">
-              <table className="table">
+              <table className="hidden md:table">
                 {/* head */}
                 <thead className="bg-green text-white rounded-sm ">
-                  <tr>
+                  <tr className="text-white">
                     <th>
                       <div className="flex ">
                         <input
@@ -341,7 +340,7 @@ const CartPage = () => {
               </table>
             </div>
 
-            <div className="my-12 flex flex-col md:flex-row justify-end ">
+            <div className="hidden md:flex my-12 flex-col md:flex-row justify-end ">
               <div className="md:w-2/2 space-y-3">
                 <div className="flex items-center">
                   <p className="text-lg">
@@ -363,6 +362,111 @@ const CartPage = () => {
                 </Link>
               </div>
             </div>
+            {/* End PC devices */}
+
+            {/* Mobile Devices */}
+            <div className="md:hidden mobile-cart-items-container">
+              <div className="flex justify-between">
+                <div className="mb-8">
+                  <input
+                    type="checkbox"
+                    checked={selectAll}
+                    onChange={toggleSelectAll}
+                  />{" "}
+                  <span>Chọn toàn bộ</span>
+                </div>
+                <button className="btn btn-sm" onClick={handleEditClick}>
+                  {isEditing ? "Xong" : "Sửa"}
+                </button>
+              </div>
+              {cart.map((item, index) => (
+                <div className="cart-item-wrapper" key={index}>
+                  <div className={`cart-item ${isEditing ? "editing" : ""}`}>
+                    <input
+                      type="checkbox"
+                      checked={selectedItems.includes(item._id)}
+                      onChange={() => toggleItemSelection(item._id)}
+                      className="select-checkbox"
+                    />
+                    <div className="cart-item-image">
+                      <Link to={`/product/${item._id}`}>
+                        <img src={PF + "/" + item.image} alt="product" />
+                      </Link>
+                    </div>
+                    <div className="cart-item-details">
+                      <div className="cart-item-name">
+                        {item.name.slice(0, 20)}...
+                      </div>
+                      <div className="cart-item-price">
+                        <FormattedPrice price={calculatePrice(item)} />
+                        {originalPrices[item._id] && (
+                          <span className="original-price">
+                            {formattedPrice(originalPrices[item._id])}
+                          </span>
+                        )}
+                      </div>
+                      <div>
+                        <button
+                          className="btn btn-xs"
+                          onClick={() => handleDecrease(item)}
+                        >
+                          -
+                        </button>
+                        <input
+                          type="number"
+                          value={item.quantity}
+                          onChange={(e) =>
+                            handleQuantityChange(item, parseInt(e.target.value))
+                          }
+                          className="w-10 mx-2 text-center overflow-hidden appearance-none"
+                        />
+                        <button
+                          onClick={() => handleIncrease(item)}
+                          className="btn btn-xs"
+                        >
+                          +
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  <div
+                    className={`cart-item-buttons ${
+                      isEditing ? "editing" : ""
+                    }`}
+                  >
+                    <button
+                      className="delete-button"
+                      onClick={() => handleDelete(item)}
+                    >
+                      <FaTrash></FaTrash>
+                    </button>
+                  </div>
+                </div>
+              ))}
+              <div className="checkout-container">
+                <div className="md:w-2/2 space-y-3">
+                  <div className="flex items-center">
+                    <p className="text-lg">
+                      Tổng thanh toán ({selectedItems.length} Sản phẩm):{" "}
+                    </p>
+                    <FormattedPrice
+                      className="text-green text-lg"
+                      price={orderTotal.toFixed(2)}
+                    />
+                  </div>
+                  <Link to={"/check-out"}>
+                    <button
+                      className="btn bg-green text-white px-5 w-full"
+                      disabled={selectedItems.length === 0}
+                      onClick={handleCheckOut}
+                    >
+                      Mua hàng
+                    </button>
+                  </Link>
+                </div>
+              </div>
+            </div>
+            {/*End Mobile Devices */}
           </div>
         ) : (
           ""

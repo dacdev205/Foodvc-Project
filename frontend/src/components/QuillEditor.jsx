@@ -4,7 +4,11 @@ import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 
 const QuillEditor = ({ defaultValue, onChange }) => {
-  return <ReactQuill defaultValue={defaultValue} onChange={onChange} />;
+  return (
+    <div className="text-black">
+      <ReactQuill defaultValue={defaultValue} onChange={onChange} />
+    </div>
+  );
 };
 
 export default QuillEditor;

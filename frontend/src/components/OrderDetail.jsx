@@ -41,7 +41,7 @@ const OrderDetail = () => {
     <div className="section-container">
       {order && (
         <div className="rounded px-8 pt-6 pb-8 mb-4">
-          <div className="bg-white">
+          <div className="bg-white text-black">
             <h2 className="text-2xl font-semibold mb-4">Chi tiết đơn hàng</h2>
             <p>
               <strong>Họ và tên:</strong> {order.address.fullName}

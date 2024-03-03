@@ -31,16 +31,24 @@ const Navbar = () => {
   const navItem = (
     <>
       <li>
-        <Link to="/">Trang chủ</Link>
+        <Link className="active-link" to="/">
+          Trang chủ
+        </Link>
       </li>
       <li>
-        <Link to="/menu">Menu</Link>
+        <Link className="active-link" to="/menu">
+          Menu
+        </Link>
       </li>
       <li>
-        <Link to="/about">Chúng tôi</Link>
+        <Link className="active-link" to="/about">
+          Chúng tôi
+        </Link>
       </li>
       <li>
-        <Link to="/blog">Blogs</Link>
+        <Link className="active-link" to="/blog">
+          Blogs
+        </Link>
       </li>
     </>
   );
@@ -81,7 +89,7 @@ const Navbar = () => {
             </div>
             <ul
               tabIndex={0}
-              className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow rounded-box w-52 bg-white"
+              className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow rounded-box w-52 "
             >
               {navItem}
             </ul>
@@ -94,10 +102,10 @@ const Navbar = () => {
         </div>
 
         <div className="navbar-center hidden lg:flex">
-          <ul className="menu menu-horizontal px-1 bg-white">{navItem}</ul>
+          <ul className="menu menu-horizontal px-1 text-black ">{navItem}</ul>
         </div>
 
-        <div className="navbar-end">
+        <div className="navbar-end text-black">
           {/* wish start */}
           <Link to="wish-list">
             <label

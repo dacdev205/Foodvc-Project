@@ -52,11 +52,11 @@ const ManageMenu = () => {
 
   return (
     <div className="w-full md:w-[870px] px-4 mx-auto">
-      <h2 className="text-2xl font-semibold my-4">
+      <h2 className="text-2xl font-semibold my-4 text-black">
         Quản lý tất cả <span className="text-green">sản phẩm</span>
       </h2>
       <div className="flex items-center my-2">
-        <label htmlFor="search" className="mr-2">
+        <label htmlFor="search" className="mr-2 text-black">
           Tìm kiếm theo tên:
         </label>
         <input
@@ -65,14 +65,14 @@ const ManageMenu = () => {
           placeholder="Nhập tên sản phẩm"
           value={searchTerm}
           onChange={handleSearch}
-          className="border p-2 rounded-md"
+          className="border p-2 rounded-md text-black"
         />
       </div>
       <div>
         <div className="overflow-x-auto">
           <table className="table">
             <thead>
-              <tr>
+              <tr className="text-black">
                 <th onClick={() => handleSort("name")}>#</th>
                 <th>Hình ảnh</th>
                 <th onClick={() => handleSort("name")}>Tên sản phẩm</th>
@@ -87,7 +87,7 @@ const ManageMenu = () => {
             </thead>
             <tbody>
               {currentMenu.map((item, index) => (
-                <tr key={index}>
+                <tr key={index} className="text-black">
                   <th>{index + 1}</th>
                   <td>
                     <div className="avatar">

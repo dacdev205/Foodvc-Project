@@ -115,12 +115,12 @@ const AddVoucher = () => {
 
   return (
     <div className="w-full md:w-[870px] px-4 mx-auto">
-      <h2 className="text-2xl font-semibold my-4">
+      <h2 className="text-2xl font-semibold my-4 text-black">
         Thêm giảm giá cho <span className="text-green">sản phẩm</span>
       </h2>
       <div>
         <div className="flex items-center">
-          <label>Loại Hàng/Mặt Hàng:</label>
+          <label className="text-black">Loại Hàng/Mặt Hàng:</label>
           <select
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
@@ -133,7 +133,7 @@ const AddVoucher = () => {
             ))}
           </select>
           <div className="flex items-center my-2 ml-5">
-            <label htmlFor="search" className="mr-2">
+            <label htmlFor="search" className="mr-2 text-black">
               Tìm kiếm theo tên:
             </label>
             <input
@@ -142,16 +142,16 @@ const AddVoucher = () => {
               placeholder="Nhập tên sản phẩm"
               value={searchTerm}
               onChange={handleSearch}
-              className="border p-2 rounded-md"
+              className="border p-2 rounded-md text-black"
             />
           </div>
         </div>
         <div className="flex items-center">
           <div>
-            <label>Phần Trăm Giảm Giá:</label>
+            <label className="text-black">Phần Trăm Giảm Giá:</label>
             <input
               type="number"
-              className="border p-2 rounded-md"
+              className="border p-2 rounded-md text-black"
               placeholder="VD: 5(%)"
               value={discountPercentage}
               onChange={(e) => {
@@ -163,7 +163,7 @@ const AddVoucher = () => {
             />
           </div>
           <button
-            className="btn btn-ghost bg-green text-white ml-10"
+            className="btn btn-ghost bg-green text-white ml-10 hover:bg-green hover:opacity-80"
             onClick={handleApplyVoucher}
           >
             Áp Dụng Voucher
@@ -175,7 +175,7 @@ const AddVoucher = () => {
         <div className="overflow-x-auto">
           <table className="table ">
             <thead>
-              <tr>
+              <tr className="text-black">
                 <th>#</th>
                 <th>Stt</th>
                 <th>Hình ảnh</th>
@@ -193,7 +193,7 @@ const AddVoucher = () => {
             </thead>
             <tbody>
               {currentMenu.map((item, index) => (
-                <tr key={index}>
+                <tr key={index} className="text-black">
                   <td>
                     <input
                       type="checkbox"

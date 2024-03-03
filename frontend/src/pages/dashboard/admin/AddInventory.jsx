@@ -38,7 +38,7 @@ const AddInventory = () => {
 
   return (
     <div className="w-full md:w-[870px] px-4 mx-auto">
-      <h2 className="text-2xl font-semibold my-4">
+      <h2 className="text-2xl font-semibold my-4 text-black">
         Thêm sản phẩm mới vào <span className="text-green">kho</span>
       </h2>
 
@@ -46,25 +46,24 @@ const AddInventory = () => {
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="form-control">
             <label className="label">
-              <span className="label-text">Tên sản phẩm*</span>
+              <span className="label-text text-black">Tên sản phẩm*</span>
             </label>
             <input
               type="text"
               {...register("name", { required: true })}
               placeholder="VD: Gà ủ muối"
-              className="input input-bordered w-full"
+              className="input input-bordered w-full text-black"
             />
           </div>
 
           <div className="flex gap-4">
             <div className="form-control w-full">
               <label className="label">
-                <span className="label-text">Loại sản phẩm*</span>
+                <span className="label- text-black">Loại sản phẩm*</span>
               </label>
               <select
                 {...register("category", { required: true })}
                 className="select select-bordered w-full"
-                defaultValue=""
               >
                 <option value="">Chọn loại sản phẩm</option>
                 <option value="protein">THỊT, CÁ, TRỨNG, HẢI SẢN</option>
@@ -78,25 +77,25 @@ const AddInventory = () => {
 
             <div className="form-control w-1/2">
               <label className="label">
-                <span className="label-text">Giá*</span>
+                <span className="label-text text-black">Giá*</span>
               </label>
               <input
                 type="number"
                 {...register("price", { required: true })}
                 placeholder="VD: 200000"
-                className="input input-bordered w-full"
+                className="input input-bordered w-full text-black "
               />
             </div>
 
             <div className="form-control w-1/2">
               <label className="label">
-                <span className="label-text">Số lượng*</span>
+                <span className="label-text text-black">Số lượng*</span>
               </label>
               <input
                 type="number"
                 {...register("quantity", { required: true })}
                 placeholder="VD: 1"
-                className="input input-bordered w-full"
+                className="input input-bordered w-full text-black"
               />
             </div>
           </div>
@@ -104,43 +103,44 @@ const AddInventory = () => {
           <div className="flex gap-4">
             <div className="form-control w-full">
               <label className="label">
-                <span className="label-text">Thương hiệu</span>
+                <span className="label-text text-black">Thương hiệu</span>
               </label>
               <input
                 type="text"
                 {...register("brand")}
                 placeholder="VD: CÔNG TY TNHH EMIVEST FEEDMILL VIỆT NAM"
-                className="input input-bordered w-full"
+                className="input input-bordered w-full text-black"
               />
             </div>
 
             <div className="form-control w-full">
               <label className="label">
-                <span className="label-text">Nơi sản xuất</span>
+                <span className="label-text text-black">Nơi sản xuất</span>
               </label>
               <input
                 type="text"
                 {...register("productionLocation")}
                 placeholder="VD: Việt Nam"
-                className="input input-bordered w-full"
+                className="input input-bordered w-full text-black"
               />
             </div>
 
             <div className="form-control w-full">
               <label className="label">
-                <span className="label-text">Hướng dẫn sử dụng</span>
+                <span className="label-text text-black">Hướng dẫn sử dụng</span>
               </label>
               <input
                 {...register("instructions")}
                 placeholder="VD: Để với nhiệt độ dưới 20 độ C"
-                className="input input-bordered w-full"
+                className="input input-bordered w-full text-black"
+                type="text"
               />
             </div>
           </div>
 
           <div className="form-control">
             <label className="label">
-              <span className="label-text">Thông tin sản phẩm</span>
+              <span className="label-text text-black">Thông tin sản phẩm</span>
             </label>
             <QuillEditor
               defaultValue=""
@@ -150,7 +150,7 @@ const AddInventory = () => {
 
           <div className="form-control">
             <label className="label">
-              <span className="label-text">Hình ảnh sản phẩm*</span>
+              <span className="label-text text-black">Hình ảnh sản phẩm*</span>
             </label>
             <input
               {...register("image", { required: true })}

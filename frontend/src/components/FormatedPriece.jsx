@@ -20,7 +20,7 @@ const FormattedPrice = ({ price }) => {
   };
 
   return (
-    <span className="">
+    <span className="text-black">
       {formattedPrice()} <span>₫</span>
     </span>
   );

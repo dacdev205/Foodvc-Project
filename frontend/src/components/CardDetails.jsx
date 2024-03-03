@@ -8,7 +8,6 @@ import { AuthContext } from "../context/AuthProvider";
 import cartAPI from "../api/cartAPI";
 import Swal from "sweetalert2";
 import { IoIosArrowUp, IoIosArrowDown } from "react-icons/io";
-import "../style.css";
 import { FaStar, FaRegStar, FaStarHalf } from "react-icons/fa";
 import { useForm } from "react-hook-form";
 import inventoryAPI from "../api/inventoryAPI";
@@ -381,7 +380,7 @@ const CardDetails = () => {
                 <div>
                   <span>Số lượng: </span>
                   <button
-                    className="btn btn-xs "
+                    className="btn btn-xs text-black bg-slate-200 hover:bg-slate-300 "
                     onClick={() => handleDecrease()}
                   >
                     -
@@ -390,11 +389,11 @@ const CardDetails = () => {
                     type="number"
                     value={quantityDefault}
                     onChange={handleInputChange}
-                    className="valueQuantity w-10 mx-2 text-center overflow-hidden appearance-none"
+                    className="valueQuantity w-10 mx-2 text-center overflow-hidden appearance-none "
                   />
                   <button
                     onClick={() => handleIncrease()}
-                    className="btn btn-xs"
+                    className="btn btn-xs text-black bg-slate-200 hover:bg-slate-300 "
                   >
                     +
                   </button>
@@ -403,15 +402,17 @@ const CardDetails = () => {
                   </span>
                 </div>
                 <button
-                  className="mt-3 btn bg-green text-white "
+                  className="mt-3 btn bg-green text-white hover:bg-green hover:opacity-80"
                   onClick={() => handleAddToCart(product)}
                   disabled={product.quantity === 0}
                 >
                   Thêm vào giỏ hàng
                 </button>
                 <button
-                  className={`mt-10 ml-3 btn bg-green text-white ${
-                    product.quantity === 0 ? "cursor-not-allowed" : ""
+                  className={`mt-10 ml-3 btn bg-green text-white hover:bg-green hover:opacity-80${
+                    product.quantity === 0
+                      ? "cursor-not-allowed text-black"
+                      : ""
                   }`}
                   onClick={handleCheckOutNow}
                   disabled={product.quantity === 0}

@@ -85,7 +85,7 @@ const UpdateMenu = () => {
 
   return (
     <div className="w-full md:w-[870px] px-4 mx-auto">
-      <h2 className="text-2xl font-semibold my-4">
+      <h2 className="text-2xl font-semibold my-4 text-black">
         Chỉnh sửa chi tiết <span className="text-green">sản phẩm</span>
       </h2>
 
@@ -95,14 +95,14 @@ const UpdateMenu = () => {
             {/* ... other form controls ... */}
             <div className="form-control w-full">
               <label className="label">
-                <span className="label-text">Recipe Name*</span>
+                <span className="label-text text-black">Tên sản phẩm*</span>
               </label>
               <input
                 type="text"
                 defaultValue={product.name}
                 {...register("name", { required: true })}
                 placeholder="Recipe Name"
-                className="input input-bordered w-full "
+                className="input input-bordered w-full text-black"
               />
             </div>
 
@@ -111,49 +111,46 @@ const UpdateMenu = () => {
               {/* categories */}
               <div className="form-control w-full my-6">
                 <label className="label">
-                  <span className="label-text">Category*</span>
+                  <span className="label-text text-black">Loại*</span>
                 </label>
                 <select
                   {...register("category", { required: true })}
                   className="select select-bordered"
                   defaultValue={product.category}
                 >
-                  <option disabled value="default">
-                    Select a category
-                  </option>
                   <option value="vegetable">RAU CỦ, NẤM, TRÁI CÂY</option>
                   <option value="protein">THỊT, CÁ, TRỨNG, HẢI SẢN</option>
                   <option value="soup">MÌ, MIẾN, CHÁO, PHỞ</option>
                   <option value="milk">SỮA CÁC LOẠI</option>
                   <option value="drinks">BIA, NƯỚC GIẢI KHÁT</option>
-                  <option value="popular">Popular</option>
+                  <option value="popular">NỔI BẬT</option>
                 </select>
               </div>
 
               {/* prices */}
               <div className="form-control w-50">
                 <label className="label">
-                  <span className="label-text">Price*</span>
+                  <span className="label-text text-black">Giá*</span>
                 </label>
                 <input
                   type="number"
                   defaultValue={product.price}
                   {...register("price", { required: true })}
                   placeholder="Price"
-                  className="input input-bordered w-full"
+                  className="input input-bordered w-full text-black"
                 />
               </div>
               {/* quantity */}
               <div className="form-control w-50">
                 <label className="label">
-                  <span className="label-text">Quantity*</span>
+                  <span className="label-text text-black">Số lượng*</span>
                 </label>
                 <input
                   type="number"
                   defaultValue={product.quantity}
                   {...register("quantity", { required: true })}
                   placeholder="Quantity"
-                  className="input input-bordered w-full"
+                  className="input input-bordered w-full text-black"
                 />
               </div>
             </div>
@@ -161,7 +158,7 @@ const UpdateMenu = () => {
             {/* 3rd row - Use QuillEditor component */}
             <div className="form-control">
               <label className="label">
-                <span className="label-text">Recipe Details</span>
+                <span className="label-text text-black">Chi tiết sản phẩm</span>
               </label>
               <QuillEditor
                 defaultValue={product.recipe}
@@ -172,41 +169,44 @@ const UpdateMenu = () => {
             {/* 4th row */}
             <div className="form-control w-full my-6">
               <label className="label">
-                <span className="label-text">Brand</span>
+                <span className="label-text text-black">Thương hiệu</span>
               </label>
               <input
                 type="text"
                 defaultValue={product.brand}
                 {...register("brand")}
                 placeholder="Brand"
-                className="input input-bordered w-full"
+                className="input input-bordered w-full text-black"
               />
             </div>
 
             {/* 5th row */}
             <div className="form-control w-full my-6">
               <label className="label">
-                <span className="label-text">Production Location</span>
+                <span className="label-text text-black">
+                  Production Location
+                </span>
               </label>
               <input
                 type="text"
                 defaultValue={product.productionLocation}
                 {...register("productionLocation")}
                 placeholder="Production Location"
-                className="input input-bordered w-full"
+                className="input input-bordered w-full text-black"
               />
             </div>
 
             {/* 6th row */}
             <div className="form-contro w-full">
               <label className="label">
-                <span className="label-text">Instructions</span>
+                <span className="label-text text-black">Instructions</span>
               </label>
               <input
                 defaultValue={product.instructions}
                 {...register("instructions")}
                 placeholder="Instructions"
-                className="textarea textarea-bordered w-full"
+                type="text"
+                className="textarea textarea-bordered w-full text-black"
               />
             </div>
 
@@ -219,7 +219,7 @@ const UpdateMenu = () => {
               />
             </div>
 
-            <button className="btn bg-green text-white px-6">
+            <button className="btn bg-green text-white px-6 hover:bg-green hover:opacity-80">
               Update Item <FaUtensils />
             </button>
           </form>

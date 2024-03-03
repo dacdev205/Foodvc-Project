@@ -53,16 +53,13 @@ const Users = () => {
   return (
     <div>
       <div>
-        <h2 className="text-2xl font-semibold my-4">
+        <h2 className="text-2xl font-semibold my-4 text-black">
           Quản lý tất cả <span className="text-green">người dùng</span>
         </h2>
-        <h5>Tổng số người dùng: {users.length}</h5>
+        <h5 className="text-black">Tổng số người dùng: {users.length}</h5>
       </div>
 
       <div className="flex items-center my-2">
-        <label htmlFor="filterType" className="mr-2">
-          Filter by:
-        </label>
         <select
           id="filterType"
           value={filterType}
@@ -73,7 +70,7 @@ const Users = () => {
           <option value="role">Chức vụ</option>
         </select>
         <div className="flex items-center justify-center">
-          <p className="ml-3">
+          <p className="ml-3 text-black">
             <FaSearch />
           </p>
           <input
@@ -81,13 +78,13 @@ const Users = () => {
             placeholder={`Search by ${filterType === "name" ? "name" : "role"}`}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="border p-2 rounded-md ml-1"
+            className="border p-2 rounded-md ml-1 "
           />
         </div>
       </div>
 
-      <div className="overflow-x-auto">
-        <table className="table table-zebra md:w-[870px]">
+      <div className="overflow-x-auto ">
+        <table className="table md:w-[870px]">
           <thead className="bg-green text-white rounded-lg">
             <tr>
               <th>#</th>
@@ -97,7 +94,7 @@ const Users = () => {
               <th>Xóa</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody className="text-black">
             {currentUsers.map((user, index) => (
               <tr key={index}>
                 <th>{index + 1 + indexOfFirstItem}</th>
@@ -108,7 +105,7 @@ const Users = () => {
                     "Admin"
                   ) : (
                     <button
-                      className="btn btn-xs"
+                      className="btn btn-xs bg-white hover:bg-slate-300 text-green"
                       onClick={() => handleMakeAdmin(user)}
                     >
                       <GrUserAdmin />
@@ -118,7 +115,7 @@ const Users = () => {
                 <td>
                   <button
                     onClick={() => handleDelete(user)}
-                    className="btn btn-xs"
+                    className="btn btn-xs bg-white hover:bg-slate-300 text-red"
                   >
                     <FaTrash />
                   </button>

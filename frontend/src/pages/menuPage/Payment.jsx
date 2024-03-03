@@ -317,7 +317,7 @@ const Payment = () => {
                   </span>
                 </div>
                 <button
-                  className="btn bg-green text-white px-5 w-full"
+                  className="btn bg-green text-white hover:bg-green hover:opacity-80 px-5 w-full"
                   onClick={handleBuyItem}
                 >
                   Đặt hàng

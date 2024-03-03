@@ -210,7 +210,7 @@ const Cards = ({ item }) => {
         </div>
 
         <button
-          className="btn bg-green text-white "
+          className="btn bg-green text-white hover:bg-green hover:opacity-80"
           onClick={() => handleAddToCart()}
           disabled={item.quantity === 0}
         >

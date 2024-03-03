@@ -16,6 +16,11 @@
   font-size: large;
 }
 
+.ql-container.ql-snow {
+  border: 1px solid #ccc !important;
+  border-radius: 5px !important;
+}
+
 /* Thêm gradient và blur cho nội dung thu gọn */
 .collapsed-content {
   background: linear-gradient(rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.5));
@@ -42,6 +47,7 @@
   box-sizing: border-box;
   border: 2px solid #ccc;
   border-radius: 4px;
+  background-color: #fff;
   font-size: 16px;
   resize: none;
 }

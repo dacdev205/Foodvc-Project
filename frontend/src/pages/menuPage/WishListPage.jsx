@@ -124,19 +124,20 @@ const WishListPage = () => {
                 </tbody>
               </table>
             </div>
+
             {/* Mobile Devices */}
             <div className="md:hidden mobile-cart-items-container">
               {wishList.map((item, index) => (
                 <div className="flex justify-between" key={index}>
                   <div className="cart-item">
-                    <div className="p-3">{index + 1} </div>
+                    <div className="p-3 text-black">{index + 1} </div>
                     <div className="cart-item-image">
                       <Link to={`/product/${item._id}`}>
                         <img src={PF + "/" + item.image} alt="product" />
                       </Link>
                     </div>
                     <div className="cart-item-details">
-                      <div className="cart-item-name">
+                      <div className="cart-item-name text-black">
                         {item.name.slice(0, 20)}...
                       </div>
                       <FormattedPrice price={item.price} />

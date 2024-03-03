@@ -294,7 +294,7 @@ const CartPage = () => {
                       <td className="text-center">
                         <div>
                           <button
-                            className="btn btn-xs"
+                            className="btn btn-xs bg-slate-200 hover:bg-slate-300 text-black"
                             onClick={() => handleDecrease(item)}
                           >
                             -
@@ -312,7 +312,7 @@ const CartPage = () => {
                           />
                           <button
                             onClick={() => handleIncrease(item)}
-                            className="btn btn-xs"
+                            className="btn btn-xs bg-slate-200 hover:bg-slate-300 text-black"
                           >
                             +
                           </button>
@@ -343,13 +343,10 @@ const CartPage = () => {
             <div className="hidden md:flex my-12 flex-col md:flex-row justify-end ">
               <div className="md:w-2/2 space-y-3">
                 <div className="flex items-center">
-                  <p className="text-lg">
+                  <p className="text-lg text-black">
                     Tổng thanh toán ({selectedItems.length} Sản phẩm):{" "}
                   </p>
-                  <FormattedPrice
-                    className="text-green text-lg"
-                    price={orderTotal.toFixed(2)}
-                  />
+                  <FormattedPrice price={orderTotal.toFixed(2)} />
                 </div>
                 <Link to={"/check-out"}>
                   <button
@@ -373,9 +370,12 @@ const CartPage = () => {
                     checked={selectAll}
                     onChange={toggleSelectAll}
                   />{" "}
-                  <span>Chọn toàn bộ</span>
+                  <span className="text-black">Chọn toàn bộ</span>
                 </div>
-                <button className="btn btn-sm" onClick={handleEditClick}>
+                <button
+                  className="btn btn-sm bg-slate-200 text-black hover:bg-slate-300"
+                  onClick={handleEditClick}
+                >
                   {isEditing ? "Xong" : "Sửa"}
                 </button>
               </div>
@@ -394,11 +394,11 @@ const CartPage = () => {
                       </Link>
                     </div>
                     <div className="cart-item-details">
-                      <div className="cart-item-name">
+                      <div className="cart-item-name text-black">
                         {item.name.slice(0, 20)}...
                       </div>
-                      <div className="cart-item-price">
-                        <FormattedPrice price={calculatePrice(item)} />
+                      <div className="cart-item-price text-black">
+                        {/* <FormattedPrice price={calculatePrice(item)} /> */}
                         {originalPrices[item._id] && (
                           <span className="original-price">
                             {formattedPrice(originalPrices[item._id])}
@@ -407,7 +407,7 @@ const CartPage = () => {
                       </div>
                       <div>
                         <button
-                          className="btn btn-xs"
+                          className="btn btn-xs bg-slate-200 hover:bg-slate-300 text-black"
                           onClick={() => handleDecrease(item)}
                         >
                           -
@@ -418,11 +418,11 @@ const CartPage = () => {
                           onChange={(e) =>
                             handleQuantityChange(item, parseInt(e.target.value))
                           }
-                          className="w-10 mx-2 text-center overflow-hidden appearance-none"
+                          className="w-10 mx-2 text-center overflow-hidden appearance-none text-black"
                         />
                         <button
                           onClick={() => handleIncrease(item)}
-                          className="btn btn-xs"
+                          className="btn btn-xs bg-slate-200 hover:bg-slate-300 text-black"
                         >
                           +
                         </button>
@@ -446,7 +446,7 @@ const CartPage = () => {
               <div className="checkout-container">
                 <div className="md:w-2/2 space-y-3">
                   <div className="flex items-center">
-                    <p className="text-lg">
+                    <p className="text-lg text-black">
                       Tổng thanh toán ({selectedItems.length} Sản phẩm):{" "}
                     </p>
                     <FormattedPrice
@@ -456,7 +456,7 @@ const CartPage = () => {
                   </div>
                   <Link to={"/check-out"}>
                     <button
-                      className="btn bg-green text-white px-5 w-full"
+                      className="btn bg-green text-white px-5 w-full hover:bg-green hover:opacity-80"
                       disabled={selectedItems.length === 0}
                       onClick={handleCheckOut}
                     >

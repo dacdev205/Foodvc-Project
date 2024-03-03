@@ -73,41 +73,44 @@ const Register = () => {
             className="card-body"
             method="dialog"
           >
-            <h3 className="font-bold text-lg">Đăng kí tài khoản!</h3>
+            <h3 className="font-bold text-lg text-black">Đăng kí tài khoản!</h3>
             <div className="form-control">
               <label className="label">
-                <span className="label-text">Tên người dùng:</span>
+                <span className="label-text text-black">Tên người dùng:</span>
               </label>
               <input
                 type="text"
                 placeholder="name"
-                className="input input-bordered"
+                className="input input-bordered text-black"
                 {...register("name")}
               />
             </div>
             <div className="form-control">
               <label className="label">
-                <span className="label-text">Email:</span>
+                <span className="label-text text-black">Email:</span>
               </label>
               <input
                 type="email"
                 placeholder="email"
-                className="input input-bordered"
+                className="input input-bordered text-black"
                 {...register("email")}
               />
             </div>
             <div className="form-control">
               <label className="label">
-                <span className="label-text">Mật khẩu:</span>
+                <span className="label-text text-black">Mật khẩu:</span>
               </label>
               <input
                 type="password"
                 placeholder="password"
-                className="input input-bordered"
+                className="input input-bordered text-black"
                 {...register("password")}
               />
               <label className="label mt-1">
-                <a href="#" className="label-text-alt link link-hover">
+                <a
+                  href="#"
+                  className="label-text-alt link link-hover text-black"
+                >
                   Quên mật khẩu?
                 </a>
               </label>
@@ -120,11 +123,11 @@ const Register = () => {
               <input
                 type="submit"
                 value="Đăng kí ngay"
-                className="btn bg-green text-white"
+                className="btn bg-green text-white hover:bg-green hover:opacity-80"
               />
             </div>
 
-            <p className="text-center my-2">
+            <p className="text-center my-2 text-black">
               Bạn đã có tài khoản?{" "}
               <Link to="/login" className="underline text-red">
                 Đăng nhập
@@ -136,11 +139,11 @@ const Register = () => {
           <div className="text-center space-x-3 mb-5">
             <button
               onClick={handleLogin}
-              className="btn btn-circle hover:bg-green hover:text-white"
+              className="btn btn-circle hover:bg-green hover:text-white bg-slate-200 text-black"
             >
               <FaGoogle />
             </button>
-            <button className="btn btn-circle hover:bg-green hover:text-white">
+            <button className="btn btn-circle hover:bg-green hover:text-white bg-slate-200 text-black">
               <FaFacebook />
             </button>
           </div>

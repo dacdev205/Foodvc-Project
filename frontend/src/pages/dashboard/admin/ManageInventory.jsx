@@ -224,11 +224,11 @@ const ManageInventory = () => {
 
   return (
     <div className="w-full md:w-[900px] px-4 mx-auto">
-      <h2 className="text-2xl font-semibold my-4">
+      <h2 className="text-2xl font-semibold my-4 text-black">
         Quản lý tất cả <span className="text-green">sản phẩm trong kho</span>
       </h2>
       <div className="flex items-center my-2">
-        <label htmlFor="search" className="mr-2">
+        <label htmlFor="search" className="mr-2 text-black">
           Tìm kiếm theo tên:
         </label>
         <input
@@ -237,23 +237,23 @@ const ManageInventory = () => {
           placeholder="Nhập tên sản phẩm"
           value={searchTerm}
           onChange={handleSearch}
-          className="border p-2 rounded-md"
+          className="border p-2 rounded-md text-black"
         />
-        <label htmlFor="sort" className="ml-2 mr-2">
+        <label htmlFor="sort" className="ml-2 mr-2 text-black">
           Sắp xếp theo:
         </label>
         <select
           id="sort"
           value={sortType}
           onChange={handleSort}
-          className="border p-2 rounded-md"
+          className="border p-2 rounded-md text-black"
         >
           <option value="name">Tên sản phẩm</option>
           <option value="price">Giá</option>
           <option value="quantity">Số lượng</option>
           <option value="status">Trạng thái</option>
         </select>
-        <label htmlFor="order" className="ml-2 mr-2">
+        <label htmlFor="order" className="ml-2 mr-2 text-black">
           Thứ tự:
         </label>
         <select
@@ -270,7 +270,7 @@ const ManageInventory = () => {
         <div className="overflow-x-auto">
           <table className="table">
             <thead>
-              <tr>
+              <tr className="text-black">
                 <th>#</th>
                 <th>Hình ảnh</th>
                 <th>Tên sản phẩm</th>
@@ -284,7 +284,7 @@ const ManageInventory = () => {
             <tbody>
               {currentInventory.map((item, index) => (
                 <tr key={index}>
-                  <th>{index + 1}</th>
+                  <th className="text-black">{index + 1}</th>
                   <td>
                     <div className="flex items-center gap-3">
                       <div className="avatar">
@@ -294,11 +294,11 @@ const ManageInventory = () => {
                       </div>
                     </div>
                   </td>
-                  <td>{item.name.slice(0, 20)}...</td>
+                  <td className="text-black">{item.name.slice(0, 20)}...</td>
                   <td>
                     <FormattedPrice price={item.price} />
                   </td>
-                  <td className="text-center">{item.quantity}</td>
+                  <td className="text-center text-black">{item.quantity}</td>
                   <td className="text-center">
                     <Link to={`/admin/update-item/${item._id}`}>
                       <button className="btn btn-ghost btn-xs bg-orange-500 text-white">

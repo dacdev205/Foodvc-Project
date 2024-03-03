@@ -72,26 +72,26 @@ const Login = () => {
               className="card-body"
               method="dialog"
             >
-              <h3 className="font-bold text-lg">Đăng nhập!</h3>
+              <h3 className="font-bold text-lg text-black">Đăng nhập!</h3>
               <div className="form-control">
                 <label className="label">
-                  <span className="label-text">Email</span>
+                  <span className="label-text text-black">Email</span>
                 </label>
                 <input
                   type="email"
                   placeholder="email"
-                  className="input input-bordered"
+                  className="input input-bordered text-black"
                   {...register("email")}
                 />
               </div>
               <div className="form-control">
                 <label className="label">
-                  <span className="label-text">Mật khẩu</span>
+                  <span className="label-text text-black">Mật khẩu</span>
                 </label>
                 <input
                   type="password"
                   placeholder="password"
-                  className="input input-bordered"
+                  className="input input-bordered text-black"
                   {...register("password")}
                 />
                 <label className="label mt-1">
@@ -116,7 +116,7 @@ const Login = () => {
                 />
               </div>
 
-              <p className="text-center my-2">
+              <p className="text-center my-2 text-black">
                 Bạn chưa có tài khoản?{" "}
                 <Link to="/register" className="underline text-red ml-1">
                   Đăng kí ngay
@@ -127,12 +127,12 @@ const Login = () => {
             {/* social sign in */}
             <div className="text-center space-x-3 mb-5">
               <button
-                className="btn btn-circle hover:bg-green hover:text-white"
+                className="btn btn-circle hover:bg-green hover:text-white bg-slate-200 text-black"
                 onClick={handleLogin}
               >
                 <FaGoogle />
               </button>
-              <button className="btn btn-circle hover:bg-green hover:text-white">
+              <button className="btn btn-circle hover:bg-green hover:text-white bg-slate-200 text-black">
                 <FaFacebook />
               </button>
             </div>

@@ -44,10 +44,10 @@ const OrdersTracking = () => {
   return (
     <div className="w-full md:w-[870px] px-4 mx-auto">
       <div>
-        <h2 className="text-2xl font-semibold my-4">
+        <h2 className="text-2xl font-semibold my-4 text-black">
           Quản lý tất cả <span className="text-green">đơn hàng</span>
         </h2>
-        <h5>Tổng số đơn hàng: {allOrders.length}</h5>
+        <h5 className="text-black">Tổng số đơn hàng: {allOrders.length}</h5>
       </div>
       <div className="my-2">
         <input
@@ -55,7 +55,7 @@ const OrdersTracking = () => {
           placeholder="Tìm kiếm theo mã đơn hàng"
           value={searchTerm}
           onChange={handleSearchChange}
-          className="border p-2 rounded-md mr-2"
+          className="border p-2 rounded-md mr-2 text-black"
         />
         <select value={searchStatus} onChange={handleStatusChangeSearch}>
           <option value="">Tất cả trạng thái</option>

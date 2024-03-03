@@ -59,10 +59,13 @@ const DashBoardLayout = () => {
                   aria-label="close sidebar"
                   className="drawer-overlay"
                 ></label>
-                <ul className="menu p-4 w-80 min-h-full bg-base-200 text-base-content">
+                <ul className="menu p-4 w-80 min-h-full text-black bg-white">
                   {/* Sidebar content here */}
                   <li className="font-bold">
-                    <Link to="/admin" className="flex justify-start mb-3">
+                    <Link
+                      to="/admin"
+                      className="flex justify-start mb-3 active-link"
+                    >
                       Foodvc
                       <span className="badge badge-primary">Admin</span>
                     </Link>
@@ -70,43 +73,43 @@ const DashBoardLayout = () => {
                   <hr />
 
                   <li>
-                    <Link to="/admin">
+                    <Link className="active-link" to="/admin">
                       <MdDashboard />
                       Dashboard
                     </Link>
                   </li>
                   <li className="">
-                    <Link to="/admin/users">
+                    <Link className="active-link" to="/admin/users">
                       <FaUser />
                       Tất cả người dùng
                     </Link>
                   </li>
                   <li>
-                    <Link to="/admin/manage-inventory">
+                    <Link className="active-link" to="/admin/manage-inventory">
                       <FaWarehouse />
                       Quản lý kho
                     </Link>
                   </li>
                   <li>
-                    <Link to="/admin/add-inventory">
+                    <Link className="active-link" to="/admin/add-inventory">
                       <IoIosAddCircle />
                       Nhập kho
                     </Link>
                   </li>
                   <li>
-                    <Link to="/admin/manage-menu">
+                    <Link className="active-link" to="/admin/manage-menu">
                       <AiOutlineMenu />
                       Quản lý menu
                     </Link>
                   </li>
                   <li>
-                    <Link to="/admin/add-voucher">
+                    <Link className="active-link" to="/admin/add-voucher">
                       <img width="12px" src="/images/price-tag.png" alt="" />
                       Thêm giảm giá
                     </Link>
                   </li>
                   <li>
-                    <Link to="/admin/order-tracking">
+                    <Link className="active-link" to="/admin/order-tracking">
                       <FaShoppingBag />
                       Quản lý đơn hàng
                     </Link>

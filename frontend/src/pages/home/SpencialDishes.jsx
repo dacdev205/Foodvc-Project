@@ -95,12 +95,12 @@ const SpecialDishes = () => {
       <div className="md:absolute right-3 top-8 mb-10 md:mr-24">
         <button
           onClick={() => slider?.current?.slickPrev()}
-          className=" btn p-2 rounded-full ml-5"
+          className=" btn bg-slate-300 hover:bg-slate-300 p-2 rounded-full ml-5 text-black"
         >
           <FaAngleLeft className=" h-8 w-8 p-1" />
         </button>
         <button
-          className="bg-green btn p-2 rounded-full ml-5"
+          className="btn bg-slate-200 hover:bg-slate-300  p-2 rounded-full ml-5 text-black"
           onClick={() => slider?.current?.slickNext()}
         >
           <FaAngleRight className=" h-8 w-8 p-1 " />

@@ -3,7 +3,6 @@ import React, { useContext, useState } from "react";
 import { FaStar } from "react-icons/fa";
 import { AuthContext } from "../context/AuthProvider";
 import "../style.css";
-import { useForm } from "react-hook-form";
 const ReviewForm = ({ productId, userId, userName, onSubmit }) => {
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState("");
@@ -64,14 +63,14 @@ const ReviewForm = ({ productId, userId, userName, onSubmit }) => {
     <div>
       <div className="flex items-center justify-center">
         <button
-          className="btn bg-green w-full"
+          className="btn bg-green w-full text-white hover:bg-green hover:opacity-80"
           onClick={() => document.getElementById("modal-review").showModal()}
         >
-          <span className="text-white">Viết đánh giá</span>
+          Viết đánh giá
         </button>
       </div>
       <dialog id="modal-review" className="modal modal-bottom sm:modal-middle">
-        <div className="modal-box">
+        <div className="modal-box bg-white">
           <span className="flex items-center justify-center font-bold text-lg">
             Đánh giá sản phẩm
           </span>
@@ -101,15 +100,18 @@ const ReviewForm = ({ productId, userId, userName, onSubmit }) => {
                 />
               </div>
               <div className="form-control mt-6">
-                <button type="submit" className="btn bg-green">
-                  <span className="text-white">Gửi đánh giá</span>
+                <button
+                  type="submit"
+                  className="btn bg-green hover:bg-green hover:opacity-80 text-white"
+                >
+                  Gửi đánh giá
                 </button>
               </div>
             </form>
             <button
               htmlFor="modal-review"
               onClick={handleCloseModal}
-              className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
+              className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2 hover:bg-slate-300"
             >
               ✕
             </button>

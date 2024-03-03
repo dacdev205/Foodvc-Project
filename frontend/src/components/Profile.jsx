@@ -20,7 +20,7 @@ const Profile = ({ user }) => {
   const [isAdmin, isAdminLoading] = useAdmin();
   return (
     <div>
-      <div className="drawer drawer-end z-50">
+      <div className="drawer drawer-end z-50 ">
         <input id="my-drawer-4" type="checkbox" className="drawer-toggle" />
         <div className="drawer-content">
           {/* Page content here */}
@@ -37,32 +37,40 @@ const Profile = ({ user }) => {
             </div>
           </label>
         </div>
-        <div className="drawer-side overflow-hidden">
+        <div className="drawer-side overflow-hidden ">
           <label
             htmlFor="my-drawer-4"
             aria-label="close sidebar"
             className="drawer-overlay"
           ></label>
-          <ul className="menu p-4 w-80 min-h-full bg-base-200 text-base-content">
+          <ul className="menu p-4 w-80 min-h-full bg-white text-black">
             {/* Sidebar content here */}
             <li>
-              <a href="/update-profile">Trang cá nhân</a>
+              <a className="active-link" href="/update-profile">
+                Trang cá nhân
+              </a>
             </li>
             <li>
-              <Link to="orders">Đặt hàng</Link>
+              <Link className="active-link" to="orders">
+                Đặt hàng
+              </Link>
             </li>
             {isAdmin ? (
               <li>
-                <Link to="/admin">Trang quản lý</Link>
+                <Link className="active-link" to="/admin">
+                  Trang quản lý
+                </Link>
               </li>
             ) : (
               ""
             )}
             <li>
-              <a>Cài đặt</a>
+              <a className="active-link">Cài đặt</a>
             </li>
             <li>
-              <a onClick={handleLogout}>Đăng xuất</a>
+              <a className="active-link" onClick={handleLogout}>
+                Đăng xuất
+              </a>
             </li>
           </ul>
         </div>

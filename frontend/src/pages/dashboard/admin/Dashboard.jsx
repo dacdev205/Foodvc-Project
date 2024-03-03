@@ -41,26 +41,28 @@ const Dashboard = () => {
   };
   return (
     <div className="w-full mx-auto px-4">
-      <h2 className="text-2xl font-bold my-4">Hi, {user.displayName}</h2>
-      <div className="stats stats-vertical w-full lg:stats-horizontal shadow">
+      <h2 className="text-2xl font-bold my-4 text-black">
+        Hi, {user.displayName}
+      </h2>
+      <div className="stats stats-vertical w-full lg:stats-horizontal shadow bg-white">
         {/* stat div */}
         <div className="stat">
           <div className="stat-figure text-secondary text-3xl">
             <CiDollar />
           </div>
-          <div className="stat-title">Doanh thu</div>
+          <div className="stat-title text-black">Doanh thu</div>
           <div className="stat-value">
             <FormattedPrice price={stats.revenue} />
           </div>
           <div className="stat-desc"></div>
         </div>
 
-        <div className="stat">
+        <div className="stat ">
           <div className="stat-figure text-secondary text-3xl">
             <MdGroups></MdGroups>
           </div>
-          <div className="stat-title">Người dùng</div>
-          <div className="stat-value flex">{stats.users}</div>
+          <div className="stat-title text-black">Người dùng</div>
+          <div className="stat-value flex text-black">{stats.users}</div>
           <div className="stat-desc">↗︎ 400 (22%)</div>
         </div>
 
@@ -68,22 +70,22 @@ const Dashboard = () => {
           <div className="stat-figure text-secondary text-3xl">
             <FaBook />
           </div>
-          <div className="stat-title">Mặt hàng hiện có</div>
-          <div className="stat-value">{stats.menuItems}</div>
+          <div className="stat-title text-black">Mặt hàng hiện có</div>
+          <div className="stat-value text-black">{stats.menuItems}</div>
           <div className="stat-desc">↘︎ 90 (14%)</div>
         </div>
         <div className="stat">
           <div className="stat-figure text-secondary text-3xl">
             <FaShoppingCart />
           </div>
-          <div className="stat-title">Tất cả đơn hàng</div>
-          <div className="stat-value">{stats.orders}</div>
+          <div className="stat-title text-black">Tất cả đơn hàng</div>
+          <div className="stat-value text-black">{stats.orders}</div>
           <div className="stat-desc">↘︎ 90 (14%)</div>
         </div>
       </div>
       <div className="grid grid-cols-2 gap-4 mt-8">
         <div>
-          <p className="text-lg font-bold">Xem thống kê doanh thu</p>
+          <p className="text-lg font-bold text-black">Xem thống kê doanh thu</p>
           <select value={selectedYear} onChange={handleYearChange}>
             <option value={new Date().getFullYear()}>Năm hiện tại</option>
             <option value={"2021"}>Năm 2021</option>
@@ -92,11 +94,13 @@ const Dashboard = () => {
             data={monthlyRevenueData}
             selectedYear={selectedYear}
           />
-          <p className="text-lg font-bold">Các danh mục khác:</p>
+          <p className="text-lg font-bold text-black">Các danh mục khác:</p>
           {/* <ChartBar data={stats}></ChartBar> */}
         </div>
         <div>
-          <p className="text-lg font-bold">Danh mục sản phẩm bán được:</p>
+          <p className="text-lg font-bold text-black">
+            Danh mục sản phẩm bán được:
+          </p>
           <div>
             <select value={selectedMonth} onChange={handleMonthChange}>
               <option value={"1"}>Tháng 1</option>

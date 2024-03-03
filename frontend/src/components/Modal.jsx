@@ -72,7 +72,7 @@ const Modal = () => {
   return (
     <div>
       <dialog id="modal-login" className="modal modal-middle sm:modal-middle">
-        <div className="modal-box">
+        <div className="modal-box bg-white">
           <div className="modal-action flex flex-col justify-center mt-0">
             <form
               onSubmit={handleSubmit(onSubmit)}
@@ -82,7 +82,7 @@ const Modal = () => {
               <h3 className="font-bold text-lg">Đăng nhập!</h3>
               <div className="form-control">
                 <label className="label">
-                  <span className="label-text">Email:</span>
+                  <span className="label-text text-black">Email:</span>
                 </label>
                 <input
                   type="email"
@@ -93,7 +93,7 @@ const Modal = () => {
               </div>
               <div className="form-control">
                 <label className="label">
-                  <span className="label-text">Mật khẩu:</span>
+                  <span className="label-text text-black">Mật khẩu:</span>
                 </label>
                 <input
                   type="password"
@@ -102,7 +102,10 @@ const Modal = () => {
                   {...register("password")}
                 />
                 <label className="label mt-1">
-                  <a href="#" className="label-text-alt link link-hover">
+                  <a
+                    href="#"
+                    className="label-text-alt link link-hover text-black"
+                  >
                     Quên mật khẩu?
                   </a>
                 </label>
@@ -119,7 +122,7 @@ const Modal = () => {
                 <input
                   type="submit"
                   value="Đăng nhập"
-                  className="btn bg-green text-white"
+                  className="btn bg-green text-white hover:bg-green hover:opacity-80"
                 />
               </div>
 
@@ -141,12 +144,12 @@ const Modal = () => {
             {/* social sign in */}
             <div className="text-center space-x-3 mb-5">
               <button
-                className="btn btn-circle hover:bg-green hover:text-white"
+                className="btn btn-circle hover:bg-green hover:text-white bg-slate-200 text-black"
                 onClick={handleLogin}
               >
                 <FaGoogle />
               </button>
-              <button className="btn btn-circle hover:bg-green hover:text-white">
+              <button className="btn btn-circle hover:bg-green hover:text-white bg-slate-200 text-black">
                 <FaFacebook />
               </button>
             </div>

@@ -53,7 +53,6 @@ const WishListPage = () => {
       <div className="section-container">
         <div className="max-w-screen-2xl container mx-auto xl:px-24 px-4 bg-gradient-to-r from-0% from-[#FAFAFA] to-[#FCFCFC] to-100%">
           <div className="py-24 flex flex-col items-center justify-center">
-            {/* content */}
             <div className=" text-center px-4 space-y-7">
               {wishList.length ? (
                 <h2 className="md:text-3xl text-2xl font-bold md:leading-snug leading-snug text-black">
@@ -77,15 +76,14 @@ const WishListPage = () => {
             </div>
           </div>
         </div>
-
         {/* table for the wishlist */}
         {wishList.length ? (
           <div>
             <div className="overflow-x-auto">
-              <table className="table text-center">
+              <table className="hidden md:table text-center">
                 {/* head */}
                 <thead className="bg-green text-white rounded-sm">
-                  <tr>
+                  <tr className="text-white">
                     <th>#</th>
                     <th>Hình ảnh</th>
                     <th>Tên sản phẩm</th>
@@ -126,6 +124,36 @@ const WishListPage = () => {
                 </tbody>
               </table>
             </div>
+            {/* Mobile Devices */}
+            <div className="md:hidden mobile-cart-items-container">
+              {wishList.map((item, index) => (
+                <div className="flex justify-between" key={index}>
+                  <div className="cart-item">
+                    <div className="p-3">{index + 1} </div>
+                    <div className="cart-item-image">
+                      <Link to={`/product/${item._id}`}>
+                        <img src={PF + "/" + item.image} alt="product" />
+                      </Link>
+                    </div>
+                    <div className="cart-item-details">
+                      <div className="cart-item-name">
+                        {item.name.slice(0, 20)}...
+                      </div>
+                      <FormattedPrice price={item.price} />
+                    </div>
+                  </div>
+                  <div className="text-center flex align-center">
+                    <button
+                      className="delete-button"
+                      onClick={() => handleDelete(item)}
+                    >
+                      <FaTrash></FaTrash>
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+            {/*End Mobile Devices */}
           </div>
         ) : (
           ""

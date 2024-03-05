@@ -46,9 +46,9 @@ const Profile = ({ user }) => {
           <ul className="menu p-4 w-80 min-h-full bg-white text-black">
             {/* Sidebar content here */}
             <li>
-              <a className="active-link" href="/update-profile">
+              <Link className="active-link" to="/update-profile">
                 Trang cá nhân
-              </a>
+              </Link>
             </li>
             <li>
               <Link className="active-link" to="orders">

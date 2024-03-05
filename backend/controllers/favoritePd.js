@@ -3,7 +3,8 @@ module.exports = class favoritePdAPI {
     //fetch all product
     static async fetchAllWishListProductWithEmail(req, res) {
         try {
-            const wishList = await WishList.find();
+            const email = req.query.email;
+            const wishList = await WishList.find({email: email});
             if(wishList) {
                 res.status(200).json(wishList);
             } else {
@@ -13,6 +14,7 @@ module.exports = class favoritePdAPI {
             res.status(500).json({message: err.message});
         }
     }
+
     //create prduct 
     static async postProductToWistLish(req, res) {
         const wishItem = req.body;

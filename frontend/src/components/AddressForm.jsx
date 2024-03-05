@@ -97,10 +97,10 @@ const AddressForm = ({ setAddress, paymentId }) => {
   return (
     <div>
       <dialog id="modal-address" className="modal modal-middle sm:modal-middle">
-        <div className="modal-box">
+        <div className="modal-box bg-white">
           <div className="modal-action flex flex-col justify-center mt-0">
             <form className="" method="dialog" onSubmit={handleSubmit}>
-              <h3 className="font-bold text-lg">Địa chỉ mới</h3>
+              <h3 className="font-bold text-lg text-black">Địa chỉ mới</h3>
               <div className="form-control ">
                 <div className="flex justify-between">
                   <div className="form-control mt-3 w-1/2 mr-1">
@@ -110,7 +110,7 @@ const AddressForm = ({ setAddress, paymentId }) => {
                       value={formData.fullName}
                       onChange={handleChange}
                       placeholder="Họ và tên"
-                      className="input input-bordered w-full"
+                      className="input input-bordered w-full text-black"
                     />
                   </div>
                   <div className="form-control mt-3 w-1/2 ml-1">
@@ -120,7 +120,7 @@ const AddressForm = ({ setAddress, paymentId }) => {
                       value={formData.phone}
                       onChange={handleChange}
                       placeholder="Số điện thoại"
-                      className="input input-bordered w-full"
+                      className="input input-bordered w-full text-black"
                     />
                   </div>
                 </div>
@@ -142,24 +142,24 @@ const AddressForm = ({ setAddress, paymentId }) => {
                   value={formData.street}
                   onChange={handleChange}
                   placeholder="Địa chỉ chi tiết"
-                  className="input input-bordered w-full"
+                  className="input input-bordered w-full text-black"
                 />
               </div>
               <div className="form-control mt-4">
                 <input
                   type="submit"
                   value="Hoàn thành"
-                  className="btn bg-green text-white"
+                  className="btn bg-green text-white hover:bg-green hover:opacity-80"
                 />
               </div>
               <div className="form-control mt-3">
-                <label className="cursor-pointer flex items-center">
+                <label className="cursor-pointer flex items-center text-black">
                   <input
                     type="checkbox"
                     name="isDefaultAddress"
                     checked={isDefaultAddress}
                     onChange={() => setIsDefaultAddress(!isDefaultAddress)}
-                    className="form-checkbox mr-2"
+                    className="form-checkbox mr-2 "
                   />
                   Đặt làm địa chỉ mặc định
                 </label>

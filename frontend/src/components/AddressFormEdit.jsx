@@ -135,10 +135,10 @@ const AddressFormEdit = ({
         id="modal-addressEdit"
         className="modal modal-middle sm:modal-middle"
       >
-        <div className="modal-box">
+        <div className="modal-box bg-white">
           <div className="modal-action flex flex-col justify-center mt-0">
             <form className="" method="dialog" onSubmit={handleSubmit}>
-              <h3 className="font-bold text-lg">Cập nhật địa chỉ</h3>
+              <h3 className="font-bold text-lg text-black">Cập nhật địa chỉ</h3>
               <div className="form-control ">
                 <div className="flex justify-between">
                   <div className="form-control mt-3 w-1/2 mr-1">
@@ -148,7 +148,7 @@ const AddressFormEdit = ({
                       value={formData.fullName}
                       onChange={handleChange}
                       placeholder="Họ và tên"
-                      className="input input-bordered w-full"
+                      className="input input-bordered w-full text-black"
                     />
                   </div>
                   <div className="form-control mt-3 w-1/2 ml-1">
@@ -158,7 +158,7 @@ const AddressFormEdit = ({
                       value={formData.phone}
                       onChange={handleChange}
                       placeholder="Số điện thoại"
-                      className="input input-bordered w-full"
+                      className="input input-bordered w-full text-black"
                     />
                   </div>
                 </div>
@@ -184,18 +184,18 @@ const AddressFormEdit = ({
                   value={formData.street}
                   onChange={handleChange}
                   placeholder="Địa chỉ chi tiết"
-                  className="input input-bordered w-full"
+                  className="input input-bordered w-full text-black"
                 />
               </div>
               <div className="form-control mt-4">
                 <input
                   type="submit"
                   value="Cập nhật"
-                  className="btn bg-green text-white"
+                  className="btn bg-green text-white hover:bg-green hover:opacity-80"
                 />
               </div>
               <div className="form-control mt-3">
-                <label className="cursor-pointer flex items-center">
+                <label className="cursor-pointer flex items-center text-black">
                   <input
                     type="checkbox"
                     name="isDefaultAddress"

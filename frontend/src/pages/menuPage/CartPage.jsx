@@ -220,7 +220,7 @@ const CartPage = () => {
                 </h2>
               ) : (
                 <div>
-                  <h2 className="md:text-2xl text-1xl font-bold md:leading-snug leading-snug mb-3">
+                  <h2 className="md:text-2xl text-1xl font-bold md:leading-snug leading-snug mb-3 text-black">
                     Chưa có sản phẩm trong{" "}
                     <span className="text-green">giỏ hàng</span>
                   </h2>

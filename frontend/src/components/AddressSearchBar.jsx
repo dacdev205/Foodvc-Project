@@ -69,10 +69,10 @@ const AddressSearchBar = ({
         value={searchTerm}
         onChange={handleInputChange}
         onClick={handleInputChange}
-        className="input input-bordered w-full"
+        className="input input-bordered w-full text-black"
       />
       {filteredResults.length > 0 && (
-        <div className="absolute z-10 w-full bg-white border border-gray-300 rounded-md mt-2 flex">
+        <div className="absolute z-10 w-full bg-white border border-gray-300 rounded-md mt-2 flex text-black">
           <div className="text-sm">
             <p className="py-2 px-4 ">Tỉnh/Thành phố</p>
             <ul>

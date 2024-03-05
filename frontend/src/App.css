@@ -47,7 +47,9 @@ html input[type="text"] {
 
 html input[type="number"],
 html input[type="email"],
-html input[type="password"] {
+html input[type="password"],
+html input[type="file"],
+html input[type="tel"] {
   background-color: white !important;
   -moz-appearance: textfield;
   border: 1px solid #ccc !important;

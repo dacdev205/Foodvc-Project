@@ -33,30 +33,31 @@ const UpdateProfile = () => {
 
   return (
     <div className="flex items-center justify-center h-screen">
-      <div className="card shrink-0 w-full max-w-sm shadow-2xl bg-base-100">
+      <div className="card shrink-0 w-full max-w-sm shadow-2xl bg-white">
         <form className="card-body" onSubmit={handleSubmit(onSubmit)}>
-          <h3 className="font-bold">Chỉnh sửa trang cá nhân</h3>
+          <h3 className="font-bold text-black">Chỉnh sửa trang cá nhân</h3>
           <div className="form-control">
             <label className="label">
-              <span className="label-text">Email:</span>
+              <span className="label-text text-black">Email:</span>
             </label>
             {user ? (
               <input
                 disabled
+                type="email"
                 placeholder={user.email}
-                className="input input-bordered"
+                className="input input-bordered text-black"
               />
             ) : (
               navigate(from, { replace: true })
             )}
             <label className="label">
-              <span className="label-text">Tên hiển thị:</span>
+              <span className="label-text text-black">Tên hiển thị:</span>
             </label>
             {user ? (
               <input
-                type="name"
+                type="text"
                 placeholder={user.displayName}
-                className="input input-bordered"
+                className="input input-bordered text-black"
                 {...register("name")}
               />
             ) : (
@@ -65,16 +66,18 @@ const UpdateProfile = () => {
           </div>
           <div className="form-control">
             <label className="label">
-              <span className="label-text">Upload Photo</span>
+              <span className="label-text text-black">Upload Photo</span>
             </label>
             <input
               type="text"
               {...register("photoURL")}
-              className="file-input w-full mt-1 "
+              className="file-input w-full mt-1 text-black"
             />
           </div>
           <div className="form-control mt-6">
-            <button className="btn bg-green text-white">Chỉnh sửa</button>
+            <button className="btn bg-green text-white hover:bg-green hover:opacity-80">
+              Chỉnh sửa
+            </button>
           </div>
         </form>
       </div>

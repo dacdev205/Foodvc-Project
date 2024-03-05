@@ -60,7 +60,7 @@ const WishListPage = () => {
                 </h2>
               ) : (
                 <div>
-                  <h2 className="md:text-2xl text-1xl font-bold md:leading-snug leading-snug mb-3">
+                  <h2 className="md:text-2xl text-1xl font-bold md:leading-snug leading-snug mb-3 text-black">
                     Chưa có sản phẩm{" "}
                     <span className="text-green">yêu thích</span>
                   </h2>

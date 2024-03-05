@@ -39,15 +39,17 @@ const SelectAddress = ({
         id="modal-selectAddress"
         className="modal modal-middle sm:modal-middle "
       >
-        <div className="modal-box overflow-y-auto">
+        <div className="modal-box overflow-y-auto bg-white">
           <div className="modal-action flex flex-col justify-center mt-0">
-            <span className="text-lg font-bold">Địa chỉ của tôi</span>
+            <span className="text-lg font-bold text-black">
+              Địa chỉ của tôi
+            </span>
             <div>
               {addresses.map((addressItem, index) => (
                 <div key={index} className="">
                   <hr className="my-2 border-t-2 border-gray-200 w-full" />
                   <div className="mb-3">
-                    <div className="flex items-center py-2 justify-between">
+                    <div className="flex items-center py-2 justify-between text-black">
                       <div>
                         <input
                           type="radio"
@@ -86,7 +88,7 @@ const SelectAddress = ({
                 onClick={() =>
                   document.getElementById("modal-address").showModal()
                 }
-                className="flex justify-start items-center border-2 border-green p-2 rounded-lg"
+                className="flex justify-start items-center border-2 border-green p-2 rounded-lg text-black"
               >
                 <FaPlus />
                 Thêm địa chỉ mới
@@ -105,7 +107,7 @@ const SelectAddress = ({
                 ✕
               </button>
               <button
-                className="btn btn-ghost bg-green p-2 rounded-lg text-white"
+                className="btn bg-green p-2 rounded-lg text-white hover:bg-green hover:opacity-80"
                 onClick={() => handleConfirmAddress(selectedAddress)}
               >
                 Xác nhận

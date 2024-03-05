@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import React, { useContext } from "react";
+import React, { useContext, useState, useRef, useEffect } from "react";
 import { AuthContext } from "../context/AuthProvider";
 import { Link, useNavigate } from "react-router-dom";
 import useAuth from "../hooks/useAuth";
@@ -8,18 +8,34 @@ import useAdmin from "../hooks/useAdmin";
 const Profile = ({ user }) => {
   const { logOut } = useContext(AuthContext);
   const navigate = useNavigate();
+
   const handleLogout = () => {
     logOut()
       .then(() => {
         navigate("/");
       })
       .catch((error) => {
-        // Xử lý lỗi nếu cần
+        // Handle error
       });
   };
+
   const { loading } = useAuth();
   const [isAdmin, isAdminLoading] = useAdmin();
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const drawerRef = useRef(null);
 
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (drawerRef.current && !drawerRef.current.contains(event.target)) {
+        setDrawerOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
   const closeDrawer = () => {
     // Lấy thẻ input drawer và thực hiện click để đóng drawer
     const drawerCheckbox = document.getElementById("my-drawer-4");
@@ -27,16 +43,23 @@ const Profile = ({ user }) => {
       drawerCheckbox.checked = false;
     }
   };
+  const toggleDrawer = () => {
+    setDrawerOpen(!drawerOpen);
+  };
 
   return (
     <div>
-      <div className="drawer drawer-end z-50">
+      <div
+        className={`drawer drawer-end z-50 ${drawerOpen ? "open" : ""}`}
+        ref={drawerRef}
+      >
         <input id="my-drawer-4" type="checkbox" className="drawer-toggle" />
         <div className="drawer-content">
-          {/* Nội dung trang ở đây */}
+          {/* Page content here */}
           <label
             htmlFor="my-drawer-4"
             className="drawer-button btn btn-ghost btn-circle avatar"
+            onClick={toggleDrawer}
           >
             <div className="w-10 rounded-full">
               {user.photoURL ? (
@@ -51,28 +74,36 @@ const Profile = ({ user }) => {
           <label
             htmlFor="my-drawer-4"
             aria-label="close sidebar"
-            className="drawer-overlay"
-            onClick={closeDrawer} // Thêm sự kiện onClick để đóng drawer
+            className={`drawer-overlay ${drawerOpen ? "open" : ""}`}
+            onClick={() => setDrawerOpen(false)}
           ></label>
           <ul className="menu p-4 w-80 min-h-full bg-white text-black">
-            {/* Nội dung thanh bên ở đây */}
+            {/* Sidebar content here */}
             <li>
               <Link
                 className="active-link"
                 to="/update-profile"
-                onClick={closeDrawer}
+                onClick={() => closeDrawer()}
               >
                 Trang cá nhân
               </Link>
             </li>
             <li>
-              <Link className="active-link" to="orders" onClick={closeDrawer}>
+              <Link
+                className="active-link"
+                to="orders"
+                onClick={() => closeDrawer()}
+              >
                 Đặt hàng
               </Link>
             </li>
             {isAdmin ? (
               <li>
-                <Link className="active-link" to="/admin" onClick={closeDrawer}>
+                <Link
+                  className="active-link"
+                  to="/admin"
+                  onClick={() => closeDrawer()}
+                >
                   Trang quản lý
                 </Link>
               </li>

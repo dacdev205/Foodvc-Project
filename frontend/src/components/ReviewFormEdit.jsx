@@ -3,8 +3,13 @@ import React, { useState, useEffect, useContext, useRef } from "react";
 import reviewAPI from "../api/reviewAPI";
 import { FaStar } from "react-icons/fa";
 import { AuthContext } from "../context/AuthProvider";
-
-const ReviewFormEdit = ({ reviewId, isModalOpen, setIsModalOpen }) => {
+import styles from "../CssModule/ReviewForm.module.css";
+const ReviewFormEdit = ({
+  reviewId,
+  isModalOpen,
+  setIsModalOpen,
+  updateReviews,
+}) => {
   const [rating, setRating] = useState(0);
   const [ratingError, setRatingError] = useState(false);
   const { user } = useContext(AuthContext);
@@ -58,8 +63,8 @@ const ReviewFormEdit = ({ reviewId, isModalOpen, setIsModalOpen }) => {
       await reviewAPI.updateReviewByReviewId(reviewId, { comment, rating });
       setIsModalOpen(false);
       alert("Cảm ơn bạn đã gửi đánh giá!");
+      updateReviews();
     } else {
-      console.log("Vui lòng đăng nhập");
       document.getElementById("my_modal_5").showModal();
     }
   };
@@ -79,7 +84,7 @@ const ReviewFormEdit = ({ reviewId, isModalOpen, setIsModalOpen }) => {
         id="modal-reviewEdit"
         className="modal modal-bottom sm:modal-middle"
       >
-        <div className="modal-box">
+        <div className="modal-box bg-white">
           <span className="flex items-center justify-center font-bold text-lg">
             Đánh giá sản phẩm
           </span>
@@ -90,14 +95,17 @@ const ReviewFormEdit = ({ reviewId, isModalOpen, setIsModalOpen }) => {
               </div>
               <div className="form-control">
                 <textarea
-                  className="review-content mt-3"
+                  className={`review-content mt-3 ${styles.textareaContent}`}
                   rows={10}
                   value={comment}
                   onChange={(e) => setComment(e.target.value)}
                 />
               </div>
               <div className="form-control mt-6">
-                <button type="submit" className="btn bg-green">
+                <button
+                  type="submit"
+                  className="btn bg-green hover:bg-green hover:opacity-80"
+                >
                   <span className="text-white">Gửi đánh giá</span>
                 </button>
               </div>

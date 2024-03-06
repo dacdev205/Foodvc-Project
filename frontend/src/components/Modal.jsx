@@ -1,53 +1,84 @@
-/* eslint-disable react/prop-types */
 import React, { useContext, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { FaGoogle, FaFacebook } from "react-icons/fa";
 import { AuthContext } from "../context/AuthProvider";
 import useAxiosPublic from "../hooks/useAxiosPublic";
+import * as Yup from "yup"; // Import Yup
+
 const Modal = () => {
   const {
     register,
     handleSubmit,
     reset,
     formState: { errors },
-  } = useForm();
+  } = useForm(); // Initialize useForm
 
   const { signUpWithGmail, login } = useContext(AuthContext);
-  const [errorMessage, setErrorMessage] = useState("");
   const axiosPublic = useAxiosPublic();
-
-  //redirecting to home page or specifig page
+  const [errorMessage, setErrorMessage] = useState({});
+  const [errorMessageSubmit, setErrorMessageSubmit] = useState("");
+  // Redirecting to home page or specific page
   const location = useLocation();
   const navigate = useNavigate();
   const from = location.state?.from?.pathname || "/";
 
-  const onSubmit = (data) => {
-    const email = data.email;
-    const password = data.password;
-    // console.log(email, password)
-    login(email, password)
-      .then((result) => {
-        const user = result.user;
-        const userInfor = {
-          name: data.name,
-          email: data.email,
-        };
-        try {
+  const schema = Yup.object().shape({
+    email: Yup.string()
+      .email("Email không hợp lệ")
+      .required("Email là bắt buộc"),
+    password: Yup.string()
+      .min(8, "Mật khẩu phải chứa ít nhất 8 ký tự")
+      .required("Mật khẩu là bắt buộc"),
+  });
+
+  const validateInput = async (name, value) => {
+    try {
+      await Yup.reach(schema, name).validate(value);
+      setErrorMessage((prevErrors) => ({ ...prevErrors, [name]: "" }));
+    } catch (error) {
+      setErrorMessage((prevErrors) => ({
+        ...prevErrors,
+        [name]: error.message,
+      }));
+    }
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    validateInput(name, value);
+  };
+
+  const onSubmit = async (data) => {
+    try {
+      await schema.validate(data, { abortEarly: false });
+      const email = data.email;
+      const password = data.password;
+      login(email, password)
+        .then((result) => {
+          const user = result.user;
+          const userInfor = {
+            name: data.name,
+            email: data.email,
+          };
           axiosPublic.post("/users", userInfor);
           alert("Login successfull");
           reset();
           navigate(from, { replace: true });
-        } catch (error) {
-          console.log("");
-        }
-      })
-      .catch((error) => {
-        const errorMessage = error.message;
-        setErrorMessage("Provide a correct email and password!");
+        })
+        .catch(() => {
+          setErrorMessageSubmit("Email hoặc mật khẩu không chính xác!");
+        });
+    } catch (error) {
+      const newErrors = {};
+      error.inner.forEach((err) => {
+        newErrors[err.path] = err.message;
       });
+      setErrorMessage(newErrors);
+    }
   };
-  //goole signin
+
+  // Google signin
   const handleLogin = async () => {
     try {
       const result = await signUpWithGmail();
@@ -55,14 +86,7 @@ const Modal = () => {
         name: result?.user?.displayName,
         email: result?.user?.email,
       };
-
-      const response = await axiosPublic.post("/users", userInfor);
-      if (response.status === 302) {
-        const redirectedLocation = response.headers.location;
-        const secondResponse = await axiosPublic.get(redirectedLocation);
-        console.log("Second response:", secondResponse);
-      }
-      console.log(response);
+      await axiosPublic.post("/users", userInfor);
       alert("Login successful");
     } catch (error) {
       console.error("Error during login:", error);
@@ -89,7 +113,13 @@ const Modal = () => {
                   placeholder="email"
                   className="input input-bordered"
                   {...register("email")}
+                  onChange={(e) => handleChange(e)}
                 />
+                {errorMessage.email && (
+                  <p className="text-red text-xs italic">
+                    {errorMessage.email}
+                  </p>
+                )}
               </div>
               <div className="form-control">
                 <label className="label">
@@ -100,7 +130,13 @@ const Modal = () => {
                   placeholder="password"
                   className="input input-bordered"
                   {...register("password")}
+                  onChange={(e) => handleChange(e)}
                 />
+                {errorMessage.password && (
+                  <p className="text-red text-xs italic">
+                    {errorMessage.password}
+                  </p>
+                )}
                 <label className="label mt-1">
                   <a
                     href="#"
@@ -110,13 +146,9 @@ const Modal = () => {
                   </a>
                 </label>
               </div>
-
-              {/* error */}
-              {errorMessage ? (
-                <p className="text-red text-xs italic">{errorMessage}</p>
-              ) : (
-                ""
-              )}
+              <p className="text-red text-xs italic">
+                {Object.values(errorMessageSubmit)}
+              </p>
               {/* login btn */}
               <div className="form-control mt-4">
                 <input

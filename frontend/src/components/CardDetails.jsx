@@ -184,7 +184,10 @@ const CardDetails = () => {
     setReviews(updatedReviews);
     reset();
   };
-
+  const updateReviews = async () => {
+    const updatedReviews = await reviewAPI.getProductById(id);
+    setReviews(updatedReviews);
+  };
   const renderReviewFormOrMessage = () => {
     if (commented) {
       return <p>Bạn đã bình luận về sản phẩm này.</p>;
@@ -562,6 +565,7 @@ const CardDetails = () => {
                   reviewId={review._id}
                   isModalOpen={isModalOpen}
                   setIsModalOpen={setIsModalOpen}
+                  updateReviews={updateReviews}
                 />
               )}
             </div>

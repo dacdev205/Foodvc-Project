@@ -16,11 +16,6 @@ export default defineConfig({
         changeOrigin: true,
       }
     },
-    // Thêm rewrite rules vào đây
-    // Đảm bảo các request không khớp với route nào sẽ được chuyển hướng đến index.html
-    fs: {
-      strict: true,
-    },
-    historyApiFallback: true, // Chấp nhận routing client-side
+    historyApiFallback: true, // Chấp nhận routing client-side và chuyển hướng các yêu cầu không khớp
   },
 });

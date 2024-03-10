@@ -6,7 +6,7 @@ import inventoryAPI from "../../../api/inventoryAPI";
 import FormattedPrice from "../../../components/FormatedPriece";
 const AddVoucher = () => {
   const [menu, , refetch] = useMenu();
-  const PF = "https://foodvc-server.onrender.com";
+  const PF = "http://localhost:3000";
   const [searchTerm, setSearchTerm] = useState("");
   const [sortType, setSortType] = useState("name");
   const [sortOrder, setSortOrder] = useState("asc");

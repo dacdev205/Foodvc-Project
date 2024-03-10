@@ -26,7 +26,7 @@ const Cards = ({ item }) => {
     createdAt,
   } = item;
   const { user } = useContext(AuthContext);
-  const PF = "https://foodvc-server.onrender.com";
+  const PF = "http://localhost:3000";
   const [reviews, setReviews] = useState([]);
   const [cart, refetchCart, isLoading] = useCart();
   const [wishList, refetchWishList] = useWishList();

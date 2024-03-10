@@ -1,7 +1,7 @@
 import React from "react";
 import axios from "axios";
 const axiosPublic = axios.create({
-  baseURL: "https://foodvc-server.onrender.com",
+  baseURL: "http://localhost:3000",
   maxRedirects: 0,
 });
 

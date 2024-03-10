@@ -1,5 +1,5 @@
 import axios from "axios";
-const url = "https://foodvc-server.onrender.com/address"
+const url = "http://localhost:3000/address"
 
 export default class addressAPI {
 

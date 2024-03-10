@@ -1,5 +1,5 @@
 import axios from "axios";
-const url = "https://foodvc-server.onrender.com/inventory"
+const url = "http://localhost:3000/inventory"
 
 export default class inventoryAPI {
     static async getProductById(id){

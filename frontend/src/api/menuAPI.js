@@ -1,5 +1,5 @@
 import axios from "axios";
-const url = "https://foodvc-server.onrender.com/api/foodvc"
+const url = "http://localhost:3000/api/foodvc"
 
 export default class menuAPI {
     static async getProductById(id){

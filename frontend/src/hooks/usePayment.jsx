@@ -18,7 +18,7 @@ const usePayment = () => {
         return [];
       }
       const res = await fetch(
-        `https://foodvc-server.onrender.com/check-out?email=${email}`,
+        `http://localhost:3000/check-out?email=${email}`,
         {
           headers: {
             authorization: `Bearer ${token}`,

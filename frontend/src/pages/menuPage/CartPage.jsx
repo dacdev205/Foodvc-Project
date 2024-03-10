@@ -14,7 +14,7 @@ import paymentAPI from "../../api/paymentAPI";
 const CartPage = () => {
   const [cart, refetchCart, isLoading] = useCart();
   const { user } = useContext(AuthContext);
-  const PF = "https://foodvc-server.onrender.com";
+  const PF = "http://localhost:3000";
   const [originalPrices, setOriginalPrices] = useState({});
   const [selectedItems, setSelectedItems] = useState([]);
   const [selectAll, setSelectAll] = useState(false);

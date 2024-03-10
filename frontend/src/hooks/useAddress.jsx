@@ -20,14 +20,11 @@ const useAddress = () => {
       if (!email) {
         return [];
       }
-      const res = await fetch(
-        `https://foodvc-server.onrender.com/address?email=${email}`,
-        {
-          headers: {
-            authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const res = await fetch(`http://localhost:3000/address?email=${email}`, {
+        headers: {
+          authorization: `Bearer ${token}`,
+        },
+      });
       if (!res.ok) {
         return [];
       }

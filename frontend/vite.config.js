@@ -8,14 +8,13 @@ export default defineConfig({
     port: 3001,
     proxy: {
       "/api/foodvc": {
-        target: "https://foodvc-server.onrender.com",
+        target: "http://localhost:3000",
         changeOrigin: true,
       },
       "/inventory": {
-        target: "https://foodvc-server.onrender.com",
+        target: "http://localhost:3000",
         changeOrigin: true,
       }
     },
-    historyApiFallback: true, // Chấp nhận routing client-side và chuyển hướng các yêu cầu không khớp
   },
 });

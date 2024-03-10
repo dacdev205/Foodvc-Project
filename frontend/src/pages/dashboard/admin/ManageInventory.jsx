@@ -16,7 +16,7 @@ import Pagination from "../../../components/Pagination";
 import FormattedPrice from "../../../components/FormatedPriece";
 
 const ManageInventory = () => {
-  const PF = "https://foodvc-server.onrender.com";
+  const PF = "http://localhost:3000";
   const [inventory, , refetch] = useInventory();
   const axiosSecure = useAxiosSecure();
   const getTransferredItemsFromStorage = () => {

@@ -29,7 +29,7 @@ module.exports = class inventoryAPI {
         product.image = imagename;
         try {
             await Inventory.create(product);
-            res.status(201).json({message: "Product created successfully"});
+            res.status(201).json(product);
         } catch (err) {
             res.status(400).json({message: err.message});
         }
@@ -41,11 +41,13 @@ module.exports = class inventoryAPI {
         const productInInventory = await Inventory.findById(productId);
         productInInventory.quantity -= quantity;
         await productInInventory.save();
-        await axios.post("https://foodvc-server.onrender.com/api/foodvc/add-to-menu", {
+        
+        await axios.post("http://localhost:3000/api/foodvc/add-to-menu", {
           productId,
           quantity,
         });
-    
+        productInInventory.transferredToMenu = true;
+        await productInInventory.save();
         res.status(200).json({ message: "Product transferred successfully" });
       } catch (error) {
         console.error("Error transferring product:", error);

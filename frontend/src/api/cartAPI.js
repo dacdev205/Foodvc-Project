@@ -1,5 +1,5 @@
 import axios from "axios";
-const url = "https://foodvc-server.onrender.com/cart"
+const url = "http://localhost:3000/cart"
 
 export default class cartAPI {
   static async getAllCart(email) {

@@ -1,5 +1,5 @@
 import axios from "axios";
-const url = "https://foodvc-server.onrender.com/reviews"
+const url = "http://localhost:3000/reviews"
 
 export default class reviewAPI {
     static async getProductById(id){
@@ -30,7 +30,7 @@ export default class reviewAPI {
       }
     }
     static async getReviewById(id){
-      const res = await axios.get(`https://foodvc-server.onrender.com/reviews/editReview/${id}`);
+      const res = await axios.get(`http://localhost:3000/reviews/editReview/${id}`);
       return res.data;
   }
 }

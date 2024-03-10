@@ -22,14 +22,11 @@ const useCart = () => {
       if (!email) {
         return [];
       }
-      const res = await fetch(
-        `https://foodvc-server.onrender.com/cart?email=${email}`,
-        {
-          headers: {
-            authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const res = await fetch(`http://localhost:3000/cart?email=${email}`, {
+        headers: {
+          authorization: `Bearer ${token}`,
+        },
+      });
       if (!res.ok) {
         return [];
       }

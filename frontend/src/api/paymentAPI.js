@@ -1,5 +1,5 @@
 import axios from "axios";
-const url = "https://foodvc-server.onrender.com/check-out"
+const url = "http://localhost:3000/check-out"
 
 export default class paymentAPI {
   static async getAllPayment(email) {

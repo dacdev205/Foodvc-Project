@@ -21,7 +21,7 @@ const Payment = () => {
   const [selectedAddress, setSelectedAddress] = useState(null);
 
   const { user } = useAuth();
-  const PF = "https://foodvc-server.onrender.com";
+  const PF = "http://localhost:3000";
   const shippingFee = 35000;
   const [addressUser, setAddress] = useState({
     street: "",

@@ -19,6 +19,10 @@ const inventorySchema = mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  transferredToMenu: {
+    type: Boolean,
+    default: false,
+  },
   expirationDate: {
     type: Date,
     default: function() {

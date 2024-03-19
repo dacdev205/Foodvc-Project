@@ -11,19 +11,26 @@ module.exports = class usersAPI {
           res.status(500).json({ message: error.message });
         }
       };
-      
+     
       static async getSigleUser(req, res) {
-        const userId = req.body._id;
+        const id = req.params.id;
         try {
-          console.log("Request User ID:", userId);
-          const user = await User.findOne({ userId: userId });
+          const user = await User.findById(id);
           res.status(200).json(user);
         } catch (err) {
           res.status(500).json({ message: err.message });
         }
       }
-      
-      
+      static async getUserByEmail(req, res) {
+        const email = req.params.email;
+        try {
+          const user = await User.findOne({ email });
+          res.status(200).json(user);
+
+        } catch (error) {
+          res.status(500).json({ message: err.message });
+        }
+      }
       // post a new user
       static async createUser (req, res) {
         const user = req.body;

@@ -91,10 +91,10 @@ code với giao diện bắt mắt, dễ sử dụng.
 
 ## Các Chức Năng
 
-Bao gồm hầu như toàn bộ các chức năng cơ bản của một website E-commerce
+Bao gồm hầu như toàn bộ các chức năng cơ bản của một website E-commerce.
 
 ## Thông Tin Thêm
 
-Sản phẩm chỉ dùng để học tập các công nghệ không dùng cho mục đích thương mại
+Sản phẩm chỉ dùng để học tập các công nghệ không dùng cho mục đích thương mại.
 
 ---

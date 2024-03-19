@@ -17,6 +17,7 @@ import ReviewFormEdit from "./ReviewFormEdit";
 import paymentAPI from "../api/paymentAPI";
 import orderAPI from "../api/orderAPI";
 import Modal from "./Modal";
+import LoadingSpinner from "./LoadingSpinner";
 const CardDetails = () => {
   const { id } = useParams();
   const { user } = useContext(AuthContext);
@@ -314,7 +315,7 @@ const CardDetails = () => {
   if (!product) {
     return (
       <div className="flex justify-center items-center h-screen">
-        <p className="text-xl font-semibold text-gray-700">Loading...</p>
+        <LoadingSpinner />
       </div>
     );
   }

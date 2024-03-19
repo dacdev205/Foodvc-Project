@@ -28,7 +28,7 @@ input::-webkit-inner-spin-button {
 }
 
 * {
-  border-style: none !important;
+  border-style: none;
 }
 html {
   background-color: #fff !important;

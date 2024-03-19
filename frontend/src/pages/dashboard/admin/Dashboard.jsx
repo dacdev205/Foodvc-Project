@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import useAuth from "../../../hooks/useAuth";
 import { useQuery } from "@tanstack/react-query";
 import useAxiosSecure from "../../../hooks/useAxiosSecure";
@@ -8,9 +8,8 @@ import { FaBook, FaShoppingCart } from "react-icons/fa";
 import FormattedPrice from "../../../components/FormatedPriece";
 import ChartMonthlyRevenue from "../../../components/ChartMonthlyRevenue";
 import ChartProduct from "../../../components/ChartProduct";
-// import ChartBar from "../../../components/ChartBar";
-
 import statsAPI from "../../../api/statsAPI";
+import * as XLSX from "xlsx";
 const Dashboard = () => {
   const { user } = useAuth();
   const axiosSecure = useAxiosSecure();
@@ -26,10 +25,12 @@ const Dashboard = () => {
       return res.data;
     },
   });
+  useEffect(() => {
+    console.log(productRevenueData);
+  }, [productRevenueData]);
   const handleYearChange = async (e) => {
     const year = parseInt(e.target.value);
     setSelectedYear(year);
-    // Sau khi refetch hoàn thành, gọi fetchDataByYear để lấy dữ liệu cho năm mới
     const newData = await statsAPI.fetchDataByYear(year);
     setMonthlyRevenueData(newData);
   };
@@ -39,6 +40,59 @@ const Dashboard = () => {
     const newData = await statsAPI.fetchDataByMonth(selectedYear, month);
     setProductRevenueData(newData);
   };
+  const exportToExcel = (selectedMonth) => {
+    if (
+      !monthlyRevenueData ||
+      !Array.isArray(monthlyRevenueData.monthlyRevenue)
+    ) {
+      console.error("Invalid monthly revenue data");
+      return;
+    }
+
+    const selectedMonthData = monthlyRevenueData.monthlyRevenue.find(
+      (item) => item._id === selectedMonth
+    );
+    if (!selectedMonthData) {
+      console.error("Selected month data not found");
+      return;
+    }
+    const products = productRevenueData;
+    const data = [];
+    Object.keys(products).forEach((category) => {
+      const productInfo = products[category].products[0];
+      const productData = {
+        Tháng: selectedMonthData._id,
+        "Loại hàng": category,
+        "Tên sản phẩm": productInfo.name,
+        "Số lượng": productInfo.quantity,
+        "Doanh thu": productInfo.totalAmount,
+      };
+
+      data.push(productData);
+    });
+    const ws = XLSX.utils.json_to_sheet(data);
+    // Define border style
+    const borderStyle = {
+      top: { style: "thin" },
+      bottom: { style: "thin" },
+      left: { style: "thin" },
+      right: { style: "thin" },
+    };
+
+    // Apply border to all cells
+    const range = XLSX.utils.decode_range(ws["!ref"]);
+    for (let R = range.s.r; R <= range.e.r; ++R) {
+      for (let C = range.s.c; C <= range.e.c; ++C) {
+        const cellAddress = { c: C, r: R };
+        const cellRef = XLSX.utils.encode_cell(cellAddress);
+        ws[cellRef].s = { border: borderStyle };
+      }
+    }
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, `Doanh thu tháng ${selectedMonth}`);
+    XLSX.writeFile(wb, `doanh_thu_thang_${selectedMonth}.xlsx`);
+  };
+
   return (
     <div className="w-full mx-auto px-4">
       <h2 className="text-2xl font-bold my-4 text-black">
@@ -90,12 +144,16 @@ const Dashboard = () => {
             <option value={new Date().getFullYear()}>Năm hiện tại</option>
             <option value={"2021"}>Năm 2021</option>
           </select>
+          <button
+            onClick={() => exportToExcel(selectedMonth)}
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          >
+            Export to Excel
+          </button>
           <ChartMonthlyRevenue
             data={monthlyRevenueData}
             selectedYear={selectedYear}
           />
-          <p className="text-lg font-bold text-black">Các danh mục khác:</p>
-          {/* <ChartBar data={stats}></ChartBar> */}
         </div>
         <div>
           <p className="text-lg font-bold text-black">
@@ -118,6 +176,25 @@ const Dashboard = () => {
             </select>
           </div>
           <ChartProduct data={productRevenueData} />
+        </div>
+      </div>
+      <div className="grid grid-cols-2 gap-4 mt-8">
+        <div>
+          <p className="text-lg font-bold text-black">Xem thống kê doanh thu</p>
+          <select value={selectedYear} onChange={handleYearChange}>
+            <option value={new Date().getFullYear()}>Năm hiện tại</option>
+            <option value={"2021"}>Năm 2021</option>
+          </select>
+          <button
+            onClick={() => exportToExcel(selectedMonth)}
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          >
+            Export to Excel
+          </button>
+          <ChartMonthlyRevenue
+            data={monthlyRevenueData}
+            selectedYear={selectedYear}
+          />
         </div>
       </div>
     </div>

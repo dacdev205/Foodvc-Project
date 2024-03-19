@@ -20,13 +20,14 @@ const Users = () => {
   });
 
   const filteredUsers = users.filter((user) => {
+    if (!user) return false;
     const lowerSearchTerm = searchTerm.toLowerCase();
     if (filterType === "name") {
-      return user.name.toLowerCase().includes(lowerSearchTerm);
+      return user.name && user.name.toLowerCase().includes(lowerSearchTerm);
     } else if (filterType === "role") {
-      return user.role.toLowerCase().includes(lowerSearchTerm);
+      return user.role && user.role.toLowerCase().includes(lowerSearchTerm);
     }
-    return true; // Default to no filter if filterType is not recognized
+    return true;
   });
   // Pagination logic
   const indexOfLastItem = currentPage * itemsPerPage;

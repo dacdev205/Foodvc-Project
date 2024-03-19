@@ -86,9 +86,9 @@ const UserOders = () => {
                       <FormattedPrice price={order.totalAmount} />
                     </td>
                     <td>{displayStatus(order.status)}</td>
-                    <td>
+                    <Link to="/admin-chat">
                       <button className="btn">Liên hệ</button>
-                    </td>
+                    </Link>
                   </tr>
                 ))}
               </tbody>

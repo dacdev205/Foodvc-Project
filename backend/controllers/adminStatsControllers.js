@@ -8,8 +8,6 @@ module.exports = class StatsAPI {
             const users = await User.countDocuments();
             const menuItems = await Menu.countDocuments();
             const orders = await Order.countDocuments();
-            // const oldestOrder = await Order.findOne({}, {}, { sort: { 'createdAt': 1 } });
-            // const newestOrder = await Order.findOne({}, {}, { sort: { 'createdAt': -1 } });
            
             let revenue = 0;
             const deliveredOrders = await Order.find({ status: "Delivered" });
@@ -25,15 +23,11 @@ module.exports = class StatsAPI {
                 [{ $set: { "month": { $month: "$createdAt" } } }]
             );
          
-            // const oldestMonth = oldestOrder ? new Date(oldestOrder.createdAt).toLocaleDateString("vi-VN", { month: "short" }) : '';
-            // const newestMonth = newestOrder ? new Date(newestOrder.createdAt).toLocaleDateString("vi-VN", { month: "short" }) : '';
             res.status(200).json({
                 users,
                 menuItems,
                 orders,
                 revenue,
-                // oldestMonth,
-                // newestMonth,
             }); 
 
         } catch (err) {
@@ -99,8 +93,8 @@ module.exports = class StatsAPI {
             const orders = await Order.find({
                 status: "Delivered",
                 createdAt: {
-                    $gte: new Date(selectedYear, selectedMonth - 1, 1), 
-                    $lt: new Date(selectedYear, selectedMonth, 1) 
+                    $gte: new Date(selectedYear, selectedMonth - 1, 1),
+                    $lt: new Date(selectedYear, selectedMonth, 1)
                 }
             });
     
@@ -108,13 +102,14 @@ module.exports = class StatsAPI {
     
             orders.forEach(order => {
                 if (order.status === "Delivered") {
-                    const totalAmount = order.totalAmount;
                     order.products.forEach(product => {
-                        const category = product.category;
+                        const { name, quantity, price, category } = product;
+                        const totalAmount = quantity * price;
                         if (category in monthlyRevenue) {
-                            monthlyRevenue[category] += totalAmount;
+                            monthlyRevenue[category].products.push({ name, quantity, totalAmount });
+                            monthlyRevenue[category].totalAmount += totalAmount; 
                         } else {
-                            monthlyRevenue[category] = totalAmount;
+                            monthlyRevenue[category] = { products: [{ name, quantity, totalAmount }]};
                         }
                     });
                 }
@@ -124,8 +119,7 @@ module.exports = class StatsAPI {
         } catch (err) {
             res.status(500).json({ message: err.message });
         }
-    }
-    
+    };
     
     
 }

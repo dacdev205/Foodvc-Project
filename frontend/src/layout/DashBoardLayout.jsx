@@ -13,7 +13,7 @@ import { FaUser, FaShoppingBag, FaQuestionCircle } from "react-icons/fa";
 const shareLinks = (
   <>
     <li>
-      <Link to="/help-users">
+      <Link to="/admin/help-users">
         <FaQuestionCircle />
         Hỗ trợ khách hàng
       </Link>

@@ -55,11 +55,9 @@ const AuthProvider = ({ children }) => {
       return Promise.reject("User is not authenticated");
     }
   };
-
   // check signed-in user
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      // console.log(currentUser);
       setUser(currentUser);
       if (currentUser) {
         const userInfo = { email: currentUser.email };

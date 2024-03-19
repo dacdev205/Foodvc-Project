@@ -1,7 +1,7 @@
 import React, { useContext, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
-import { FaGoogle, FaFacebook } from "react-icons/fa";
+import { FaGoogle, FaFacebook, FaEye, FaEyeSlash } from "react-icons/fa";
 import { AuthContext } from "../context/AuthProvider";
 import useAxiosPublic from "../hooks/useAxiosPublic";
 import * as Yup from "yup";
@@ -20,6 +20,8 @@ const Register = () => {
   const navigate = useNavigate();
   const from = location.state?.from?.pathname || "/";
   const axiosPublic = useAxiosPublic();
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const schema = Yup.object().shape({
     name: Yup.string().required("Tên người dùng là bắt buộc"),
@@ -44,6 +46,12 @@ const Register = () => {
         [name]: error.message,
       }));
     }
+  };
+
+  const togglePasswordVisibility = (fieldName) => {
+    fieldName === "password"
+      ? setShowPassword(!showPassword)
+      : setShowConfirmPassword(!showConfirmPassword);
   };
 
   const handleChange = (e) => {
@@ -105,7 +113,6 @@ const Register = () => {
       });
     });
   };
-
   return (
     <div className="max-w-md bg-white shadow w-full mx-auto flex items-center justify-center my-20">
       <div className="modal-action flex flex-col justify-center mt-0">
@@ -149,13 +156,22 @@ const Register = () => {
                 Mật khẩu (<span className="text-red">*</span>):
               </span>
             </label>
-            <input
-              type="password"
-              placeholder="password"
-              className="input input-bordered text-black"
-              {...register("password")}
-              onChange={(e) => handleChange(e)}
-            />
+            <div className="relative">
+              <input
+                type={showPassword ? "text" : "password"}
+                placeholder="password"
+                className="input input-bordered w-full text-black"
+                {...register("password")}
+                onChange={(e) => handleChange(e)}
+              />
+              <button
+                type="button"
+                className="absolute inset-y-0 right-0 p-3 flex items-center text-black"
+                onClick={() => togglePasswordVisibility("password")}
+              >
+                {showPassword ? <FaEyeSlash /> : <FaEye />}
+              </button>
+            </div>
             {errorMessage.password && (
               <p className="text-red text-xs italic">{errorMessage.password}</p>
             )}
@@ -166,19 +182,29 @@ const Register = () => {
                 Xác nhận mật khẩu (<span className="text-red">*</span>):
               </span>
             </label>
-            <input
-              type="password"
-              placeholder="confirm password"
-              className="input input-bordered text-black"
-              {...register("confirmPassword")}
-              onChange={(e) => handleChange(e)}
-            />
+            <div className="relative">
+              <input
+                type={showConfirmPassword ? "text" : "password"}
+                placeholder="confirm password"
+                className="input input-bordered pr-10 text-black"
+                {...register("confirmPassword")}
+                onChange={(e) => handleChange(e)}
+              />
+              <button
+                type="button"
+                className="absolute inset-y-0 right-0 p-3 flex items-center text-black"
+                onClick={() => togglePasswordVisibility("confirmPassword")}
+              >
+                {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
+              </button>
+            </div>
             {errorMessage.confirmPassword && (
               <p className="text-red text-xs italic">
                 {errorMessage.confirmPassword}
               </p>
             )}
           </div>
+          {/* Checkbox để chuyển đổi hiển thị mật khẩu */}
           <label className="label mt-1">
             <a href="#" className="label-text-alt link link-hover text-black">
               Quên mật khẩu?

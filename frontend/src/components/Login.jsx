@@ -1,7 +1,7 @@
 import React, { useContext, useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useForm } from "react-hook-form";
-import { FaGoogle, FaFacebook } from "react-icons/fa";
+import { FaGoogle, FaFacebook, FaEyeSlash, FaEye } from "react-icons/fa";
 import { AuthContext } from "../context/AuthProvider";
 import useAxiosPublic from "../hooks/useAxiosPublic";
 import * as Yup from "yup";
@@ -20,6 +20,7 @@ const Login = () => {
   const [errorMessageSubmit, setErrorMessageSubmit] = useState("");
   const axiosPublic = useAxiosPublic();
   const from = location.state?.from?.pathname || "/";
+  const [showPassword, setShowPassword] = useState(false);
 
   const schema = Yup.object().shape({
     email: Yup.string()
@@ -44,7 +45,9 @@ const Login = () => {
     const { name, value } = e.target;
     validateInput(name, value);
   };
-
+  const togglePasswordVisibility = (fieldName) => {
+    fieldName === "password" ? setShowPassword(!showPassword) : "";
+  };
   const onSubmit = async (data) => {
     try {
       await schema.validate(data, { abortEarly: false });
@@ -132,13 +135,22 @@ const Login = () => {
                     Mật khẩu (<span className="text-red">*</span>):
                   </span>
                 </label>
-                <input
-                  type="password"
-                  placeholder="password"
-                  className="input input-bordered text-black"
-                  {...register("password")}
-                  onChange={(e) => handleChange(e)}
-                />
+                <div className="relative">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    placeholder="password"
+                    className="input input-bordered text-black w-full"
+                    {...register("password")}
+                    onChange={(e) => handleChange(e)}
+                  />
+                  <button
+                    type="button"
+                    className="absolute inset-y-0 right-0 p-3 flex items-center text-black"
+                    onClick={() => togglePasswordVisibility("password")}
+                  >
+                    {showPassword ? <FaEyeSlash /> : <FaEye />}
+                  </button>
+                </div>
                 {errorMessage.password && (
                   <p className="text-red text-xs italic">
                     {errorMessage.password}

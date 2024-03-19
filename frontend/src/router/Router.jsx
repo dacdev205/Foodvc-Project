@@ -24,6 +24,8 @@ import Payment from "../pages/menuPage/Payment";
 import UserOrders from "../pages/dashboard/UserOders";
 import OrdersTracking from "../pages/dashboard/admin/OrdersTracking";
 import OrderDetail from "../components/OrderDetail";
+import HelpUsers from "../pages/dashboard/admin/HelpUsers";
+import ContactAdmin from "../components/ContactAdmin";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -72,6 +74,10 @@ const router = createBrowserRouter([
       {
         path: "/orders",
         element: <UserOrders />,
+      },
+      {
+        path: "/admin-chat",
+        element: <ContactAdmin />,
       },
     ],
   },
@@ -130,6 +136,10 @@ const router = createBrowserRouter([
       {
         path: "order-tracking/:id",
         element: <OrderDetail />,
+      },
+      {
+        path: "help-users",
+        element: <HelpUsers />,
       },
     ],
   },

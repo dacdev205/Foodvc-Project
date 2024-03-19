@@ -168,7 +168,12 @@ const Navbar = () => {
                 }
                 className="btn flex items-center gap-22 rounded-full px-6 bg-green text-white hover:bg-green hover:opacity-80"
               >
-                <FaUser /> Đăng nhập
+                <div className="flex">
+                  <span className="hidden md:flex">
+                    <FaUser />
+                  </span>{" "}
+                  Đăng nhập
+                </div>
               </button>
               <Modal></Modal>
             </div>

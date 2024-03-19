@@ -62,13 +62,11 @@ const Register = () => {
           .then((result) => {
             // Signed up
             const user = result.user;
-
             updateUserProfile(data.email, data.photoURL).then(() => {
               const userInfor = {
                 name: data.name,
                 email: data.email,
               };
-
               axiosPublic.post("/users", userInfor).then((response) => {
                 if (userInfor.name) {
                   alert("Đăng kí thành công!");

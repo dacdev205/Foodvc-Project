@@ -54,3 +54,13 @@ html input[type="tel"] {
   -moz-appearance: textfield;
   border: 1px solid #ccc !important;
 }
+
+.canvas-size {
+  height: 300px !important;
+  width: 300px !important;
+}
+
+.chart-line-style {
+  height: 100% !important;
+  width: 100% !important;
+}

@@ -79,7 +79,7 @@ const ChartMonthlyRevenue = ({ data, selectedYear }) => {
 
   return (
     <div>
-      <canvas ref={chartRef}></canvas>
+      <canvas className="chart-line-style" ref={chartRef}></canvas>
     </div>
   );
 };

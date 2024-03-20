@@ -109,7 +109,7 @@ module.exports = class StatsAPI {
                             monthlyRevenue[category].products.push({ name, quantity, totalAmount });
                             monthlyRevenue[category].totalAmount += totalAmount; 
                         } else {
-                            monthlyRevenue[category] = { products: [{ name, quantity, totalAmount }]};
+                            monthlyRevenue[category] = { products: [{ name, quantity, totalAmount }],totalAmount };
                         }
                     });
                 }

@@ -102,6 +102,7 @@ module.exports = class inventoryAPI {
             }
             const productInInventory = await Inventory.findById(menuItem._id);
             productInInventory.quantity += menuItem.quantity;
+            productInInventory.transferredToMenu = false;
             await productInInventory.save();
             await menuItem.remove();
         

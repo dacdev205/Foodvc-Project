@@ -215,7 +215,7 @@ const Register = () => {
             <input
               type="submit"
               value="Đăng kí ngay"
-              className="btn bg-green text-white hover:bg-green hover:opacity-80"
+              className="btn bg-green text-white hover:bg-green hover:opacity-80 border-none"
             />
           </div>
 
@@ -231,11 +231,11 @@ const Register = () => {
         <div className="text-center space-x-3 mb-5">
           <button
             onClick={handleLogin}
-            className="btn btn-circle hover:bg-green hover:text-white bg-slate-200 text-black"
+            className="btn btn-circle hover:bg-green hover:text-white bg-slate-200 text-black border-none"
           >
             <FaGoogle />
           </button>
-          <button className="btn btn-circle hover:bg-green hover:text-white bg-slate-200 text-black">
+          <button className="btn btn-circle hover:bg-green hover:text-white bg-slate-200 text-black border-none">
             <FaFacebook />
           </button>
         </div>

@@ -10,6 +10,7 @@ import menuAPI from "../../api/menuAPI";
 import { Link } from "react-router-dom";
 import inventoryAPI from "../../api/inventoryAPI";
 import FormattedPrice from "../../components/FormatedPriece";
+import { FaCheck } from "react-icons/fa6";
 import paymentAPI from "../../api/paymentAPI";
 const CartPage = () => {
   const [cart, refetchCart, isLoading] = useCart();
@@ -19,6 +20,7 @@ const CartPage = () => {
   const [selectedItems, setSelectedItems] = useState([]);
   const [selectAll, setSelectAll] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [selectAllChecked, setSelectAllChecked] = useState(false);
   const toggleSelectAll = () => {
     if (selectAll) {
       setSelectedItems([]);
@@ -66,24 +68,6 @@ const CartPage = () => {
     }
 
     return priceNumber;
-  };
-
-  const toggleItemSelection = (itemId) => {
-    setSelectedItems((prevSelected) => {
-      if (prevSelected.includes(itemId)) {
-        const updatedSelected = prevSelected.filter((id) => id !== itemId);
-        if (updatedSelected.length === 0) {
-          setSelectAll(false);
-        }
-        return updatedSelected;
-      } else {
-        const updatedSelected = [...prevSelected, itemId];
-        if (updatedSelected.length === cart.length) {
-          setSelectAll(true);
-        }
-        return updatedSelected;
-      }
-    });
   };
 
   //handleDelete(item)
@@ -181,7 +165,23 @@ const CartPage = () => {
     }
     return 0;
   };
-
+  const toggleItemSelection = (itemId) => {
+    setSelectedItems((prevSelected) => {
+      if (prevSelected.includes(itemId)) {
+        const updatedSelected = prevSelected.filter((id) => id !== itemId);
+        if (updatedSelected.length === 0) {
+          setSelectAll(false);
+        }
+        return updatedSelected;
+      } else {
+        const updatedSelected = [...prevSelected, itemId];
+        if (updatedSelected.length === cart.length) {
+          setSelectAll(true);
+        }
+        return updatedSelected;
+      }
+    });
+  };
   const cartSubTotal = selectedItems.reduce((totalPrice, itemId) => {
     const selectedItem = cart.find((item) => item._id === itemId);
     return totalPrice + calculatePrice(selectedItem);
@@ -226,7 +226,7 @@ const CartPage = () => {
                   </h2>
                   <div>
                     <Link to="/menu">
-                      <button className="btn bg-green text-white">
+                      <button className="btn bg-green text-white border-style hover:bg-green hover:opacity-80">
                         Tiếp tục mua sắm
                       </button>
                     </Link>
@@ -242,20 +242,27 @@ const CartPage = () => {
           <div>
             {/* PC devices */}
             <div className="overflow-x-auto">
-              <table className="hidden md:table">
+              <table className="hidden md:table border">
                 {/* head */}
                 <thead className="bg-green text-white rounded-sm ">
-                  <tr className="text-white">
+                  <tr className="text-white ">
                     <th>
-                      <div className="flex ">
+                      <label
+                        className="relative cursor-pointer"
+                        htmlFor="checkbox-all"
+                      >
                         <input
                           type="checkbox"
                           checked={selectAll}
+                          id="checkbox-all"
                           onChange={toggleSelectAll}
-                          className=" "
+                          className="appearance-none w-4 h-4 rounded-sm bg-white border-2 border-[#39d84A] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
                         />{" "}
+                        {selectAll && (
+                          <FaCheck className="absolute top-[-1px] left-[1px] text-green" />
+                        )}
                         <span>Sản phẩm</span>
-                      </div>
+                      </label>
                     </th>
                     <th>Hình ảnh</th>
                     <th>Tên sản phẩm</th>
@@ -267,18 +274,31 @@ const CartPage = () => {
                 <tbody className="">
                   {/* row 1 */}
                   {cart.map((item, index) => (
-                    <tr key={index} className="text-black">
+                    <tr key={index} className={styles.styleBordered}>
                       <td>
-                        <input
-                          type="checkbox"
-                          checked={selectedItems.includes(item._id)}
-                          onChange={() => toggleItemSelection(item._id)}
-                          className="text-white"
-                        />
+                        <label
+                          htmlFor={`check-box-${index}`}
+                          className="cursor-pointer relative"
+                        >
+                          <input
+                            type="checkbox"
+                            id={`check-box-${index}`}
+                            checked={selectedItems.includes(item._id)}
+                            onChange={() => toggleItemSelection(item._id)}
+                            className="appearance-none w-4 h-4 rounded-sm bg-white border-2 border-[#39d84A] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                          />
+                          <FaCheck
+                            className={`absolute top-0 left-[1px] text-green ${
+                              selectedItems.includes(item._id)
+                                ? "text-opacity-100"
+                                : "text-opacity-0"
+                            } check-1 transition`}
+                          />
+                        </label>
                       </td>
                       <td>
                         <div className="flex items-center gap-3">
-                          <div className="avatar">
+                          <div className="avatar hover:">
                             <Link
                               to={`/product/${item._id}`}
                               className="mask mask-squircle w-12 h-12"
@@ -294,7 +314,7 @@ const CartPage = () => {
                       <td className="text-center">
                         <div>
                           <button
-                            className="btn btn-xs bg-slate-200 hover:bg-slate-300 text-black"
+                            className="btn btn-xs bg-slate-200 hover:bg-slate-300 text-black border-none"
                             onClick={() => handleDecrease(item)}
                           >
                             -
@@ -312,7 +332,7 @@ const CartPage = () => {
                           />
                           <button
                             onClick={() => handleIncrease(item)}
-                            className="btn btn-xs bg-slate-200 hover:bg-slate-300 text-black"
+                            className="btn btn-xs bg-slate-200 hover:bg-slate-300 text-black border-none"
                           >
                             +
                           </button>
@@ -350,7 +370,7 @@ const CartPage = () => {
                 </div>
                 <Link to={"/check-out"}>
                   <button
-                    className="btn bg-green text-white px-5 w-full"
+                    className="btn bg-green text-white px-5 w-full hover:bg-green hover:opacity-80 border-none"
                     disabled={selectedItems.length === 0}
                     onClick={handleCheckOut}
                   >
@@ -365,16 +385,24 @@ const CartPage = () => {
             <div className="md:hidden">
               <div className={styles.mobileCartItemsContainer}>
                 <div className="flex justify-between">
-                  <div className="mb-8">
+                  <label
+                    className="relative cursor-pointer mb-8"
+                    htmlFor="checkbox-all"
+                  >
                     <input
                       type="checkbox"
                       checked={selectAll}
+                      id="checkbox-all"
                       onChange={toggleSelectAll}
+                      className="appearance-none w-4 h-4 rounded-sm bg-white border-2 border-[#39d84A] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
                     />{" "}
-                    <span className="text-black">Chọn toàn bộ</span>
-                  </div>
+                    {selectAll && (
+                      <FaCheck className="absolute top-0 left-[1px] text-green" />
+                    )}
+                    <span>Sản phẩm</span>
+                  </label>
                   <button
-                    className="btn btn-sm bg-slate-200 text-black hover:bg-slate-300"
+                    className="btn btn-sm bg-slate-200 text-black hover:bg-slate-300 border-none "
                     onClick={handleEditClick}
                   >
                     {isEditing ? "Xong" : "Sửa"}
@@ -387,12 +415,25 @@ const CartPage = () => {
                         isEditing ? styles.editing : ""
                       }`}
                     >
-                      <input
-                        type="checkbox"
-                        checked={selectedItems.includes(item._id)}
-                        onChange={() => toggleItemSelection(item._id)}
-                        className={styles.selectCheckbox}
-                      />
+                      <label
+                        htmlFor={`check-box-${index}`}
+                        className="cursor-pointer relative mr-1"
+                      >
+                        <input
+                          type="checkbox"
+                          id={`check-box-${index}`}
+                          checked={selectedItems.includes(item._id)}
+                          onChange={() => toggleItemSelection(item._id)}
+                          className="appearance-none w-4 h-4 rounded-sm bg-white border-2 border-[#39d84A] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                        />
+                        <FaCheck
+                          className={`absolute top-0 left-[1px] text-green ${
+                            selectedItems.includes(item._id)
+                              ? "text-opacity-100"
+                              : "text-opacity-0"
+                          } check-1 transition`}
+                        />
+                      </label>
                       <div className={styles.cartItemImage}>
                         <Link to={`/product/${item._id}`}>
                           <img src={PF + "/" + item.image} alt="product" />
@@ -412,7 +453,7 @@ const CartPage = () => {
                         </div>
                         <div>
                           <button
-                            className="btn btn-xs bg-slate-200 hover:bg-slate-300 text-black"
+                            className="btn btn-xs bg-slate-200 hover:bg-slate-300 text-black border-none"
                             onClick={() => handleDecrease(item)}
                           >
                             -
@@ -430,7 +471,7 @@ const CartPage = () => {
                           />
                           <button
                             onClick={() => handleIncrease(item)}
-                            className="btn btn-xs bg-slate-200 hover:bg-slate-300 text-black"
+                            className="btn btn-xs bg-slate-200 hover:bg-slate-300 text-black border-none"
                           >
                             +
                           </button>
@@ -454,7 +495,7 @@ const CartPage = () => {
                 <div className={styles.checkoutContainer}>
                   <div className="md:w-2/2 space-y-3">
                     <div className="flex items-center">
-                      <p className="text-lg text-black">
+                      <p className="md:text-lg text-black text-sm">
                         Tổng thanh toán ({selectedItems.length} Sản phẩm):{" "}
                       </p>
                       <FormattedPrice
@@ -464,7 +505,7 @@ const CartPage = () => {
                     </div>
                     <Link to={"/check-out"}>
                       <button
-                        className="btn bg-green text-white px-5 w-full hover:bg-green hover:opacity-80"
+                        className="btn bg-green text-white px-5 w-full hover:bg-green hover:opacity-80 border-style"
                         disabled={selectedItems.length === 0}
                         onClick={handleCheckOut}
                       >

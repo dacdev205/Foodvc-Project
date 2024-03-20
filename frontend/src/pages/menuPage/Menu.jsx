@@ -91,7 +91,7 @@ const Menu = () => {
               ăn ngon miệng như Salad Hy Lạp, Lasagne, Bí ngô Butternut, Tokusen
               Wagyu, Olivas Rellenas và nhiều món khác với chi phí vừa phải
             </p>
-            <button className="bg-green font-semibold btn text-white px-8 py-3 rounded-full">
+            <button className="bg-green font-semibold btn text-white px-8 py-3 rounded-full border-style hover:bg-green hover:opacity-80">
               Đặt ngay
             </button>
           </div>

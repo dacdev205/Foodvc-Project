@@ -5,6 +5,7 @@ import addressAPI from "../api/addressAPI";
 import useAuth from "../hooks/useAuth";
 import useAddress from "../hooks/useAddress";
 import { useForm } from "react-hook-form";
+import { FaCheck } from "react-icons/fa6";
 
 const AddressForm = ({ setAddress, paymentId }) => {
   const { user } = useAuth();
@@ -149,19 +150,24 @@ const AddressForm = ({ setAddress, paymentId }) => {
                 <input
                   type="submit"
                   value="Hoàn thành"
-                  className="btn bg-green text-white hover:bg-green hover:opacity-80"
+                  className="btn bg-green text-white hover:bg-green hover:opacity-80 border-style"
                 />
               </div>
-              <div className="form-control mt-3">
-                <label className="cursor-pointer flex items-center text-black">
+              <div className="form-control mt-3 relative">
+                <label
+                  className="cursor-pointer flex items-center text-black"
+                  htmlFor="checkbox-Default-Loca"
+                >
                   <input
                     type="checkbox"
                     name="isDefaultAddress"
                     checked={isDefaultAddress}
+                    id="checkbox-Default-Loca"
                     onChange={() => setIsDefaultAddress(!isDefaultAddress)}
-                    className="form-checkbox mr-2 "
+                    className="form-checkbox mr-2 appearance-none w-4 h-4 rounded-sm bg-white border-2 border-[#39d84A] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
                   />
                   Đặt làm địa chỉ mặc định
+                  <FaCheck className="absolute top-[3px] text-opacity-0 left-[1px] text-green check-Default" />
                 </label>
               </div>
             </form>

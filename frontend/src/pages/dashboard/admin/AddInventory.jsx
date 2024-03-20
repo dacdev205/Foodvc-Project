@@ -83,7 +83,7 @@ const AddInventory = () => {
                 type="number"
                 {...register("price", { required: true })}
                 placeholder="VD: 200000"
-                className="input input-bordered w-full text-black "
+                className="input input-bordered w-full text-black border-2 border-rose-500"
               />
             </div>
 

@@ -27,9 +27,6 @@ input::-webkit-inner-spin-button {
   margin: 0;
 }
 
-* {
-  border-style: none;
-}
 html {
   background-color: #fff !important;
 }
@@ -63,4 +60,17 @@ html input[type="tel"] {
 .chart-line-style {
   height: 100% !important;
   width: 100% !important;
+}
+
+.border-style {
+  border-style: none !important;
+  border-color: transparent !important;
+}
+
+#check-box-1:checked ~ {
+  @apply text-opacity-100;
+}
+
+#checkbox-Default-Loca:checked ~ .check-Default {
+  @apply text-opacity-100;
 }

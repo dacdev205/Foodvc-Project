@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 const Banner = () => {
   return (
@@ -17,16 +18,18 @@ const Banner = () => {
             mang trong mình một lịch sử, một văn hóa, và một cái nhìn sâu sắc về
             cuộc sống.
           </p>
-          <button className="btn bg-green px-8 py-3 font-semibold text-white rounded-full ">
-            Đặt ngay
-          </button>
+          <Link to="/menu">
+            <button className=" mt-3 bg-green px-8 py-3 font-semibold text-white rounded-full border-style hover:bg-green hover:opacity-80">
+              Đặt ngay
+            </button>
+          </Link>
         </div>
         {/* images */}
         <div className="md:w-1/2">
           <img src="/images/home/banner.png" alt="" />
 
           <div className="flex flex-col md:flex-row items-center justify-around -mt-14 gap-4">
-            <div className="flex bg-white py-2 px-3 rounded-2xl items-center gap-3 shadow-md w-64">
+            <div className="flex  py-2 px-3 rounded-2xl items-center gap-3 shadow-md w-64">
               <img
                 src="/images/home/b-food1.png"
                 alt=""
@@ -67,7 +70,6 @@ const Banner = () => {
                     readOnly
                   />
                 </div>
-                <p className="text-red">$19</p>
               </div>
             </div>
             <div className="sm:flex hidden bg-white py-2 px-3 rounded-2xl items-center gap-3 shadow-md w-64">
@@ -110,7 +112,6 @@ const Banner = () => {
                     readOnly
                   />
                 </div>
-                <p className="text-red">$19</p>
               </div>
             </div>
           </div>

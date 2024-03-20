@@ -24,7 +24,7 @@ const ChartProduct = ({ data }) => {
       );
       const revenues = categories.map((category) =>
         data[category].products.reduce(
-          (total, product) => total + product.quantity * product.totalAmount,
+          (total, product) => total + product.totalAmount,
           0
         )
       );

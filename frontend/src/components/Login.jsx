@@ -172,7 +172,7 @@ const Login = () => {
                 <input
                   type="submit"
                   value="Đăng nhập"
-                  className="btn bg-green text-white hover:bg-green hover:opacity-80"
+                  className="btn bg-green text-white hover:bg-green hover:opacity-80 border-none"
                 />
               </div>
 
@@ -187,12 +187,12 @@ const Login = () => {
             {/* social sign in */}
             <div className="text-center space-x-3 mb-5">
               <button
-                className="btn btn-circle hover:bg-green hover:text-white bg-slate-200 text-black"
+                className="btn btn-circle hover:bg-green hover:text-white bg-slate-200 text-black border-none"
                 onClick={handleLogin}
               >
                 <FaGoogle />
               </button>
-              <button className="btn btn-circle hover:bg-green hover:text-white bg-slate-200 text-black">
+              <button className="btn btn-circle hover:bg-green hover:text-white bg-slate-200 text-black border-none">
                 <FaFacebook />
               </button>
             </div>

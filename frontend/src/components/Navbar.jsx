@@ -116,7 +116,7 @@ const Navbar = () => {
               <div className="indicator">
                 <FaRegHeart size={18} />
                 {wishList.length > 0 && (
-                  <span className="badge badge-sm indicator-item bg-red text-white">
+                  <span className="badge badge-sm indicator-item bg-red text-white border-style">
                     {wishList.length}
                   </span>
                 )}
@@ -148,7 +148,7 @@ const Navbar = () => {
                   />
                 </svg>
                 {cart.length > 0 && (
-                  <span className="badge badge-sm indicator-item bg-red text-white">
+                  <span className="badge badge-sm indicator-item bg-red text-white border-style">
                     {cart.length}
                   </span>
                 )}
@@ -166,7 +166,7 @@ const Navbar = () => {
                 onClick={() =>
                   document.getElementById("modal-login").showModal()
                 }
-                className="btn flex items-center gap-22 rounded-full px-6 bg-green text-white hover:bg-green hover:opacity-80"
+                className="btn flex items-center gap-22 rounded-full px-6 border-none bg-green text-white hover:bg-green hover:opacity-80"
               >
                 <div className="flex">
                   <span className="hidden md:flex">

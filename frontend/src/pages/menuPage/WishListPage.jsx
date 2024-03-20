@@ -5,6 +5,8 @@ import LoadingSpinner from "../../components/LoadingSpinner";
 import useWishList from "../../hooks/useWishList";
 import { Link } from "react-router-dom";
 import FormattedPrice from "../../components/FormatedPriece";
+import styles from "../../CssModule/CartnWishPage.module.css";
+
 const WishListPage = () => {
   const [wishList, refetchWishList, isLoading] = useWishList();
   const PF = "http://localhost:3000";
@@ -66,7 +68,7 @@ const WishListPage = () => {
                   </h2>
                   <div>
                     <Link to="/menu">
-                      <button className="btn bg-green text-white">
+                      <button className="btn bg-green text-white border-style hover:bg-green hover:opacity-80">
                         Tiếp tục mua sắm
                       </button>
                     </Link>
@@ -80,10 +82,10 @@ const WishListPage = () => {
         {wishList.length ? (
           <div>
             <div className="overflow-x-auto">
-              <table className="hidden md:table text-center">
+              <table className="hidden md:table text-center border">
                 {/* head */}
-                <thead className="bg-green text-white rounded-sm">
-                  <tr className="text-white">
+                <thead className="bg-green text-white rounded-sm ">
+                  <tr className="text-white border-style">
                     <th>#</th>
                     <th>Hình ảnh</th>
                     <th>Tên sản phẩm</th>
@@ -94,7 +96,7 @@ const WishListPage = () => {
                 <tbody>
                   {/* row 1 */}
                   {wishList.map((item, index) => (
-                    <tr key={index} className="text-black">
+                    <tr key={index} className={styles.styleBordered}>
                       <td>{index + 1}</td>
                       <td>
                         <Link to={`/product/${item._id}`}>
@@ -129,10 +131,13 @@ const WishListPage = () => {
             <div className="md:hidden mobile-cart-items-container">
               {wishList.map((item, index) => (
                 <div className="flex justify-between" key={index}>
-                  <div className="cart-item">
+                  <div className="cart-item flex py-3 ">
                     <div className="p-3 text-black">{index + 1} </div>
-                    <div className="cart-item-image">
-                      <Link to={`/product/${item._id}`}>
+                    <div className="avatar hover:scale-105 transition-all duration-200 mr-3">
+                      <Link
+                        to={`/product/${item._id}`}
+                        className="mask mask-squircle w-12 h-12"
+                      >
                         <img src={PF + "/" + item.image} alt="product" />
                       </Link>
                     </div>
@@ -148,7 +153,7 @@ const WishListPage = () => {
                       className="delete-button"
                       onClick={() => handleDelete(item)}
                     >
-                      <FaTrash></FaTrash>
+                      <FaTrash className="text-red"></FaTrash>
                     </button>
                   </div>
                 </div>

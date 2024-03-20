@@ -47,7 +47,7 @@ const UserOders = () => {
                 </h2>
                 <div>
                   <Link to="/menu">
-                    <button className="btn bg-green text-white">
+                    <button className="btn bg-green text-white hover:bg-green hover:opacity-80 border-none">
                       Tiếp tục mua sắm
                     </button>
                   </Link>

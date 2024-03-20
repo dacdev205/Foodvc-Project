@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 const serviceLists = [
   {
@@ -43,9 +44,11 @@ const OurService = () => {
               ẩm thực khó quên và cung cấp các dịch vụ đặc biệt, kết hợp nghệ
               thuật ẩm thực với lòng hiếu khách nồng hậu.
             </blockquote>
-            <button className="btn bg-green text-white px-8 py-3 rounded-full">
-              Khám phá
-            </button>
+            <Link to="/about">
+              <button className="btn bg-green text-white px-8 py-3 rounded-full border-style hover:bg-green hover:opacity-80">
+                Khám phá
+              </button>
+            </Link>
           </div>
         </div>
 

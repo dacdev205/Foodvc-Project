@@ -18,7 +18,6 @@ const Payment = () => {
   const [address, refetchAddress] = useAddress();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [addressModalOpen, setAddressModalOpen] = useState(false);
-  const [selectedAddress, setSelectedAddress] = useState(null);
 
   const { user } = useAuth();
   const PF = "http://localhost:3000";
@@ -153,12 +152,12 @@ const Payment = () => {
               <div className="flex">
                 <div className="flex">
                   <div className="mr-3">
-                    <p className="text-lg font-bold">
+                    <p className="text-lg font-bold text-black">
                       {addressUser.fullName} {addressUser.phone}{" "}
                     </p>
                   </div>
                   <div className="mr-3">
-                    <p>
+                    <p className="text-black">
                       {addressUser.street && `${addressUser.street}, `}
                       {addressUser.ward && `${addressUser.ward}, `}
                       {addressUser.district && `${addressUser.district}, `}
@@ -175,7 +174,7 @@ const Payment = () => {
                   <table className="table ">
                     {/* head */}
                     <thead className="bg-green text-white rounded-sm">
-                      <tr>
+                      <tr className="border-style">
                         <th>Sản phẩm</th>
                         <th>Giá</th>
                         <th className="text-center">Số lượng</th>
@@ -185,7 +184,10 @@ const Payment = () => {
                     <tbody>
                       {/* row 1 */}
                       {item.products.map((product, index) => (
-                        <tr key={index} className="text-black">
+                        <tr
+                          key={index}
+                          className="text-black border border-green"
+                        >
                           <td>
                             <div className="flex items-center">
                               <div className="avatar p-3">
@@ -317,7 +319,7 @@ const Payment = () => {
                   </span>
                 </div>
                 <button
-                  className="btn bg-green text-white hover:bg-green hover:opacity-80 px-5 w-full"
+                  className="btn bg-green text-white hover:bg-green hover:opacity-80 px-5 w-full border-style"
                   onClick={handleBuyItem}
                 >
                   Đặt hàng

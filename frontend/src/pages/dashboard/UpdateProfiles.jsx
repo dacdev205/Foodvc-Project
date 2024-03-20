@@ -71,11 +71,12 @@ const UpdateProfile = () => {
             <input
               type="text"
               {...register("photoURL")}
-              className="file-input w-full mt-1 text-black"
+              className="file-input input w-full mt-1 text-black"
+              placeholder="Write photo URL"
             />
           </div>
           <div className="form-control mt-6">
-            <button className="btn bg-green text-white hover:bg-green hover:opacity-80">
+            <button className="btn bg-green text-white hover:bg-green hover:opacity-80 border-style">
               Chỉnh sửa
             </button>
           </div>

@@ -19,13 +19,7 @@ const ManageInventory = () => {
   const PF = "http://localhost:3000";
   const [inventory, , refetch] = useInventory();
   const axiosSecure = useAxiosSecure();
-  const getTransferredItemsFromStorage = () => {
-    const transferredItems = localStorage.getItem("transferredItems");
-    return transferredItems ? JSON.parse(transferredItems) : [];
-  };
-  const [transferredItems, setTransferredItems] = useState(
-    getTransferredItemsFromStorage()
-  );
+
   const [transferQuantity, setTransferQuantity] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const [sortType, setSortType] = useState("createdAt");
@@ -71,20 +65,6 @@ const ManageInventory = () => {
     indexOfFirstItem,
     indexOfLastItem
   );
-
-  useEffect(() => {
-    updateTransferredItems(getTransferredItemsFromStorage());
-  }, []);
-
-  const saveTransferredItemsToStorage = (items) => {
-    localStorage.setItem("transferredItems", JSON.stringify(items));
-  };
-
-  const updateTransferredItems = (newItems) => {
-    setTransferredItems(newItems);
-    saveTransferredItemsToStorage(newItems);
-  };
-
   const handleDeleteItem = (item) => {
     Swal.fire({
       title: "Are you sure?",
@@ -137,16 +117,12 @@ const ManageInventory = () => {
             text: "Your food has been transferred to the menu.",
             icon: "success",
           });
-          setTransferredItems((prevItems) => [...prevItems, item._id]);
-          updateTransferredItems([...transferredItems, item._id]);
         }
       }
     } catch (error) {
       console.error("Error transferring item:", error);
     }
   };
-
-  const isItemTransferred = (itemId) => transferredItems.includes(itemId);
 
   const handleRemoveFromMenu = async (item) => {
     try {
@@ -173,10 +149,7 @@ const ManageInventory = () => {
             text: "Your food has been removed from the menu.",
             icon: "success",
           });
-          const updatedTransferredItems = transferredItems.filter(
-            (id) => id !== item._id
-          );
-          updateTransferredItems(updatedTransferredItems);
+
           refetch();
         } else {
           Swal.fire({
@@ -315,7 +288,7 @@ const ManageInventory = () => {
                     </button>
                   </td>
                   <td>
-                    {isItemTransferred(item._id) ? (
+                    {item.transferredToMenu ? (
                       <div>
                         <button
                           onClick={() => handleUpdateQuantity(item)}

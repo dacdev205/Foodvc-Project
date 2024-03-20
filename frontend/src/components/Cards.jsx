@@ -31,12 +31,10 @@ const Cards = ({ item }) => {
   const [cart, refetchCart, isLoading] = useCart();
   const [wishList, refetchWishList] = useWishList();
 
-  // Use localStorage to store the list of _id of the wishItems that have been clicked.
   const [heartFilledIds, setHeartFilledIds] = useState(
     JSON.parse(localStorage.getItem("heartFilledIds")) || []
   );
   const isHeartFilled = heartFilledIds.includes(_id);
-  // Check if the _id of the item is in the list of wishItems that have been clicked.
 
   useEffect(() => {
     const fetchProductDetail = async () => {
@@ -136,7 +134,6 @@ const Cards = ({ item }) => {
     const averageRating = totalRating / reviews.length;
     return averageRating;
   };
-  //save list _id to localStorage when something change
 
   const formattedPrice = (price) => {
     const priceNumber = new Intl.NumberFormat("vi-VN", {
@@ -145,7 +142,6 @@ const Cards = ({ item }) => {
 
     const [, decimalPart] = priceNumber.split(",");
 
-    // Check if the part after the decimal point is greater than or equal to 5
     if (decimalPart && parseInt(decimalPart) >= 5) {
       return new Intl.NumberFormat("vi-VN", {
         currency: "VND",
@@ -208,7 +204,7 @@ const Cards = ({ item }) => {
         </div>
 
         <button
-          className="btn bg-green text-white hover:bg-green hover:opacity-80"
+          className="btn bg-green text-white hover:bg-green hover:opacity-80 border-style"
           onClick={() => handleAddToCart()}
           disabled={item.quantity === 0}
         >

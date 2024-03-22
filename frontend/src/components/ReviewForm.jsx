@@ -64,7 +64,7 @@ const ReviewForm = ({ productId, userId, userName, onSubmit }) => {
     <div>
       <div className="flex items-center justify-center">
         <button
-          className="btn bg-green w-full text-white hover:bg-green hover:opacity-80"
+          className="btn bg-green w-full text-white hover:bg-green hover:opacity-80 border-style"
           onClick={() => document.getElementById("modal-review").showModal()}
         >
           Viết đánh giá

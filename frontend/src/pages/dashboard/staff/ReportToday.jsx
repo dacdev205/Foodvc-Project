@@ -109,7 +109,7 @@ const ReportToday = () => {
   };
 
   return (
-    <div className="overflow-x-auto ">
+    <div className="overflow-none">
       <h1 className="text-lg text-black">Các đơn hơn đã tạo trong hôm nay:</h1>
       <table className="table text-black">
         {/* head */}

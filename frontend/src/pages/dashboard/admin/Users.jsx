@@ -34,13 +34,24 @@ const Users = () => {
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentUsers = filteredUsers.slice(indexOfFirstItem, indexOfLastItem);
 
-  const handleMakeAdmin = (user) => {
-    axiosSecure.patch(`/users/makeAdmin/${user._id}`).then((res) => {
-      alert(`${user.name} is now admin`);
-      refetch();
-    });
+  const handleRoleChange = async (user, role) => {
+    try {
+      // Gửi yêu cầu API để cập nhật quyền của người dùng
+      const response = await axiosSecure.patch(
+        `/users/users/${user._id}/role`,
+        {
+          role,
+        }
+      );
+      if (response.status === 200) {
+        // Nếu cập nhật thành công, hiển thị thông báo và refetch dữ liệu
+        alert(`${user.name} is now ${role}`);
+        refetch();
+      }
+    } catch (error) {
+      console.error("Lỗi khi cập nhật quyền:", error);
+    }
   };
-
   const handleDelete = (user) => {
     axiosSecure.delete(`/users/${user._id}`).then((res) => {
       alert(`${user.name} is removed from the database`);
@@ -87,7 +98,7 @@ const Users = () => {
       <div className="overflow-x-auto ">
         <table className="table md:w-[870px]">
           <thead className="bg-green text-white rounded-lg">
-            <tr>
+            <tr className="border-style">
               <th>#</th>
               <th>Tên người dùng</th>
               <th>Email</th>
@@ -97,7 +108,7 @@ const Users = () => {
           </thead>
           <tbody className="text-black">
             {currentUsers.map((user, index) => (
-              <tr key={index}>
+              <tr key={index} className="border-gray-300">
                 <th>{index + 1 + indexOfFirstItem}</th>
                 <td>{user.name}</td>
                 <td>{user.email}</td>
@@ -105,18 +116,19 @@ const Users = () => {
                   {user.role === "admin" ? (
                     "Admin"
                   ) : (
-                    <button
-                      className="btn btn-xs bg-white hover:bg-slate-300 text-green"
-                      onClick={() => handleMakeAdmin(user)}
+                    <select
+                      value={user.role}
+                      onChange={(e) => handleRoleChange(user, e.target.value)}
                     >
-                      <GrUserAdmin />
-                    </button>
+                      <option value="staff">Nhân viên</option>
+                      <option value="user">Người dùng</option>
+                    </select>
                   )}
                 </td>
                 <td>
                   <button
                     onClick={() => handleDelete(user)}
-                    className="btn btn-xs bg-white hover:bg-slate-300 text-red"
+                    className="btn btn-xs bg-white hover:bg-slate-300 text-red border-style"
                   >
                     <FaTrash />
                   </button>

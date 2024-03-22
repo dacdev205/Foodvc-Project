@@ -54,7 +54,7 @@ const SelectAddress = ({
                         <input
                           type="radio"
                           name="selectedAddress"
-                          className="mr-2 form-radio rounded-full focus:ring-gray-500 h-4 w-4"
+                          className="mr-2 appearance-none w-4 h-4 rounded-full bg-white border-2 border-[#8df097] checked:bg-[#39d84A] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
                           onChange={() => setSelectedAddress(addressItem)}
                         />
                         <span className="font-semibold border-r-2 border-gray-200 pr-1">
@@ -107,7 +107,7 @@ const SelectAddress = ({
                 ✕
               </button>
               <button
-                className="btn bg-green p-2 rounded-lg text-white hover:bg-green hover:opacity-80"
+                className="btn bg-green p-2 rounded-lg text-white hover:bg-green hover:opacity-80 border-style"
                 onClick={() => handleConfirmAddress(selectedAddress)}
               >
                 Xác nhận

@@ -16,7 +16,7 @@ const OrdersTracking = () => {
     };
 
     fetchAllOrders();
-  }, [allOrders]);
+  }, []);
   const paginate = (pageNumber) => {
     setCurrentPage(pageNumber);
   };
@@ -34,13 +34,17 @@ const OrdersTracking = () => {
   const handleStatusChangeSearch = (e) => {
     setSearchStatus(e.target.value);
   };
-
   const filteredOrders = allOrders.filter((order) => {
     return (
       order.orderCode.toLowerCase().includes(searchTerm.toLowerCase()) &&
       (searchStatus === "" || order.status === searchStatus)
     );
   });
+  const currentOrders = filteredOrders.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
   return (
     <div className="w-full md:w-[870px] px-4 mx-auto">
       <div>
@@ -80,7 +84,7 @@ const OrdersTracking = () => {
               </thead>
               <tbody>
                 {/* row 1 */}
-                {filteredOrders.map((order, index) => (
+                {currentOrders.map((order, index) => (
                   <tr key={index} className="text-black border-gray-300">
                     <td>{index + 1}</td>
                     <td>

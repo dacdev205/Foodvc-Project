@@ -385,7 +385,7 @@ const CardDetails = () => {
                 <div>
                   <span>Số lượng: </span>
                   <button
-                    className="btn btn-xs text-black bg-slate-200 hover:bg-slate-300 "
+                    className="btn btn-xs text-black bg-slate-200 hover:bg-slate-300 border-style"
                     onClick={() => handleDecrease()}
                   >
                     -
@@ -398,7 +398,7 @@ const CardDetails = () => {
                   />
                   <button
                     onClick={() => handleIncrease()}
-                    className="btn btn-xs text-black bg-slate-200 hover:bg-slate-300 "
+                    className="btn btn-xs text-black bg-slate-200 hover:bg-slate-300 border-style"
                   >
                     +
                   </button>
@@ -407,14 +407,14 @@ const CardDetails = () => {
                   </span>
                 </div>
                 <button
-                  className="mt-3 btn bg-green text-white hover:bg-green hover:opacity-80"
+                  className="mt-3 btn bg-green text-white hover:bg-green hover:opacity-80 border-style"
                   onClick={() => handleAddToCart(product)}
                   disabled={product.quantity === 0}
                 >
                   Thêm vào giỏ hàng
                 </button>
                 <button
-                  className={`mt-10 ml-3 btn bg-green text-white hover:bg-green hover:opacity-80${
+                  className={`mt-10 ml-3 btn bg-green text-white hover:bg-green hover:opacity-80 border-style${
                     product.quantity === 0
                       ? "cursor-not-allowed text-black"
                       : ""

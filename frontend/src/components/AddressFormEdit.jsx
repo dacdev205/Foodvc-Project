@@ -4,6 +4,7 @@ import AddressSearchBar from "./AddressSearchBar";
 import addressAPI from "../api/addressAPI";
 import useAuth from "../hooks/useAuth";
 import useAddress from "../hooks/useAddress";
+import { FaCheck } from "react-icons/fa6";
 
 const AddressFormEdit = ({
   isModalEditOpen,
@@ -191,18 +192,20 @@ const AddressFormEdit = ({
                 <input
                   type="submit"
                   value="Cập nhật"
-                  className="btn bg-green text-white hover:bg-green hover:opacity-80"
+                  className="btn bg-green text-white hover:bg-green hover:opacity-80 border-style"
                 />
               </div>
               <div className="form-control mt-3">
-                <label className="cursor-pointer flex items-center text-black">
+                <label className="cursor-pointer flex items-center text-black relative">
                   <input
                     type="checkbox"
-                    name="isDefaultAddress"
                     checked={isDefaultAddress}
                     onChange={() => setIsDefaultAddress(!isDefaultAddress)}
-                    className="form-checkbox mr-2"
+                    className="mr-2 appearance-none w-4 h-4 rounded-sm bg-white border-2 border-[#39d84A] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
                   />
+                  {isDefaultAddress && (
+                    <FaCheck className="absolute top-[3px] left-[1px] text-green" />
+                  )}
                   Đặt làm địa chỉ mặc định
                 </label>
               </div>

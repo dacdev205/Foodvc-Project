@@ -4,6 +4,7 @@ import Pagination from "../../../components/Pagination";
 import axios from "axios";
 import inventoryAPI from "../../../api/inventoryAPI";
 import FormattedPrice from "../../../components/FormatedPriece";
+import { FaCheck } from "react-icons/fa6";
 const AddVoucher = () => {
   const [menu, , refetch] = useMenu();
   const PF = "http://localhost:3000";
@@ -175,7 +176,7 @@ const AddVoucher = () => {
         <div className="overflow-x-auto">
           <table className="table ">
             <thead>
-              <tr className="text-black">
+              <tr className="text-black border-style">
                 <th>#</th>
                 <th>Stt</th>
                 <th>Hình ảnh</th>
@@ -193,13 +194,27 @@ const AddVoucher = () => {
             </thead>
             <tbody>
               {currentMenu.map((item, index) => (
-                <tr key={index} className="text-black">
+                <tr key={index} className="text-black border-gray-300">
                   <td>
-                    <input
-                      type="checkbox"
-                      value={item._id}
-                      onChange={(e) => handleCheckboxChange(e, item._id)}
-                    />
+                    <label
+                      htmlFor={`checkbox-${item._id}`}
+                      className="cursor-pointer relative"
+                    >
+                      <input
+                        type="checkbox"
+                        id={`checkbox-${item._id}`}
+                        checked={selectedProducts.includes(item._id)}
+                        onChange={(e) => handleCheckboxChange(e, item._id)}
+                        className="appearance-none w-4 h-4 rounded-sm bg-white border-2 border-[#39d84A] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                      />
+                      <FaCheck
+                        className={`absolute top-0 left-[1px] text-green ${
+                          selectedProducts.includes(item._id)
+                            ? "text-opacity-100"
+                            : "text-opacity-0"
+                        } check-${item._id} transition`}
+                      />
+                    </label>
                   </td>
                   <th>{index + 1}</th>
 

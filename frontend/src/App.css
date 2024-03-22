@@ -70,7 +70,3 @@ html input[type="tel"] {
 #check-box-1:checked ~ {
   @apply text-opacity-100;
 }
-
-#checkbox-Default-Loca:checked ~ .check-Default {
-  @apply text-opacity-100;
-}

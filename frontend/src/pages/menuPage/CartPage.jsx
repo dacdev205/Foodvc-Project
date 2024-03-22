@@ -20,7 +20,6 @@ const CartPage = () => {
   const [selectedItems, setSelectedItems] = useState([]);
   const [selectAll, setSelectAll] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-  const [selectAllChecked, setSelectAllChecked] = useState(false);
   const toggleSelectAll = () => {
     if (selectAll) {
       setSelectedItems([]);
@@ -245,7 +244,7 @@ const CartPage = () => {
               <table className="hidden md:table border">
                 {/* head */}
                 <thead className="bg-green text-white rounded-sm ">
-                  <tr className="text-white ">
+                  <tr className="text-white border-style">
                     <th>
                       <label
                         className="relative cursor-pointer"
@@ -292,7 +291,7 @@ const CartPage = () => {
                               selectedItems.includes(item._id)
                                 ? "text-opacity-100"
                                 : "text-opacity-0"
-                            } check-1 transition`}
+                            } check-${item._id} transition`}
                           />
                         </label>
                       </td>

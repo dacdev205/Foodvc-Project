@@ -10,6 +10,7 @@ router.get("/:id", usersAPI.getSigleUser)
 router.get("/getUserByEmail/:email",usersAPI.getUserByEmail)
 router.delete("/:id",verifyToken, verifyAdmin,usersAPI.deleteUser);
 router.get("/getAdmin/:email",verifyToken, usersAPI.getAdmin);
-router.patch("/makeAdmin/:id",verifyToken, verifyAdmin,usersAPI.makeAdmin)
+router.get("/getStaff/:email",verifyToken, usersAPI.getStaff);
 
+router.patch('/users/:id/role',verifyToken, verifyAdmin, usersAPI.updateUserRole);
 module.exports = router;

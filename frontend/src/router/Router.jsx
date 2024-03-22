@@ -26,6 +26,7 @@ import OrdersTracking from "../pages/dashboard/adminNstaff/OrdersTracking";
 import OrderDetail from "../components/OrderDetail";
 import HelpUsers from "../pages/dashboard/adminNstaff/HelpUsers";
 import ContactAdmin from "../components/ContactAdmin";
+import ReportToDay from "../pages/dashboard/staff/ReportToDay";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -140,6 +141,10 @@ const router = createBrowserRouter([
       {
         path: "help-users",
         element: <HelpUsers />,
+      },
+      {
+        path: "report",
+        element: <ReportToDay />,
       },
     ],
   },

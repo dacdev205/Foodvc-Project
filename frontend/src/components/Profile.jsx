@@ -4,10 +4,12 @@ import { AuthContext } from "../context/AuthProvider";
 import { Link, useNavigate } from "react-router-dom";
 import useAuth from "../hooks/useAuth";
 import useAdmin from "../hooks/useAdmin";
+import useStaff from "../hooks/useStaff";
 
 const Profile = ({ user }) => {
   const { logOut } = useContext(AuthContext);
   const navigate = useNavigate();
+  const [isStaff, isStaffLoading] = useStaff();
 
   const handleLogout = () => {
     logOut()
@@ -47,6 +49,15 @@ const Profile = ({ user }) => {
     setDrawerOpen(!drawerOpen);
   };
 
+  // if (isStaff) {
+  //   return (
+  //     <div className="h-screen flex justify-center items-center">
+  //       <Link to="/">
+  //         <button className="btn bg-green text-white">Back to Home</button>
+  //       </Link>
+  //     </div>
+  //   );
+  // }
   return (
     <div>
       <div
@@ -97,7 +108,7 @@ const Profile = ({ user }) => {
                 Đặt hàng
               </Link>
             </li>
-            {isAdmin ? (
+            {isAdmin || isStaff ? (
               <li>
                 <Link
                   className="active-link"

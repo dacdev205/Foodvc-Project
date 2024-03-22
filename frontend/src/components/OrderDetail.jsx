@@ -67,6 +67,12 @@ const OrderDetail = () => {
               {order.address.city}, {order.address.district},{" "}
               {order.address.ward}
             </p>
+            <div className="mt-3">
+              <h3 className="text-xl font-semibold mb-2">Lưu ý:</h3>
+              <p>
+                <strong>Lời nhắn:</strong> {order.note}
+              </p>
+            </div>
             <div className="mt-4">
               <h3 className="text-xl font-semibold mb-2">Sản phẩm:</h3>
               {order.products.map((product, index) => (

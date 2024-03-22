@@ -16,15 +16,15 @@ import Users from "../pages/dashboard/admin/Users";
 import NotFoundPage from "../components/NotFoundPage";
 import AddInventory from "../pages/dashboard/admin/AddInventory";
 import WishListPage from "../pages/menuPage/WishListPage";
-import ManageInventory from "../pages/dashboard/admin/ManageInventory";
+import ManageInventory from "../pages/dashboard/adminNstaff/ManageInventory";
 import UpdateItem from "../pages/dashboard/admin/UpdateItem";
 import AddVoucher from "../pages/dashboard/admin/AddVoucher";
-import ManageMenu from "../pages/dashboard/admin/ManageMenu";
+import ManageMenu from "../pages/dashboard/adminNstaff/ManageMenu";
 import Payment from "../pages/menuPage/Payment";
 import UserOrders from "../pages/dashboard/UserOders";
-import OrdersTracking from "../pages/dashboard/admin/OrdersTracking";
+import OrdersTracking from "../pages/dashboard/adminNstaff/OrdersTracking";
 import OrderDetail from "../components/OrderDetail";
-import HelpUsers from "../pages/dashboard/admin/HelpUsers";
+import HelpUsers from "../pages/dashboard/adminNstaff/HelpUsers";
 import ContactAdmin from "../components/ContactAdmin";
 const router = createBrowserRouter([
   {

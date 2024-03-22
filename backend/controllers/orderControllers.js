@@ -4,7 +4,7 @@ const Order = require('../models/order');
 
 module.exports = class orderAPI {
     static async createOrder(req, res) {
-        const {userId, email , products, totalAmount, orderCode, address } = req.body;
+        const {userId, email , products, totalAmount, orderCode, address,note } = req.body;
         
         try {
             const orders = await Order.create({
@@ -13,6 +13,7 @@ module.exports = class orderAPI {
                 products,
                 totalAmount,
                 orderCode,
+                note,
                 address
             });
             for (const product of products) {
@@ -90,4 +91,16 @@ module.exports = class orderAPI {
       res.status(500).json({ message: error.message });
     }
   }
+  static async reportRevenueToday(req, res) {
+    try {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const tomorrow = new Date(today);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        const orders = await Order.find({ createdAt: { $gte: today, $lt: tomorrow } });
+        res.json(orders);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+}
 }

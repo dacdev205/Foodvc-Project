@@ -1,10 +1,10 @@
 import React, { useContext, useEffect, useState } from "react";
 import { FaTrash } from "react-icons/fa";
 import wishListAPI from "../../api/wishListAPI";
-import LoadingSpinner from "../../components/LoadingSpinner";
+import LoadingSpinner from "../../ultis/LoadingSpinner";
 import useWishList from "../../hooks/useWishList";
 import { Link } from "react-router-dom";
-import FormattedPrice from "../../components/FormatedPriece";
+import FormattedPrice from "../../ultis/FormatedPriece";
 import styles from "../../CssModule/CartnWishPage.module.css";
 
 const WishListPage = () => {

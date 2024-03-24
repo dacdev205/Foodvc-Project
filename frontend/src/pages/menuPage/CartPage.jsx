@@ -4,12 +4,12 @@ import useCart from "../../hooks/useCart";
 import { FaTrash } from "react-icons/fa";
 import cartAPI from "../../api/cartAPI";
 import { AuthContext } from "../../context/AuthProvider";
-import LoadingSpinner from "../../components/LoadingSpinner";
+import LoadingSpinner from "../../ultis/LoadingSpinner";
 import Swal from "sweetalert2";
 import menuAPI from "../../api/menuAPI";
 import { Link } from "react-router-dom";
 import inventoryAPI from "../../api/inventoryAPI";
-import FormattedPrice from "../../components/FormatedPriece";
+import FormattedPrice from "../../ultis/FormatedPriece";
 import { FaCheck } from "react-icons/fa6";
 import paymentAPI from "../../api/paymentAPI";
 const CartPage = () => {

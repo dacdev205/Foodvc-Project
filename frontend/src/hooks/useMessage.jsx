@@ -16,7 +16,7 @@ const useMessage = () => {
     },
   });
 
-  return [messages, loading, refetch];
+  return { messages, loading, refetch };
 };
 
 export default useMessage;

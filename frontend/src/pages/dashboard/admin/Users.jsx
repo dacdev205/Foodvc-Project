@@ -1,9 +1,8 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { FaTrash, FaSearch } from "react-icons/fa";
-import { GrUserAdmin } from "react-icons/gr";
 import useAxiosSecure from "../../../hooks/useAxiosSecure";
-import Pagination from "../../../components/Pagination";
+import Pagination from "../../../ultis/Pagination";
 
 const Users = () => {
   const [searchTerm, setSearchTerm] = useState("");

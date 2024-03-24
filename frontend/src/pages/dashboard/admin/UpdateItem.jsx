@@ -5,7 +5,7 @@ import { FaUtensils } from "react-icons/fa";
 import inventoryAPI from "../../../api/inventoryAPI";
 import menuAPI from "../../../api/menuAPI";
 import React, { useEffect, useState } from "react";
-import QuillEditor from "../../../components/QuillEditor";
+import QuillEditor from "../../../ultis/QuillEditor";
 
 const UpdateMenu = () => {
   const { register, handleSubmit, setValue } = useForm({ mode: "onChange" });

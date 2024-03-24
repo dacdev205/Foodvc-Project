@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from "react";
-import LoadingSpinner from "../../components/LoadingSpinner";
+import LoadingSpinner from "../../ultis/LoadingSpinner";
 import usePayment from "../../hooks/usePayment";
-import FormattedPrice from "../../components/FormatedPriece";
+import FormattedPrice from "../../ultis/FormatedPriece";
 import { CiDiscount1, CiLocationOn } from "react-icons/ci";
 import useAuth from "../../hooks/useAuth";
 import useCart from "../../hooks/useCart";
 import orderAPI from "../../api/orderAPI";
 import useAddress from "../../hooks/useAddress";
-import AddressForm from "../../components/AddressForm";
-import SelectAddress from "../../components/SelectAddress";
+import AddressForm from "../../components/Address/AddressForm";
+import SelectAddress from "../../components/Address/SelectAddress";
 
 const Payment = () => {
   const [payment, refetch, isLoading] = usePayment();

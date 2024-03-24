@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import orderAPI from "../api/orderAPI";
-import FormattedPrice from "./FormatedPriece";
+import FormattedPrice from "../ultis/FormatedPriece";
 
 const OrderDetail = () => {
   const { id } = useParams();

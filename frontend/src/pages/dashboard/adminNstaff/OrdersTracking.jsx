@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
-import FormattedPrice from "../../../components/FormatedPriece";
+import FormattedPrice from "../../../ultis/FormatedPriece";
 import { Link } from "react-router-dom";
 import orderAPI from "../../../api/orderAPI";
-import Pagination from "../../../components/Pagination";
+import Pagination from "../../../ultis/Pagination";
 const OrdersTracking = () => {
   const [allOrders, setAllOrders] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");

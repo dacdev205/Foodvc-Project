@@ -12,8 +12,8 @@ import useAxiosSecure from "../../../hooks/useAxiosSecure";
 import inventoryAPI from "../../../api/inventoryAPI";
 import menuAPI from "../../../api/menuAPI";
 import useInventory from "../../../hooks/useInventory";
-import Pagination from "../../../components/Pagination";
-import FormattedPrice from "../../../components/FormatedPriece";
+import Pagination from "../../../ultis/Pagination";
+import FormattedPrice from "../../../ultis/FormatedPriece";
 
 const ManageInventory = () => {
   const PF = "http://localhost:3000";

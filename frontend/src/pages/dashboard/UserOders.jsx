@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
-import FormattedPrice from "../../components/FormatedPriece";
+import FormattedPrice from "../../ultis/FormatedPriece";
 import { Link } from "react-router-dom";
-const PF = "http://localhost:3000";
 import useOrders from "../../hooks/useOrders";
 const UserOders = () => {
   const [orders, refetch, isLoading] = useOrders();

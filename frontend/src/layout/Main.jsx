@@ -4,9 +4,8 @@ import { Outlet } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import "../App.css";
-import LoadingSpinner from "../components/LoadingSpinner";
+import LoadingSpinner from "../ultis/LoadingSpinner";
 const Main = () => {
-  const { user } = useContext(AuthContext);
   const { loading } = useContext(AuthContext);
   return (
     <div>

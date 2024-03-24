@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import useMenu from "../../../hooks/useMenu";
-import Pagination from "../../../components/Pagination";
-import FormattedPrice from "../../../components/FormatedPriece";
+import Pagination from "../../../ultis/Pagination";
+import FormattedPrice from "../../../ultis/FormatedPriece";
 
 const ManageMenu = () => {
   const [menu, , refetch] = useMenu();

@@ -3,7 +3,7 @@ import { FaUtensils } from "react-icons/fa";
 import { useForm } from "react-hook-form";
 import Swal from "sweetalert2";
 import inventoryAPI from "../../../api/inventoryAPI";
-import QuillEditor from "../../../components/QuillEditor";
+import QuillEditor from "../../../ultis/QuillEditor";
 
 const AddInventory = () => {
   const { register, handleSubmit, setValue, reset } = useForm({

@@ -1,42 +1,39 @@
 import React, { useEffect, useState, useRef } from "react";
-import useMessage2Admin from "../hooks/useMessage2Admin";
+import useMessage from "../hooks/useMessage";
 import singleAPI from "../api/userAPI";
 import { format } from "timeago.js";
 import InputEmoji from "react-input-emoji";
-import io from "socket.io-client";
 import useAdminData from "../hooks/useAdminData";
 import messageAPI from "../api/messagesAPI";
+import socket from "../socket/socket";
 
 const ContactAdmin = () => {
-  const [messages, refetch] = useMessage2Admin();
+  const { messages, loading, refetch } = useMessage();
   const [users, setUsers] = useState([]);
   const [chatId, setChatId] = useState("");
   const [selectedUser, setSelectedUser] = useState(null);
   const [newMessage, setNewMessage] = useState("");
-  const [onlineAdmins, setOnlineAdmins] = useState([]);
   const [messagesContent, setMessages] = useState([]);
-  const socket = useRef(null);
   const userData = useAdminData();
+  const socketRef = useRef(socket);
 
   useEffect(() => {
     if (selectedUser) {
-      socket.current = io("http://localhost:8800");
-      socket.current.emit("new-user-add", selectedUser._id);
-      socket.current.emit("new-user-add", userData._id);
-
-      socket.current.on("get-users", (users) => {
-        // Lọc ra các kết nối có vai trò là admin
-        const admins = users.filter((user) => user.role === "admin");
-        setOnlineAdmins(admins);
-      });
-      socket.current.on("connect", () => {
+      socketRef.current.emit("new-user-add", selectedUser._id);
+      socketRef.current.emit("new-user-add", userData._id);
+      socketRef.current.on("connect", () => {
         console.log("Connected to server");
-      });
-      socket.current.on("recieve-message", (data) => {
-        setMessages((prevMessages) => [...prevMessages, data.message]);
       });
     }
   }, [selectedUser, userData]);
+
+  useEffect(() => {
+    if (selectedUser) {
+      socketRef.current.on("receive-message", (data) => {
+        setMessages((prevMessages) => [...prevMessages, data.message]);
+      });
+    }
+  }, [selectedUser]);
 
   // fetch messages
   useEffect(() => {
@@ -75,7 +72,7 @@ const ContactAdmin = () => {
   };
 
   useEffect(() => {
-    if (chatId) {
+    if (chatId && selectedUser) {
       try {
         const fetchData = async () => {
           const data = await messageAPI.getChatWithId(chatId);
@@ -86,7 +83,7 @@ const ContactAdmin = () => {
         console.log("Error:", error);
       }
     }
-  }, [chatId]);
+  }, [chatId, selectedUser]);
 
   const handleSendMessage = async (e) => {
     e.preventDefault();
@@ -97,12 +94,13 @@ const ContactAdmin = () => {
         receivers: selectedUser._id,
         chatId: chatId,
       };
-      socket.current.emit("send-message", {
+      socketRef.current.emit("send-message", {
         receiverId: selectedUser._id,
         message: message,
       });
       await messageAPI.addMessage(message);
       setNewMessage("");
+      refetch();
     }
   };
   const handleChange = (newMessage) => {

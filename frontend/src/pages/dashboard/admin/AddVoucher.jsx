@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import useMenu from "../../../hooks/useMenu";
-import Pagination from "../../../components/Pagination";
+import Pagination from "../../../ultis/Pagination";
 import axios from "axios";
 import inventoryAPI from "../../../api/inventoryAPI";
-import FormattedPrice from "../../../components/FormatedPriece";
+import FormattedPrice from "../../../ultis/FormatedPriece";
 import { FaCheck } from "react-icons/fa6";
 const AddVoucher = () => {
   const [menu, , refetch] = useMenu();

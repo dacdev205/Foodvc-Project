@@ -3,6 +3,5 @@ const router = express.Router();
 const messageAPI = require('../controllers/messageControllers');
 
 router.post('/send-message', messageAPI.sendMessage);
-router.get('/', messageAPI.fetchAllMessages)
-router.get('/:chatId', messageAPI.fetchMessageById);
+router.get('/:conversasionsId', messageAPI.fetchMessageById);
 module.exports = router;

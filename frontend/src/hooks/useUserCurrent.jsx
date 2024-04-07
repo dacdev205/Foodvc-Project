@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import useAuth from "../hooks/useAuth";
-const useAdminData = () => {
+import useAuth from "./useAuth";
+const useUserCurrent = () => {
   const { user } = useAuth();
   const [userData, setUserData] = useState(null);
 
@@ -25,4 +25,4 @@ const useAdminData = () => {
   return userData;
 };
 
-export default useAdminData;
+export default useUserCurrent;

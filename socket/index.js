@@ -4,43 +4,44 @@ const io = require("socket.io")(8800, {
   },
 });
 
-// Sử dụng Map thay vì Array cho activeUsers
-const activeUsers = new Map();
+let users = [];
 
-function addUser(userId, socketId) {
-  activeUsers.set(userId, socketId);
-  console.log("New User Connected", activeUsers);
-}
+const addUser = (userId, socketId) => {
+  !users.some((user) => user.userId === userId) &&
+    users.push({ userId, socketId });
+};
 
-function removeUser(socketId) {
-  for (let [userId, id] of activeUsers) {
-    if (id === socketId) {
-      activeUsers.delete(userId);
-      console.log("User Disconnected", activeUsers);
-      break;
-    }
+const removeUser = (socketId) => {
+  const removedUser = users.find((user) => user.socketId === socketId);
+  users = users.filter((user) => user.socketId !== socketId);
+  if (removedUser) {
   }
-}
+};
 
-function sendMessage(data) {
-  const { receiverId } = data;
-  const socketId = activeUsers.get(receiverId);
-  console.log("Sending from socket to:", receiverId);
-  if (socketId) {
-    io.to(socketId).emit("receive-message", data);
-  }
-}
+const getUser = (userId) => {
+  return users.find((user) => user.userId === userId);
+};
 
 io.on("connection", (socket) => {
-  socket.on("new-user-add", (newUserId) => {
-    addUser(newUserId, socket.id);
-    io.emit("get-users", Array.from(activeUsers.keys()));
+  socket.on("addUser", (userId) => {
+    addUser(userId, socket.id);
+    io.emit("getUsers", users);
   });
+
+  socket.on("sendMessage", ({ senderId, receiverId, content }) => {
+    const user = getUser(receiverId);
+    if (user?.socketId) {
+      io.to(user.socketId).emit("getMessage", {
+        senderId,
+        content,
+      });
+    }
+  });
+  
+  
 
   socket.on("disconnect", () => {
     removeUser(socket.id);
-    io.emit("get-users", Array.from(activeUsers.keys()));
+    io.emit("getUsers", users);
   });
-
-  socket.on("send-message", sendMessage);
 });

@@ -1,150 +1,288 @@
+/* eslint-disable react-refresh/only-export-components */
+import React, { Suspense, lazy } from "react";
 import { createBrowserRouter } from "react-router-dom";
-import Main from "../layout/Main";
-import Home from "../pages/home/Home";
-import Menu from "../pages/menuPage/Menu";
-import Blog from "../pages/Blog/Blog";
-import About from "../pages/About/About";
-import Register from "../components/Register";
-import Login from "../components/Login";
+
+// Lazy load các components
+const MainLazyLoading = lazy(() => import("../layout/Main"));
+const HomeLazyLoading = lazy(() => import("../pages/home/Home"));
+const RegisterLazyLoading = lazy(() => import("../components/Register"));
+const LoginLazyLoading = lazy(() => import("../components/Login"));
+const PrivateRouterLazyLoading = lazy(() =>
+  import("../PrivateRouter/PrivateRouter")
+);
+const UpdateProfilesLazyLoading = lazy(() =>
+  import("../pages/dashboard/UpdateProfiles")
+);
+const CardDetailsLazyLoading = lazy(() => import("../components/CardDetails"));
+const CartPageLazyLoading = lazy(() => import("../pages/menuPage/CartPage"));
+const DashBoardLayoutLazyLoading = lazy(() =>
+  import("../layout/DashBoardLayout")
+);
+const DashboardLazyLoading = lazy(() =>
+  import("../pages/dashboard/admin/Dashboard")
+);
+const UsersLazyLoading = lazy(() => import("../pages/dashboard/admin/Users"));
+const NotFoundPageLazyLoading = lazy(() => import("../ultis/NotFoundPage"));
+const AddInventoryLazyLoading = lazy(() =>
+  import("../pages/dashboard/admin/AddInventory")
+);
+const WishListPageLazyLoading = lazy(() =>
+  import("../pages/menuPage/WishListPage")
+);
+const ManageInventoryLazyLoading = lazy(() =>
+  import("../pages/dashboard/adminNstaff/ManageInventory")
+);
+const UpdateItemLazyLoading = lazy(() =>
+  import("../pages/dashboard/admin/UpdateItem")
+);
+const AddVoucherLazyLoading = lazy(() =>
+  import("../pages/dashboard/admin/AddVoucher")
+);
+const ManageMenuLazyLoading = lazy(() =>
+  import("../pages/dashboard/adminNstaff/ManageMenu")
+);
+const PaymentLazyLoading = lazy(() => import("../pages/menuPage/Payment"));
+const UserOrdersLazyLoading = lazy(() =>
+  import("../pages/dashboard/UserOders")
+);
+const OrdersTrackingLazyLoading = lazy(() =>
+  import("../pages/dashboard/adminNstaff/OrdersTracking")
+);
+const OrderDetailLazyLoading = lazy(() => import("../components/OrderDetail"));
+const HelpUsersLazyLoading = lazy(() =>
+  import("../pages/dashboard/adminNstaff/HelpUsers")
+);
+const ContactAdminLazyLoading = lazy(() =>
+  import("../components/ContactAdmin")
+);
+const ReportTodayLazyLoading = lazy(() =>
+  import("../pages/dashboard/staff/ReportToday")
+);
+const MenuLazyLoading = lazy(() => import("../pages/menuPage/Menu"));
+const BlogLazyLoading = lazy(() => import("../pages/Blog/Blog"));
+const AboutLazyLoading = lazy(() => import("../pages/About/About"));
+import LoadingSpinner from "../ultis/LoadingSpinner";
 import PrivateRouter from "../PrivateRouter/PrivateRouter";
-import UpdateProfiles from "../pages/dashboard/UpdateProfiles";
-import CardDetails from "../components/CardDetails";
-import CartPage from "../pages/menuPage/CartPage";
-import DashBoardLayout from "../layout/DashBoardLayout";
-import Dashboard from "../pages/dashboard/admin/Dashboard";
-import Users from "../pages/dashboard/admin/Users";
-import NotFoundPage from "../ultis/NotFoundPage";
-import AddInventory from "../pages/dashboard/admin/AddInventory";
-import WishListPage from "../pages/menuPage/WishListPage";
-import ManageInventory from "../pages/dashboard/adminNstaff/ManageInventory";
-import UpdateItem from "../pages/dashboard/admin/UpdateItem";
-import AddVoucher from "../pages/dashboard/admin/AddVoucher";
-import ManageMenu from "../pages/dashboard/adminNstaff/ManageMenu";
-import Payment from "../pages/menuPage/Payment";
-import UserOrders from "../pages/dashboard/UserOders";
-import OrdersTracking from "../pages/dashboard/adminNstaff/OrdersTracking";
-import OrderDetail from "../components/OrderDetail";
-import HelpUsers from "../pages/dashboard/adminNstaff/HelpUsers";
-import ContactAdmin from "../components/ContactAdmin";
-import ReportToday from "../pages/dashboard/staff/ReportToday";
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <Main />,
+    element: (
+      <Suspense fallback={<LoadingSpinner />}>
+        <MainLazyLoading />
+      </Suspense>
+    ),
     children: [
       {
         path: "/",
-        element: <Home />,
+        element: (
+          <Suspense fallback={<LoadingSpinner />}>
+            <HomeLazyLoading />
+          </Suspense>
+        ),
       },
       {
         path: "/menu",
-        element: <Menu />,
+        element: (
+          <Suspense fallback={<LoadingSpinner />}>
+            <MenuLazyLoading />
+          </Suspense>
+        ),
       },
       {
         path: "/blog",
-        element: <Blog />,
+        element: (
+          <Suspense fallback={<LoadingSpinner />}>
+            <BlogLazyLoading />
+          </Suspense>
+        ),
       },
       {
         path: "/about",
-        element: <About />,
+        element: (
+          <Suspense fallback={<LoadingSpinner />}>
+            <AboutLazyLoading />
+          </Suspense>
+        ),
       },
       {
         path: "/update-profile",
-        element: <UpdateProfiles />,
+        element: (
+          <Suspense fallback={<LoadingSpinner />}>
+            <UpdateProfilesLazyLoading />
+          </Suspense>
+        ),
       },
       {
         path: "/product/:id",
-        element: <CardDetails />,
+        element: (
+          <Suspense fallback={<LoadingSpinner />}>
+            <CardDetailsLazyLoading />
+          </Suspense>
+        ),
       },
       {
         path: "/cart-page",
-        element: <CartPage />,
+        element: (
+          <Suspense fallback={<LoadingSpinner />}>
+            <CartPageLazyLoading />
+          </Suspense>
+        ),
       },
       {
         path: "/check-out",
-        element: <Payment />,
+        element: (
+          <Suspense fallback={<LoadingSpinner />}>
+            <PaymentLazyLoading />
+          </Suspense>
+        ),
       },
       {
         path: "/wish-list",
-        element: <WishListPage />,
-      },
-      {
-        path: "/menu",
-        element: <Menu />,
+        element: (
+          <Suspense fallback={<LoadingSpinner />}>
+            <WishListPageLazyLoading />
+          </Suspense>
+        ),
       },
       {
         path: "/orders",
-        element: <UserOrders />,
+        element: (
+          <Suspense fallback={<LoadingSpinner />}>
+            <UserOrdersLazyLoading />
+          </Suspense>
+        ),
       },
       {
         path: "/admin-chat",
-        element: <ContactAdmin />,
+        element: (
+          <Suspense fallback={<LoadingSpinner />}>
+            <ContactAdminLazyLoading />
+          </Suspense>
+        ),
       },
     ],
   },
   {
     path: "*",
-    element: <NotFoundPage />,
+    element: (
+      <Suspense fallback={<LoadingSpinner />}>
+        <NotFoundPageLazyLoading />
+      </Suspense>
+    ),
   },
   {
     path: "/register",
-    element: <Register />,
+    element: (
+      <Suspense fallback={<LoadingSpinner />}>
+        <RegisterLazyLoading />
+      </Suspense>
+    ),
   },
   {
     path: "/login",
-    element: <Login />,
+    element: (
+      <Suspense fallback={<LoadingSpinner />}>
+        <LoginLazyLoading />
+      </Suspense>
+    ),
   },
   {
     path: "/admin",
     element: (
-      <PrivateRouter>
-        <DashBoardLayout />
-      </PrivateRouter>
+      <Suspense fallback={<LoadingSpinner />}>
+        <PrivateRouter>
+          <DashBoardLayoutLazyLoading />
+        </PrivateRouter>
+      </Suspense>
     ),
     children: [
       {
         path: "",
-        element: <Dashboard />,
+        element: (
+          <Suspense fallback={<LoadingSpinner />}>
+            <DashboardLazyLoading />
+          </Suspense>
+        ),
       },
       {
         path: "users",
-        element: <Users />,
+        element: (
+          <Suspense fallback={<LoadingSpinner />}>
+            <UsersLazyLoading />
+          </Suspense>
+        ),
       },
       {
         path: "add-inventory",
-        element: <AddInventory />,
+        element: (
+          <Suspense fallback={<LoadingSpinner />}>
+            <AddInventoryLazyLoading />
+          </Suspense>
+        ),
       },
       {
         path: "manage-inventory",
-        element: <ManageInventory />,
+        element: (
+          <Suspense fallback={<LoadingSpinner />}>
+            <ManageInventoryLazyLoading />
+          </Suspense>
+        ),
       },
       {
         path: "manage-menu",
-        element: <ManageMenu />,
+        element: (
+          <Suspense fallback={<LoadingSpinner />}>
+            <ManageMenuLazyLoading />
+          </Suspense>
+        ),
       },
       {
         path: "update-item/:id",
-        element: <UpdateItem />,
+        element: (
+          <Suspense fallback={<LoadingSpinner />}>
+            <UpdateItemLazyLoading />
+          </Suspense>
+        ),
       },
       {
         path: "add-voucher",
-        element: <AddVoucher />,
+        element: (
+          <Suspense fallback={<LoadingSpinner />}>
+            <AddVoucherLazyLoading />
+          </Suspense>
+        ),
       },
       {
         path: "order-tracking",
-        element: <OrdersTracking />,
+        element: (
+          <Suspense fallback={<LoadingSpinner />}>
+            <OrdersTrackingLazyLoading />
+          </Suspense>
+        ),
       },
       {
         path: "order-tracking/:id",
-        element: <OrderDetail />,
+        element: (
+          <Suspense fallback={<LoadingSpinner />}>
+            <OrderDetailLazyLoading />
+          </Suspense>
+        ),
       },
       {
         path: "help-users",
-        element: <HelpUsers />,
+        element: (
+          <Suspense fallback={<LoadingSpinner />}>
+            <HelpUsersLazyLoading />
+          </Suspense>
+        ),
       },
       {
         path: "report",
-        element: <ReportToday />,
+        element: (
+          <Suspense fallback={<LoadingSpinner />}>
+            <ReportTodayLazyLoading />
+          </Suspense>
+        ),
       },
     ],
   },

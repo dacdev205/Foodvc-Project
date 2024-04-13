@@ -8,4 +8,5 @@ router.get("/allOrder", orderAPI.fetchAllOrder)
 router.get("/:id",orderAPI.getOrderById);
 router.get("/order-user/:userId", orderAPI.getUserOrders);
 router.patch("/:id", orderAPI.updateOrderStatus)
+router.get("/reports/today",orderAPI.reportRevenueToday)
 module.exports = router;

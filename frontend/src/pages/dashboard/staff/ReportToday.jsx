@@ -17,7 +17,6 @@ const ReportToday = () => {
       try {
         const response = await axiosSecure.get("/order/reports/today");
         setOrders(response.data);
-
         let revenue = 0;
         let productsSold = 0;
         response.data.forEach((order) => {
@@ -41,14 +40,6 @@ const ReportToday = () => {
   const exportToExcel = async () => {
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet("Báo cáo");
-
-    // Thêm tiêu đề "BÁO CÁO DOANH THU HÔM NAY"
-    const titleRow = worksheet.addRow(["BÁO CÁO DOANH THU HÔM NAY"]);
-    titleRow.font = { bold: true, size: 16 };
-    worksheet.mergeCells(`A${titleRow.number}:E${titleRow.number}`); // Merge các ô trong hàng chứa tiêu đề
-
-    // Thêm dòng trống
-    worksheet.addRow([]);
 
     // Định dạng cột
     const columns = [

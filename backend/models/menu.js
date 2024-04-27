@@ -23,19 +23,6 @@ const menuSchema = mongoose.Schema({
       return now;
     }
   },
-  storage: {
-    temperature: {
-      type: Number,
-      min: -273.15,  
-      max: 4,        
-      default: 4     
-    },
-    unit: {
-      type: String,
-      enum: ["Celsius", "Fahrenheit"],
-      default: "Celsius"
-    }
-  },
   reviews: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Review' }],
   createdAt: {
     type: Date,

@@ -1,12 +1,14 @@
 const Inventory = require("../models/inventory");
 const fs = require("fs");
+const Product = require("../models/product");
 const axios = require('axios');
 const Menu = require("../models/menu");
+
 module.exports = class inventoryAPI {
-    //fetch all menu
+    
     static async fetchAllInventory(req, res) {
         try {
-            const inventorys = await Inventory.find();
+            const inventorys = await Product.find();
             res.status(200).json(inventorys);
         } catch (err) {
             res.status(500).json({message: err.message});
@@ -16,7 +18,7 @@ module.exports = class inventoryAPI {
       static async fetchProductByID(req, res) {
         const id = req.params.id;
         try {
-            const product = await Inventory.findById(id);
+            const product = await Product.findById(id);
             res.status(200).json(product);
         } catch (err) {
             res.status(500).json({message: err.message});
@@ -24,21 +26,24 @@ module.exports = class inventoryAPI {
     }
     //create prduct 
     static async createProductInInventory(req, res) {
-        const product = req.body;
-        const imagename =req.file.filename;
-        product.image = imagename;
-        try {
-            await Inventory.create(product);
-            res.status(201).json(product);
-        } catch (err) {
-            res.status(400).json({message: err.message});
-        }
-    }
+      const productData = req.body; 
+      const imagename = req.file.filename;
+      productData.image = imagename; 
+      try {
+          const product = await Product.create(productData);
+  
+          const inventoryItem = await Inventory.create({ product: product._id });
+  
+          return res.status(201).json(inventoryItem);
+      } catch (error) {
+          return res.status(400).json({ message: error.message });
+      }
+  }
     // post product to menu
     static async postProductToMenu(req, res) {
       try {
         const { productId, quantity } = req.body;
-        const productInInventory = await Inventory.findById(productId);
+        const productInInventory = await Product.findById(productId);
         productInInventory.quantity -= quantity;
         await productInInventory.save();
         
@@ -60,7 +65,7 @@ module.exports = class inventoryAPI {
     let new_image = "";
     
     try {
-      const existingProduct = await Inventory.findById(id);
+      const existingProduct = await Product.findById(id);
   
       if (!existingProduct) {
         return res.status(404).json({ message: 'Product not found' });
@@ -100,7 +105,7 @@ module.exports = class inventoryAPI {
             if (!menuItem) {
               return res.status(404).json({ message: "Product not found in menu" });
             }
-            const productInInventory = await Inventory.findById(menuItem._id);
+            const productInInventory = await Product.findById(menuItem._id);
             productInInventory.quantity += menuItem.quantity;
             productInInventory.transferredToMenu = false;
             await productInInventory.save();
@@ -113,34 +118,31 @@ module.exports = class inventoryAPI {
           }
     }
 
-    static async deleteProductFromInventory(req, res) {
-      const id = req.params.id;
-      try {
-          const productInMenu = await Menu.findById(id);
-          if (productInMenu) {
-              const imgItemMenu = await Menu.findByIdAndDelete(id);
-              if(imgItemMenu.image !="") {
-                try {
-                    fs.unlinkSync("./uploads/" + imgItemMenu.image);
-                } catch (err) {
-                    console.log(err)
-                }
+      static async deleteProductFromInventory(req, res) {
+        const id = req.params.id;
+        try {
+            const productInMenu = await Menu.findById(id);
+            if (productInMenu) {
+                const imgItemMenu = await Menu.findByIdAndDelete(id);
+                if(imgItemMenu.image !="") {
+                  try {
+                      fs.unlinkSync("./uploads/" + imgItemMenu.image);
+                  } catch (err) {
+                      console.log(err)
+                  }
+              }
             }
-          }
-          const imgItemInventory = await Inventory.findByIdAndDelete(id);
-          if(imgItemInventory.image !="") {
-            try {
-                fs.unlinkSync("./uploads/" + imgItemInventory.image);
-            } catch (err) {
-                console.log(err)
+            const inventoryItem = await Inventory.findOne({ product: id });
+            if (inventoryItem) {
+                await Inventory.findByIdAndDelete(inventoryItem._id);
             }
+    
+            await Product.findByIdAndDelete(id);
+    
+            res.status(200).json({ message: "Product deleted successfully" });
+        } catch (err) {
+            res.status(500).json({ message: err.message });
         }
-          
-          res.status(200).json({message: "Product deleted successfully"});
-      } catch (err) {
-          res.status(500).json({message: err.message});
-      }
-      
-  }
+    }
   
 }

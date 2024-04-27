@@ -1,7 +1,7 @@
 const Menu = require("../models/menu");
 const fs = require("fs");
 const Inventory = require("../models/inventory");
-
+const Product = require("../models/product");
 module.exports = class menuAPI {
     //fetch all menu
 
@@ -31,7 +31,7 @@ module.exports = class menuAPI {
       const { productId, quantity } = req.body;
       const productInMenu = await Menu.findById(productId);
       if (!productInMenu) {
-        const product = await Inventory.findById(productId);
+        const product = await Product.findById(productId);
         await Menu.create({
           _id: product._id,
           name: product.name,
@@ -88,7 +88,7 @@ module.exports = class menuAPI {
           existingMenuProduct.quantity = req.body.quantity;
           await existingMenuProduct.save();
           // update quantity in inventory
-          const existingInventoryProduct = await Inventory.findById(id);
+          const existingInventoryProduct = await Product.findById(id);
           if (existingInventoryProduct) {
             existingInventoryProduct.quantity -= quantityDifference;
             await existingInventoryProduct.save();
@@ -100,7 +100,7 @@ module.exports = class menuAPI {
           await existingMenuProduct.save();
 
           // update quantity in inventory
-          const existingInventoryProduct = await Inventory.findById(id);
+          const existingInventoryProduct = await Product.findById(id);
           if (existingInventoryProduct) {
             existingInventoryProduct.quantity += quantityDifference;
             await existingInventoryProduct.save();

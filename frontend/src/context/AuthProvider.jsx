@@ -1,3 +1,4 @@
+/* eslint-disable no-useless-catch */
 /* eslint-disable react/prop-types */
 import React, { createContext, useEffect, useState } from "react";
 import {
@@ -19,11 +20,29 @@ const googleProvider = new GoogleAuthProvider();
 const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const apiKeyFirebase = import.meta.env.VITE_APIKEY;
 
-  // create an account
   const createUser = (email, password) => {
     setLoading(true);
     return createUserWithEmailAndPassword(auth, email, password);
+  };
+
+  // create an account
+  const createUserWithoutLogin = async (email, password) => {
+    try {
+      const response = await axios.post(
+        `https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${apiKeyFirebase}`,
+        {
+          email: email,
+          password: password,
+          returnSecureToken: true,
+        }
+      );
+      return response.data;
+    } catch (error) {
+      // Xử lý lỗi khi tạo người dùng không thành công
+      throw error;
+    }
   };
 
   // signup with gmail
@@ -80,6 +99,7 @@ const AuthProvider = ({ children }) => {
   const authInfo = {
     user,
     createUser,
+    createUserWithoutLogin,
     signUpWithGmail,
     login,
     logOut,

@@ -1,15 +1,19 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { FaTrash, FaSearch } from "react-icons/fa";
 import useAxiosSecure from "../../../hooks/useAxiosSecure";
+import useAuth from "../../../hooks/useAuth";
 import Pagination from "../../../ultis/Pagination";
-
+import AddUserModal from "./AddUserModal";
+import { deleteUser } from "firebase/auth";
 const Users = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterType, setFilterType] = useState("name"); // Default filter type is 'name'
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(5); // Number of items to show per page
   const axiosSecure = useAxiosSecure();
+  const [addUserModalOpen, setAddUserModalOpen] = useState(false);
+  const auth = useAuth();
   const { refetch, data: users = [] } = useQuery({
     queryKey: ["users"],
     queryFn: async () => {
@@ -44,52 +48,68 @@ const Users = () => {
       );
       if (response.status === 200) {
         // Nếu cập nhật thành công, hiển thị thông báo và refetch dữ liệu
-        alert(`${user.name} is now ${role}`);
+        alert(`${user.name} bây giờ là ${role}`);
         refetch();
       }
     } catch (error) {
       console.error("Lỗi khi cập nhật quyền:", error);
     }
   };
-  const handleDelete = (user) => {
+  const handleDelete = async (user) => {
     axiosSecure.delete(`/users/${user._id}`).then((res) => {
-      alert(`${user.name} is removed from the database`);
+      alert(`${user.name} da được xóa thành công`);
       refetch();
     });
   };
   const paginate = (pageNumber) => {
     setCurrentPage(pageNumber);
   };
-
+  const refetchData = () => {
+    refetch();
+  };
   return (
     <div>
-      <div>
-        <h2 className="text-2xl font-semibold my-4 text-black">
-          Quản lý tất cả <span className="text-green">người dùng</span>
-        </h2>
-        <h5 className="text-black">Tổng số người dùng: {users.length}</h5>
-      </div>
-
-      <div className="flex items-center my-2">
-        <select
-          id="filterType"
-          value={filterType}
-          onChange={(e) => setFilterType(e.target.value)}
-          className="border p-2 rounded-md"
-        >
-          <option value="name">Tên người dùng</option>
-          <option value="role">Chức vụ</option>
-        </select>
-        <div className="flex items-center justify-center">
-          <p className="ml-3 text-black">
-            <FaSearch />
-          </p>
-          <input
-            type="text"
-            placeholder={`Search by ${filterType === "name" ? "name" : "role"}`}
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="border p-2 rounded-md ml-1 "
+      <h2 className="text-2xl font-semibold my-4 text-black">
+        Quản lý tất cả <span className="text-green">người dùng</span>
+      </h2>
+      <h5 className="text-black">Tổng số người dùng: {users.length}</h5>
+      <div className="flex items-center my-2 justify-between">
+        <div className="flex">
+          <select
+            id="filterType"
+            value={filterType}
+            onChange={(e) => setFilterType(e.target.value)}
+            className="border p-2 rounded-md"
+          >
+            <option value="name">Tên người dùng</option>
+            <option value="role">Chức vụ</option>
+          </select>
+          <div className="flex items-center justify-center">
+            <p className="ml-3 text-black">
+              <FaSearch />
+            </p>
+            <input
+              type="text"
+              placeholder={`Search by ${
+                filterType === "name" ? "name" : "role"
+              }`}
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="border p-2 rounded-md ml-1 "
+            />
+          </div>
+        </div>
+        <div>
+          <button
+            className="btn bg-green text-white border-none hover:opacity-80 hover:bg-green"
+            onClick={() => setAddUserModalOpen(true)}
+          >
+            + Thêm người dùng
+          </button>
+          <AddUserModal
+            addUserModalOpen={addUserModalOpen}
+            setAddUserModalOpen={setAddUserModalOpen}
+            refetchData={refetchData}
           />
         </div>
       </div>
@@ -102,7 +122,7 @@ const Users = () => {
               <th>Tên người dùng</th>
               <th>Email</th>
               <th>Chức vụ</th>
-              <th>Xóa</th>
+              <th>Thao tác</th>
             </tr>
           </thead>
           <tbody className="text-black">

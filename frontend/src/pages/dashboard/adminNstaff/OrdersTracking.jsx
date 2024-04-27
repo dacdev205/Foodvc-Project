@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import FormattedPrice from "../../../ultis/FormatedPriece";
 import { Link } from "react-router-dom";
 import orderAPI from "../../../api/orderAPI";
 import Pagination from "../../../ultis/Pagination";
@@ -12,6 +11,7 @@ const OrdersTracking = () => {
   useEffect(() => {
     const fetchAllOrders = async () => {
       const response = await orderAPI.getAllOrder();
+      console.log(response);
       setAllOrders(response);
     };
 
@@ -24,6 +24,8 @@ const OrdersTracking = () => {
   const handleStatusChange = async (orderId, newStatus) => {
     try {
       await orderAPI.updateOrderStatus(orderId, newStatus);
+      const updatedOrders = await orderAPI.getAllOrder();
+      setAllOrders(updatedOrders);
     } catch (error) {
       console.error("Failed to update order status:", error);
     }
@@ -93,7 +95,6 @@ const OrdersTracking = () => {
 
                     <td>
                       <select
-                        value={order.status}
                         onChange={(e) =>
                           handleStatusChange(order._id, e.target.value)
                         }

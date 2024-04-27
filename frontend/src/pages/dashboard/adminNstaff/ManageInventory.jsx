@@ -27,6 +27,7 @@ const ManageInventory = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(5);
   const [newQuantity, setNewQuantity] = useState(1);
+
   const paginate = (pageNumber) => {
     setCurrentPage(pageNumber);
   };
@@ -47,8 +48,9 @@ const ManageInventory = () => {
     setCurrentPage(1);
   };
 
-  const filteredInventory = inventory.filter((item) =>
-    item.name.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredInventory = inventory.filter(
+    (item) =>
+      item.name && item.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const sortedInventory = filteredInventory.sort((a, b) => {

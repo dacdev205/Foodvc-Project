@@ -7,9 +7,7 @@ const MainLazyLoading = lazy(() => import("../layout/Main"));
 const HomeLazyLoading = lazy(() => import("../pages/home/Home"));
 const RegisterLazyLoading = lazy(() => import("../components/Register"));
 const LoginLazyLoading = lazy(() => import("../components/Login"));
-const PrivateRouterLazyLoading = lazy(() =>
-  import("../PrivateRouter/PrivateRouter")
-);
+
 const UpdateProfilesLazyLoading = lazy(() =>
   import("../pages/dashboard/UpdateProfiles")
 );

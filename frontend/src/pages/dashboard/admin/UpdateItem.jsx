@@ -6,6 +6,7 @@ import inventoryAPI from "../../../api/inventoryAPI";
 import menuAPI from "../../../api/menuAPI";
 import React, { useEffect, useState } from "react";
 import QuillEditor from "../../../ultis/QuillEditor";
+import productsAPI from "../../../api/productsAPI";
 
 const UpdateMenu = () => {
   const { register, handleSubmit, setValue } = useForm({ mode: "onChange" });
@@ -40,7 +41,7 @@ const UpdateMenu = () => {
       formData.append("instructions", data.instructions);
 
       // Update product in the inventory
-      await inventoryAPI.updateProduct(product._id, formData);
+      await productsAPI.updateProduct(product._id, formData);
       Swal.fire({
         position: "center",
         icon: "success",
@@ -69,14 +70,6 @@ const UpdateMenu = () => {
         // Update the product on the menu
         await menuAPI.updateProduct(product._id, menuUpdateData);
       }
-
-      Swal.fire({
-        position: "center",
-        icon: "success",
-        title: "Food updated on the menu.",
-        showConfirmButton: false,
-        timer: 1000,
-      });
     } catch (error) {
       console.log("Update menu failed", error);
     }

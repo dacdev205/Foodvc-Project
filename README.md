@@ -7,8 +7,8 @@ Foodvc
 Mục tiêu website: Xây dựng một trang bán hàng, với đầy đủ chức năng, phân
 quyền, admin page. Phân chia component một cách tối ưu để tái sử dụng
 code với giao diện bắt mắt, dễ sử dụng.
-• Trang web được thiết kế theo mô hình MERN.
 
+• Trang web được thiết kế theo mô hình MERN.
 - Frontend: sử dụng HTML, CSS, framework ReacJS + ViteJS, Tailwind
   CSS, daisyui để làm giao diện người dùng.
 - Backend: sử dụng NodeJS, ExpressJS, MongoDB để lưu trữ dữ liệu,
@@ -69,7 +69,7 @@ code với giao diện bắt mắt, dễ sử dụng.
       Sử dụng npm:
 
       ```bash
-      npm start "vì có sử dụng nodemon để auto chạy lại server khi save"
+      npm start (vì có sử dụng nodemon để auto chạy lại server khi save)
 
       ```
 
@@ -95,6 +95,6 @@ Bao gồm hầu như toàn bộ các chức năng cơ bản của một website 
 
 ## Thông Tin Thêm
 
-Sản phẩm chỉ dùng để học tập các công nghệ không dùng cho mục đích thương mại.
+Sản phẩm chỉ dùng để học tập các công nghệ, không dùng cho mục đích thương mại.
 
 ---

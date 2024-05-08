@@ -5,6 +5,7 @@ import { AuthContext } from "../../../context/AuthProvider";
 import useAxiosPublic from "../../../hooks/useAxiosPublic";
 import * as Yup from "yup";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import axios from "axios";
 
 const AddUserModal = ({
   addUserModalOpen,
@@ -67,6 +68,35 @@ const AddUserModal = ({
     validateInput(name, value);
   };
 
+  const sendEmailToNewUser = async (email, password) => {
+    try {
+      await axios.post("http://localhost:3000/email", {
+        email: email,
+        subject: "Chào mừng thành viên mới!🎉🎉🎉",
+        html: `
+        <html>
+        <head>
+          <style>
+            @import url('https://unpkg.com/tailwindcss@^2.0/dist/tailwind.min.css');
+          </style>
+        </head>
+        <body class="font-sans bg-gray-100">
+          <div class="max-w-xl mx-auto p-8 bg-white rounded shadow">
+            <h1 class="text-2xl font-bold text-center text-gray-800 mb-4">Chào mừng bạn đến với FOODVC🥰🥰🥰</h1>
+            <h2 class="text-lg font-semibold text-gray-700 mb-2">Tài khoản bạn được cấp:</h2>
+            <p class="text-gray-600 mb-2"><span class="font-semibold">Tài khoản đăng nhập:</span> ${email}</p>
+            <p class="text-gray-600 mb-4"><span class="font-semibold">Mật khẩu:</span> ${password}</p>
+            <i class="text-sm text-red-500 tex">Lưu ý: không được cung cấp tài khoản cho người khác.</i>
+          </div>
+        </body>
+        </html>
+      `,
+      });
+    } catch (error) {
+      console.error("Error sending email to:", email, error);
+    }
+  };
+
   const onSubmit = (data, e) => {
     e.preventDefault();
     schema
@@ -80,12 +110,13 @@ const AddUserModal = ({
             const userInfor = {
               name: data.name,
               email: data.email,
-              role: role, // Thêm quyền vào thông tin người dùng
+              role: role,
             };
-            axiosPublic.post("/users", userInfor).then((response) => {
+            axiosPublic.post("/users", userInfor).then(() => {
               if (userInfor.name) {
                 alert("Thêm thành công thành công!");
                 setAddUserModalOpen(false);
+                sendEmailToNewUser(data.email, password);
                 refetchData();
               } else {
                 console.error(

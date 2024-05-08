@@ -16,5 +16,6 @@ let upload = multer({
 }).single("image")
 
 router.patch("/:id",upload, productsAPI.updateProduct);
+router.get("/:id", productsAPI.fetchProductByID);
 
 module.exports = router;

@@ -52,31 +52,29 @@ const Cards = ({ item }) => {
     localStorage.setItem("heartFilledIds", JSON.stringify(heartFilledIds));
   }, [heartFilledIds]);
   const handleAddToCart = async () => {
-    if (user && user?.email) {
-      const cartItem = {
-        _id,
-        name,
-        quantity: 1,
-        price,
-        recipe,
-        category,
-        image,
-        productionLocation,
-        instructions,
-        expirationDate,
-        createdAt,
-        storage,
-        email: user.email,
-      };
-      await cartAPI.postProductToCart(cartItem);
-      Swal.fire({
-        position: "center",
-        icon: "success",
-        title: "Food added on the cart.",
-        showConfirmButton: false,
-        timer: 1000,
-      });
-    }
+    const cartItem = {
+      _id,
+      name,
+      quantity: 1,
+      price,
+      recipe,
+      category,
+      image,
+      productionLocation,
+      instructions,
+      expirationDate,
+      createdAt,
+      storage,
+      email: user.email,
+    };
+    await cartAPI.postProductToCart(cartItem);
+    Swal.fire({
+      position: "center",
+      icon: "success",
+      title: "Food added on the cart.",
+      showConfirmButton: false,
+      timer: 1000,
+    });
     refetchCart();
   };
 

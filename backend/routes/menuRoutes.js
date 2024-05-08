@@ -19,8 +19,9 @@ router.post("/", upload, menuAPI.createProduct);
 router.post("/add-to-menu", upload, menuAPI.createProduct);
 router.get("/", menuAPI.fetchAllMenu);
 router.get("/:id",menuAPI.fetchProductByID);
+router.patch("/quantity/:id",upload, menuAPI.updateProductQuantityInMenu);
 router.patch("/:id",upload, menuAPI.updateProductInMenu);
-router.post("/update-quantity-menu", menuAPI.updateMenuQuantity);
+
 router.post("/apply-voucher",menuAPI.applyVoucher);
 
 

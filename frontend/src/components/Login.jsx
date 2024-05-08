@@ -62,7 +62,6 @@ const Login = () => {
           };
           try {
             axiosPublic.post("/users", userInfor);
-            alert("Login successfull");
             reset();
             navigate(from, { replace: true });
           } catch (error) {

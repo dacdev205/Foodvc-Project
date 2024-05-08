@@ -1,7 +1,7 @@
 const User = require("../models/user");
 const Menu = require("../models/menu");
 const Order = require("../models/order");
-
+const moment = require('moment');
 module.exports = class StatsAPI {
     static async getAllDataForStats(req, res) {
         try {
@@ -114,12 +114,63 @@ module.exports = class StatsAPI {
                     });
                 }
             });
-    
             res.status(200).json(monthlyRevenue);
         } catch (err) {
             res.status(500).json({ message: err.message });
         }
     };
     
+
+    static async fetchRevenueWithStart2End(req, res) {
+        try {
+            const { startDate, endDate } = req.query;
+            const startMoment = moment(startDate, 'YYYY-MM-DD');
+            if (!startMoment.isValid()) {
+                return res.status(400).json({ message: "Ngày bắt đầu không hợp lệ" });
+            }
+    
+            const endMoment = moment(endDate, 'YYYY-MM-DD');
+            if (!endMoment.isValid()) {
+                return res.status(400).json({ message: "Ngày kết thúc không hợp lệ" });
+            }
+    
+            const startOfDay = startMoment.startOf('day').toDate();
+            const endOfDay = endMoment.endOf('day').toDate();
+    
+            const orders = await Order.find({
+                status: "Delivered",
+                createdAt: { $gte: startOfDay, $lte: endOfDay }
+            });
+    
+            const result = {};
+    
+            orders.forEach(order => {
+                if (order.status === "Delivered") {
+                    order.products.forEach(product => {
+                        const { name, quantity, price, category } = product;
+                        const totalAmount = quantity * price;
+                        if (category in result) {
+                            const existingProductIndex = result[category].products.findIndex(p => p.name === name);
+                            if (existingProductIndex !== -1) {
+                                // Product exists, increase quantity
+                                result[category].products[existingProductIndex].quantity += quantity;
+                                result[category].products[existingProductIndex].totalAmount += totalAmount;
+                            } else {
+                                // Product doesn't exist, add new product
+                                result[category].products.push({ name, quantity, totalAmount });
+                            }
+                            result[category].totalAmount += totalAmount;
+                        } else {
+                            result[category] = { products: [{ name, quantity, totalAmount }], totalAmount };
+                        }
+                    });
+                }
+            });
+    
+            res.status(200).json(result);
+        } catch (err) {
+            res.status(500).json({ message: err.message });
+        }
+    }
     
 }

@@ -16,7 +16,17 @@ export default class menuAPI {
         return res.data;
     }
     
-    static async updateProduct(productId, updateData) {
+    static async updateQuantityProduct(productId, updateData) {
+        try {
+          const res = await axios.patch(`${url}/quantity/${productId}`, updateData);
+          return res.data;
+        } catch (error) {
+          console.error('Error updating product:', error);
+          throw error;
+        }
+      }
+
+      static async updateProduct(productId, updateData) {
         try {
           const res = await axios.patch(`${url}/${productId}`, updateData);
           return res.data;

@@ -181,7 +181,7 @@ const ManageInventory = () => {
 
       if (newQty) {
         const parsedQuantity = parseInt(newQty, 10);
-        await menuAPI.updateProduct(`${item._id}`, {
+        await menuAPI.updateQuantityProduct(`${item._id}`, {
           quantity: parsedQuantity,
         });
         setNewQuantity(parsedQuantity);

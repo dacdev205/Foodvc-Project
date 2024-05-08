@@ -1,7 +1,5 @@
 const fs = require("fs");
 const Product = require("../models/product");
-const axios = require('axios');
-const Menu = require("../models/menu");
 
 module.exports = class productAPI {
   

@@ -1,6 +1,5 @@
 const Menu = require("../models/menu");
 const fs = require("fs");
-const Inventory = require("../models/inventory");
 const Product = require("../models/product");
 module.exports = class menuAPI {
     //fetch all menu
@@ -57,23 +56,45 @@ module.exports = class menuAPI {
       res.status(500).json({ error: "Internal Server Error" });
     }
     }
-    static async updateMenuQuantity(req, res) {
+    static async updateProductInMenu(req, res) {
+      const id = req.params.id;
+      let new_image = "";
+      
       try {
-        const menuItemId = req.body.menuItemId;
-        const newQuantity = req.body.quantity;
-        const menuItem = await Menu.findById(menuItemId);
-        if (!menuItem) {
-          return res.status(404).json({ error: 'Menu item not found' });
+        const existingProduct = await Menu.findById(id);
+    
+        if (!existingProduct) {
+          return res.status(404).json({ message: 'Product not found' });
         }
-        menuItem.quantity = newQuantity;
-        await menuItem.save();
-        res.status(200).json({ message: "Menu quantity updated successfully" });
-      } catch (error) {
-        res.status(500).json({ error: "Internal Server Error" });
+    
+        if (req.file) {
+          new_image = req.file.filename;
+          // Remove the old image
+          try {
+            fs.unlinkSync("./uploads/" + existingProduct.image);
+          } catch (err) {
+            console.log(err);
+          }
+        } else {
+          new_image = existingProduct.image;
+        }
+    
+        const updatedProduct = {
+          ...req.body,
+          image: new_image,
+        };
+    
+        await existingProduct.set(updatedProduct);
+        await existingProduct.save();
+    
+        res.status(200).json({ message: "Product updated successfully" });
+      } catch (err) {
+        console.error('Error updating product:', err);
+        res.status(500).json({ message: 'Internal server error' });
       }
     }
 
-    static async updateProductInMenu(req, res) {
+    static async updateProductQuantityInMenu(req, res) {
       const id = req.params.id;
       try {
         const existingMenuProduct = await Menu.findById(id);

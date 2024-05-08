@@ -8,7 +8,7 @@ import React, { useEffect, useState } from "react";
 import QuillEditor from "../../../ultis/QuillEditor";
 import productsAPI from "../../../api/productsAPI";
 
-const UpdateMenu = () => {
+const UpdateItem = () => {
   const { register, handleSubmit, setValue } = useForm({ mode: "onChange" });
   const [product, setProduct] = useState(null);
   const { id } = useParams();
@@ -50,7 +50,7 @@ const UpdateMenu = () => {
         timer: 1000,
       });
       // Update product on the menu
-      const updatedProduct = await inventoryAPI.getProductById(product._id);
+      const updatedProduct = await productsAPI.getProductById(product._id);
       const menuUpdateData = {
         name: updatedProduct.name,
         category: updatedProduct.category,
@@ -222,4 +222,4 @@ const UpdateMenu = () => {
   );
 };
 
-export default UpdateMenu;
+export default UpdateItem;

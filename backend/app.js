@@ -34,6 +34,7 @@ app.use("/address", require("./routes/addressRoutes"))
 app.use('/api/conversations', require("./routes/conversationRoutes"));
 app.use('/api/messages', require("./routes/messageRoutes"));
 app.use("/products", require("./routes/productsRoutes"));
+app.use("/email", require("./routes/sendEmailRoutes"))
 app.post('/jwt', async(req, res) => {
     const user = req.body;
     const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {

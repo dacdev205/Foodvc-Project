@@ -10,6 +10,7 @@ import ChartMonthlyRevenue from "../../../components/Chart/ChartMonthlyRevenue";
 import ChartProduct from "../../../components/Chart/ChartProduct";
 import statsAPI from "../../../api/statsAPI";
 import ExcelJS from "exceljs";
+import axios from "axios";
 import useAdmin from "../../../hooks/useAdmin";
 const Dashboard = () => {
   const { user } = useAuth();
@@ -19,6 +20,11 @@ const Dashboard = () => {
   const [monthlyRevenueData, setMonthlyRevenueData] = useState([]);
   const [productRevenueData, setProductRevenueData] = useState([]);
   const [isAdmin, isAdminLoading] = useAdmin();
+
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+  const [result, setResult] = useState("");
+
   const { refetch, data: stats = [] } = useQuery({
     queryKey: ["stats"],
     queryFn: async () => {
@@ -26,9 +32,7 @@ const Dashboard = () => {
       return res.data;
     },
   });
-  useEffect(() => {
-    console.log(monthlyRevenueData);
-  }, [monthlyRevenueData]);
+
   const handleYearChange = async (e) => {
     const year = parseInt(e.target.value);
     setSelectedYear(year);
@@ -42,87 +46,75 @@ const Dashboard = () => {
     setProductRevenueData(newData);
   };
 
-  const exportToExcel = (selectedMonth) => {
-    if (
-      !monthlyRevenueData ||
-      !Array.isArray(monthlyRevenueData.monthlyRevenue)
-    ) {
-      console.error("Invalid monthly revenue data");
+  const exportToExcel = (data, startDate, endDate) => {
+    if (!data || typeof data !== "object") {
+      console.error("Invalid data");
       return;
     }
 
-    const selectedMonthData = monthlyRevenueData.monthlyRevenue.find(
-      (item) => item._id === selectedMonth
-    );
-    if (!selectedMonthData) {
-      console.error("Selected month data not found");
-      return;
-    }
-
-    const products = productRevenueData;
     const workbook = new ExcelJS.Workbook();
-    const worksheet = workbook.addWorksheet(`Doanh thu tháng ${selectedMonth}`);
+    const worksheet = workbook.addWorksheet(`Doanh thu`);
 
-    // Add headers
-    worksheet.addRow([
-      "Tháng",
-      "Loại hàng",
-      "Tên sản phẩm",
-      "Số lượng",
-      "Doanh thu",
-    ]);
+    worksheet.mergeCells("A1:D1");
+    const titleCell = worksheet.getCell("A1");
+    titleCell.value = `BÁO CÁO DOANH THU ${startDate} đến ${endDate} `;
+    titleCell.alignment = { horizontal: "center" };
+    titleCell.font = { bold: true, size: 16 };
 
-    // Add data rows
-    Object.keys(products).forEach((category) => {
-      const productInfo = products[category].products.reduce((acc, product) => {
-        const existingProduct = acc.find(
-          (p) => p["Tên sản phẩm"] === product.name
-        );
-        if (existingProduct) {
-          existingProduct["Số lượng"] += product.quantity;
-          existingProduct["Doanh thu"] += product.totalAmount;
-        } else {
-          acc.push({
-            Tháng: selectedMonthData._id,
-            "Loại hàng": category,
-            "Tên sản phẩm": product.name,
-            "Số lượng": product.quantity,
-            "Doanh thu": product.totalAmount,
-          });
-        }
-        return acc;
-      }, []);
-      productInfo.forEach((rowData) => {
-        worksheet.addRow(Object.values(rowData));
+    const headers = ["Loại hàng", "Tên sản phẩm", "Số lượng", "Doanh thu"];
+    worksheet.addRow(headers);
+
+    const columnWidths = [
+      { header: "Tháng", key: "Tháng", width: 15 },
+      { header: "Loại hàng", key: "Loại hàng", width: 20 },
+      { header: "Tên sản phẩm", key: "Tên sản phẩm", width: 25 },
+      { header: "Số lượng", key: "Số lượng", width: 15 },
+      { header: "Doanh thu", key: "Doanh thu", width: 20 },
+    ];
+
+    Object.keys(data).forEach((category) => {
+      data[category].products.forEach((product) => {
+        const rowData = [
+          category,
+          product.name,
+          product.quantity,
+          product.totalAmount,
+        ];
+        worksheet.addRow(rowData);
       });
     });
 
-    // Style the worksheet
+    columnWidths.forEach((column, index) => {
+      const columnIndex = index + 1;
+      const columnKey = worksheet.getColumn(columnIndex);
+      if (columnKey) columnKey.width = column.width;
+      else console.error(`Column '${column.key}' not found`);
+    });
+
     worksheet.eachRow((row, rowNumber) => {
       row.eachCell((cell, colNumber) => {
-        // Apply styling to cell
         cell.font = { bold: true };
-        cell.alignment = { vertical: "middle", horizontal: "center" };
-        if (rowNumber === 1) {
-          // Header row
+        const isSecondRow = rowNumber === 2;
+        if (isSecondRow) {
           cell.fill = {
             type: "pattern",
             pattern: "solid",
             fgColor: { argb: "8FCE00" },
           };
-        } else {
-          // Data rows
-          cell.border = {
-            top: { style: "thin" },
-            bottom: { style: "thin" },
-            left: { style: "thin" },
-            right: { style: "thin" },
-          };
+          cell.alignment = { vertical: "middle", horizontal: "center" };
         }
+        const borderStyles = {
+          top: "thin",
+          bottom: "thin",
+          left: "thin",
+          right: "thin",
+        };
+        cell.border = isSecondRow
+          ? borderStyles
+          : { ...borderStyles, horizontal: "center" };
       });
     });
 
-    // Save the workbook
     workbook.xlsx.writeBuffer().then((buffer) => {
       const blob = new Blob([buffer], {
         type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
@@ -130,10 +122,26 @@ const Dashboard = () => {
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `doanh_thu_thang_${selectedMonth}.xlsx`;
+      a.download = `doanh_thu.xlsx`;
       a.click();
       window.URL.revokeObjectURL(url);
     });
+  };
+
+  const handleResultClick = () => {
+    axios
+      .post(
+        `http://localhost:3000/adminStats/products/sold?startDate=${startDate}&endDate=${endDate}`
+      )
+      .then((response) => {
+        const data = response.data;
+        setResult(data);
+        exportToExcel(data, startDate, endDate);
+      })
+      .catch((error) => {
+        // Xử lý lỗi nếu có
+        console.error("Error fetching data:", error);
+      });
   };
 
   return (
@@ -191,12 +199,7 @@ const Dashboard = () => {
                 <option value={new Date().getFullYear()}>Năm hiện tại</option>
                 <option value={"2021"}>Năm 2021</option>
               </select>
-              <button
-                onClick={() => exportToExcel(selectedMonth)}
-                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-              >
-                Export to Excel
-              </button>
+
               <ChartMonthlyRevenue
                 data={monthlyRevenueData}
                 selectedYear={selectedYear}
@@ -225,7 +228,33 @@ const Dashboard = () => {
               <ChartProduct data={productRevenueData} />
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-4 mt-8"></div>
+          <div className="grid grid-cols-2 gap-4 mt-8">
+            <div>
+              <div className="flex">
+                <input
+                  type="date"
+                  value={startDate}
+                  onChange={(e) => setStartDate(e.target.value)}
+                  className="appearance-none block bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                />
+                <p className="flex items-center m-3 text-black">Đến:</p>
+                <input
+                  type="date"
+                  value={endDate}
+                  onChange={(e) => setEndDate(e.target.value)}
+                  className="appearance-none block bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                />
+              </div>
+              <div>
+                <button
+                  className="btn btn-primary mt-3 text-white"
+                  onClick={() => handleResultClick()}
+                >
+                  Xuất báo cáo
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       )}
     </div>

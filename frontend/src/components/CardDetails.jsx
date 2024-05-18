@@ -5,7 +5,6 @@ import styles from "../CssModule/CardDetails.module.css";
 import menuAPI from "../api/menuAPI";
 import reviewAPI from "../api/reviewAPI";
 import ReviewForm from "../components/Reviews/ReviewForm";
-import { AuthContext } from "../context/AuthProvider";
 import cartAPI from "../api/cartAPI";
 import Swal from "sweetalert2";
 import { IoIosArrowUp, IoIosArrowDown } from "react-icons/io";
@@ -18,6 +17,7 @@ import paymentAPI from "../api/paymentAPI";
 import orderAPI from "../api/orderAPI";
 import Modal from "./Modal";
 import LoadingSpinner from "../ultis/LoadingSpinner";
+import { AuthContext } from "../context/AuthProvider";
 const CardDetails = () => {
   const { id } = useParams();
   const { user } = useContext(AuthContext);

@@ -2,8 +2,7 @@ import axios from "axios";
 const url = "http://localhost:3000/address"
 
 export default class addressAPI {
-
-
+// 
     static async postAddressToDB(address) {
       try {
           const res = await axios.post(url, address);

@@ -21,6 +21,7 @@
 .active {
   @apply text-green;
 }
+
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
   -webkit-appearance: none;
@@ -42,13 +43,14 @@ html input[type="text"] {
   border: 1px solid #ccc !important;
 }
 
-html input[type="number"],
-html input[type="email"],
-html input[type="password"],
-html input[type="file"],
-html input[type="tel"] {
+input[type="number"],
+input[type="email"],
+input[type="password"],
+input[type="file"],
+input[type="tel"] {
   background-color: white !important;
   -moz-appearance: textfield;
+  appearance: none;
   border: 1px solid #ccc !important;
 }
 

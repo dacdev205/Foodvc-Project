@@ -153,7 +153,7 @@ const AddVoucher = () => {
             <input
               type="number"
               className="border p-2 rounded-md text-black"
-              placeholder="VD: 5(%)"
+              placeholder="VD: 5"
               value={discountPercentage}
               onChange={(e) => {
                 const inputValue = e.target.value;
@@ -162,6 +162,7 @@ const AddVoucher = () => {
                 }
               }}
             />
+            <span className="ml-1 text-black">%</span>
           </div>
           <button
             className="btn btn-ghost bg-green text-white ml-10 hover:bg-green hover:opacity-80"

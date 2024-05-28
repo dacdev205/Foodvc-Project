@@ -16,6 +16,7 @@ const AddressSearchBar = ({
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredResults, setFilteredResults] = useState([]);
   const searchBarRef = useRef(null);
+
   useEffect(() => {
     if (selectedCity && selectedDistrict && selectedWard && selectedStreet) {
       setSearchTerm(`${selectedCity}, ${selectedDistrict}, ${selectedWard}`);
@@ -37,10 +38,12 @@ const AddressSearchBar = ({
     onCitySelect(city);
     setSearchTerm(city);
   };
+
   const handleDistrictClick = (district) => {
     onDistrictSelect(district);
     setSearchTerm(`${searchTerm}, ${district}`);
   };
+
   const handleWardsClick = (ward) => {
     onWardsSelect(ward);
     setSearchTerm(`${searchTerm}, ${ward}`);
@@ -72,10 +75,10 @@ const AddressSearchBar = ({
         className="input input-bordered w-full text-black"
       />
       {filteredResults.length > 0 && (
-        <div className="absolute z-10 w-full bg-white border border-gray-300 rounded-md mt-2 flex text-black">
+        <div className="absolute z-10 w-full bg-white border border-gray-300 rounded-md mt-2 flex text-black ">
           <div className="text-sm">
             <p className="py-2 px-4 ">Tỉnh/Thành phố</p>
-            <ul>
+            <ul className="max-h-48 overflow-y-auto ">
               {filteredResults.map((city, index) => (
                 <li
                   key={index}
@@ -89,7 +92,7 @@ const AddressSearchBar = ({
           </div>
           <div className="text-sm">
             <p className="py-2 px-4 ">Quận/Huyện</p>
-            <ul>
+            <ul className="max-h-48 overflow-y-auto">
               {districts.map((district, index) => (
                 <li
                   key={index}
@@ -103,7 +106,7 @@ const AddressSearchBar = ({
           </div>
           <div className="text-sm">
             <p className="py-2 px-4 ">Phường/Xã</p>
-            <ul>
+            <ul className="max-h-48 overflow-y-auto">
               {wards.map((ward, index) => (
                 <li
                   key={index}

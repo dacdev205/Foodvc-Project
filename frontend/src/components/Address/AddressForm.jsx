@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState } from "react";
 import AddressSearchBar from "./AddressSearchBar";
 import addressAPI from "../../api/addressAPI";
 import useAuth from "../../hooks/useAuth";
@@ -10,7 +10,9 @@ import { FaCheck } from "react-icons/fa6";
 const AddressForm = ({ setAddress, paymentId }) => {
   const { user } = useAuth();
   const [address, refetchAddress] = useAddress();
+  const [cities, setCities] = useState([]);
   const [districts, setDistricts] = useState([]);
+  const [districtsID, setDistrictsID] = useState([]);
   const [wards, setWards] = useState([]);
   const [isDefaultAddress, setIsDefaultAddress] = useState(false);
   const { reset } = useForm();
@@ -25,28 +27,87 @@ const AddressForm = ({ setAddress, paymentId }) => {
     email: user.email,
   });
 
-  const districtOptions = useMemo(
-    () => ({
-      "Vĩnh Long": {
-        "Mang Thít": ["Mỹ Phước", "Mỹ An"],
-        "Thành Phố Vĩnh Long": ["Phường 1", "Phường 2"],
-      },
-      "Cần Thơ": {
-        "Quận Ninh Kiều": ["Phường Xuân Khánh", "Phường Hưng Lợi"],
-        "Quận Cái Răng": ["Phường Hưng Phú", "Phường Hưng Thạnh"],
-      },
-    }),
-    []
-  );
+  useEffect(() => {
+    async function getAPIProvinces() {
+      try {
+        const response = await fetch(
+          "https://api.nosomovo.xyz/province/getalllist/193"
+        );
+        const data = await response.json();
+        if (data && Array.isArray(data)) {
+          setCities(data);
+        } else {
+          console.error("Unexpected data format:", data);
+          setCities([]);
+        }
+      } catch (error) {
+        console.error("Failed to fetch provinces:", error);
+        setCities([]);
+      }
+    }
 
-  const handleCitySelect = (city) => {
+    getAPIProvinces();
+  }, []);
+
+  const handleCitySelect = async (cityName) => {
+    const selectedCity = cities.find((city) => city.name === cityName);
     setFormData({
       ...formData,
-      city: city,
+      city: selectedCity.name,
       district: "",
       ward: "",
     });
-    setDistricts(Object.keys(districtOptions[city] || {}));
+
+    try {
+      const res = await fetch(
+        `https://api.nosomovo.xyz/district/getalllist/${selectedCity.id}`
+      );
+      const data = await res.json();
+      if (data && Array.isArray(data)) {
+        const districtNames = data.map((district) => district.name);
+        setDistricts(districtNames);
+        setDistrictsID(data);
+      } else {
+        setDistricts([]);
+      }
+    } catch (error) {
+      console.error("Failed to fetch districts:", error);
+      setDistricts([]);
+    }
+  };
+
+  const handleDistrictSelect = async (districtName) => {
+    const selectedDistrict = districtsID.find(
+      (district) => district.name === districtName
+    );
+    setFormData({
+      ...formData,
+      district: districtName,
+      ward: "",
+    });
+    try {
+      const res = await fetch(
+        `https://api.nosomovo.xyz/commune/getalllist/${selectedDistrict.id}`
+      );
+      const data = await res.json();
+      if (data) {
+        const wardNames = data.map((ward) => ward.name);
+        setWards(wardNames || []);
+      } else {
+        console.error("Unexpected data format:", data);
+        setWards([]);
+      }
+    } catch (error) {
+      console.error("Failed to fetch district details:", error);
+      setWards([]);
+    }
+  };
+
+  const handleWardsSelect = (ward) => {
+    setFormData({
+      ...formData,
+      ward: ward,
+    });
   };
 
   const handleChange = (e) => {
@@ -57,21 +118,6 @@ const AddressForm = ({ setAddress, paymentId }) => {
     });
   };
 
-  const handleDistrictSelect = (district) => {
-    setFormData({
-      ...formData,
-      district: district,
-      ward: "",
-    });
-    setWards(districtOptions[formData.city][district] || []);
-  };
-
-  const handleWardsSelect = (ward) => {
-    setFormData({
-      ...formData,
-      ward: ward,
-    });
-  };
   const handleSubmit = async (e) => {
     e.preventDefault();
     const formDataWithDefault = {
@@ -128,7 +174,7 @@ const AddressForm = ({ setAddress, paymentId }) => {
               </div>
               <div className="form-control mt-3">
                 <AddressSearchBar
-                  cities={["Vĩnh Long", "Cần Thơ"]}
+                  cities={cities.map((city) => city.name)}
                   onCitySelect={handleCitySelect}
                   onDistrictSelect={handleDistrictSelect}
                   districts={districts}

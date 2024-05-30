@@ -1,64 +1,73 @@
-const Review = require('../models/reviews');
-const Menu = require('../models/menu');
+const Review = require("../models/reviews");
+const Menu = require("../models/menu");
 
 module.exports = class reviewAPI {
-  static async addReview (req, res) {
+  static async addReview(req, res) {
     const { productId, userId, userName, rating, comment } = req.body;
     try {
-      const review = new Review({ productId, userId,userName, rating, comment });
+      const review = new Review({
+        productId,
+        userId,
+        userName,
+        rating,
+        comment,
+      });
       await review.save();
-  
+
       const menu = await Menu.findById(productId);
       menu.reviews.push(review);
       await menu.save();
-  
-      res.status(201).json({ message: 'Review added successfully' });
+
+      res.status(201).json({ message: "Review added successfully" });
     } catch (error) {
-      console.error('Error adding review:', error);
-      res.status(500).json({ message: 'Internal server error' });
+      console.error("Error adding review:", error);
+      res.status(500).json({ message: "Internal server error" });
     }
-  };
-  
-  static async getReviewsByProductId (req, res) {
+  }
+
+  static async getReviewsByProductId(req, res) {
     const productId = req.params.productId;
     try {
-      const reviews = await Review.find({ productId }).populate('userId', 'displayName');
+      const reviews = await Review.find({ productId }).populate(
+        "userId",
+        "displayName"
+      );
       res.json(reviews);
     } catch (error) {
-      console.error('Error getting reviews:', error);
-      res.status(500).json({ message: 'Internal server error' });
+      console.error("Error getting reviews:", error);
+      res.status(500).json({ message: "Internal server error" });
     }
-  };
-  static async getReviewsByReviewId (req, res) {
+  }
+  static async getReviewsByReviewId(req, res) {
     const reviewId = req.params.reviewId;
     try {
-      const reviews = await Review.findById(reviewId)
+      const reviews = await Review.findById(reviewId);
       res.json(reviews);
     } catch (error) {
-      console.error('Error getting reviews:', error);
-      res.status(500).json({ message: 'Internal server error' });
+      console.error("Error getting reviews:", error);
+      res.status(500).json({ message: "Internal server error" });
     }
-  };
-  static async deleteReviewByReviewId (req, res) {
+  }
+  static async deleteReviewByReviewId(req, res) {
     const reviewId = req.params.reviewId;
-  
+
     try {
       const deletedReview = await Review.findByIdAndDelete(reviewId);
       if (!deletedReview) {
-        return res.status(404).json({ message: 'Review not found' });
+        return res.status(404).json({ message: "Review not found" });
       }
-  
-      const menu = await Menu.findOne({ 'reviews': deletedReview._id });
+
+      const menu = await Menu.findOne({ reviews: deletedReview._id });
       if (menu) {
         menu.reviews.pull(deletedReview._id);
         await menu.save();
       }
-      res.json({ message: 'Review deleted successfully' });
+      res.json({ message: "Review deleted successfully" });
     } catch (error) {
-      console.error('Error deleting review:', error);
-      res.status(500).json({ message: 'Internal server error' });
+      console.error("Error deleting review:", error);
+      res.status(500).json({ message: "Internal server error" });
     }
-  };
+  }
   static async updateReviewByReviewId(req, res) {
     const reviewId = req.params.reviewId;
     const { rating, comment } = req.body;
@@ -70,13 +79,13 @@ module.exports = class reviewAPI {
       );
 
       if (!updatedReview) {
-        return res.status(404).json({ message: 'Review not found' });
+        return res.status(404).json({ message: "Review not found" });
       }
 
-      res.json({ message: 'Review updated successfully', updatedReview });
+      res.json({ message: "Review updated successfully", updatedReview });
     } catch (error) {
-      console.error('Error updating review:', error);
-      res.status(500).json({ message: 'Internal server error' });
+      console.error("Error updating review:", error);
+      res.status(500).json({ message: "Internal server error" });
     }
-  };
-}
+  }
+};

@@ -78,7 +78,7 @@ const AddressSearchBar = ({
         <div className="absolute z-10 w-full bg-white border border-gray-300 rounded-md mt-2 flex text-black ">
           <div className="text-sm">
             <p className="py-2 px-4 ">Tỉnh/Thành phố</p>
-            <ul className="max-h-48 overflow-y-auto ">
+            <ul className="max-h-48 overflow-y-auto scrollbar-thin scrollbar-webkit">
               {filteredResults.map((city, index) => (
                 <li
                   key={index}
@@ -92,7 +92,7 @@ const AddressSearchBar = ({
           </div>
           <div className="text-sm">
             <p className="py-2 px-4 ">Quận/Huyện</p>
-            <ul className="max-h-48 overflow-y-auto">
+            <ul className="max-h-48 overflow-y-auto scrollbar-thin scrollbar-webkit">
               {districts.map((district, index) => (
                 <li
                   key={index}
@@ -106,7 +106,7 @@ const AddressSearchBar = ({
           </div>
           <div className="text-sm">
             <p className="py-2 px-4 ">Phường/Xã</p>
-            <ul className="max-h-48 overflow-y-auto">
+            <ul className="max-h-48 overflow-y-auto scrollbar-thin scrollbar-webkit">
               {wards.map((ward, index) => (
                 <li
                   key={index}

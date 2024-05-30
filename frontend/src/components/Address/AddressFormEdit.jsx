@@ -184,7 +184,7 @@ const AddressFormEdit = ({
         id="modal-addressEdit"
         className="modal modal-middle sm:modal-middle"
       >
-        <div className="modal-box bg-white">
+        <div className="modal-box bg-white scrollbar-thin scrollbar-webkit">
           <div className="modal-action flex flex-col justify-center mt-0">
             <form className="" method="dialog" onSubmit={handleSubmit}>
               <h3 className="font-bold text-lg text-black">Cập nhật địa chỉ</h3>

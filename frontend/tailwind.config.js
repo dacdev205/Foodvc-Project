@@ -15,5 +15,28 @@ export default {
     require("daisyui"),
     require("tailwind-scrollbar"),
     { nocompatible: true },
+    function ({ addUtilities }) {
+      const newUtilities = {
+        ".scrollbar-thin": {
+          scrollbarWidth: "thin",
+          scrollbarColor: "#39d84A white",
+        },
+        ".scrollbar-webkit": {
+          "&::-webkit-scrollbar": {
+            width: "8px",
+          },
+          "&::-webkit-scrollbar-track": {
+            backgroundColor: "#39d84A",
+            borderRadius: "10px",
+          },
+          "&::-webkit-scrollbar-thumb": {
+            backgroundColor: "#39d84A",
+            borderRadius: "20px",
+            border: "1px solid grey",
+          },
+        },
+      };
+      addUtilities(newUtilities, ["responsive", "hover"]);
+    },
   ],
 };

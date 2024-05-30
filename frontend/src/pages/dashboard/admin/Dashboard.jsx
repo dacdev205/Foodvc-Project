@@ -197,7 +197,7 @@ const Dashboard = () => {
               </p>
               <select value={selectedYear} onChange={handleYearChange}>
                 <option value={new Date().getFullYear()}>Năm hiện tại</option>
-                <option value={"2021"}>Năm 2021</option>
+                <option value={"2023"}>Năm 2023</option>
               </select>
 
               <ChartMonthlyRevenue

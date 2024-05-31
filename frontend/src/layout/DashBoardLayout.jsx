@@ -1,14 +1,24 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link, Outlet } from "react-router-dom";
-import { MdDashboard, MdDashboardCustomize } from "react-icons/md";
-import { FaWarehouse } from "react-icons/fa";
-import { IoIosAddCircle } from "react-icons/io";
-import { AiOutlineMenu } from "react-icons/ai";
+import {
+  MdDashboard,
+  MdDashboardCustomize,
+  MdOutlineInventory,
+} from "react-icons/md";
+import { VscLayoutMenubar } from "react-icons/vsc";
+import { CiDiscount1 } from "react-icons/ci";
+import { BiSolidDiscount } from "react-icons/bi";
+import {
+  FaWarehouse,
+  FaUser,
+  FaShoppingBag,
+  FaQuestionCircle,
+} from "react-icons/fa";
+import { IoIosAddCircle, IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
+import { AiOutlineMenu, AiOutlinePlusCircle } from "react-icons/ai";
 import Login from "../components/Login";
 import useAuth from "../hooks/useAuth";
 import useAdmin from "../hooks/useAdmin";
-
-import { FaUser, FaShoppingBag, FaQuestionCircle } from "react-icons/fa";
 import useStaff from "../hooks/useStaff";
 
 const shareLinks = (
@@ -24,8 +34,23 @@ const shareLinks = (
 
 const DashBoardLayout = () => {
   const { loading } = useAuth();
-  const [isAdmin, isAdminLoading] = useAdmin();
-  const [isStaff, isStaffLoading] = useStaff();
+  const [isAdmin] = useAdmin();
+  const [isStaff] = useStaff();
+  const [promotionsOpen, setPromotionsOpen] = useState(false);
+  const [inventoryOpen, setInventoryOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  const togglePromotions = () => {
+    setPromotionsOpen(!promotionsOpen);
+  };
+
+  const toggleInventory = () => {
+    setInventoryOpen(!inventoryOpen);
+  };
+  const toggleMenu = () => {
+    setMenuOpen(!menuOpen);
+  };
+
   if (isStaff) {
     return (
       <div>
@@ -50,7 +75,7 @@ const DashBoardLayout = () => {
                 <Outlet />
               </div>
             </div>
-            <div className="drawer-side ">
+            <div className="drawer-side shadow-md">
               <label
                 htmlFor="my-drawer-2"
                 aria-label="close sidebar"
@@ -69,17 +94,61 @@ const DashBoardLayout = () => {
                 </li>
                 <hr />
                 <li>
-                  <Link className="active-link" to="/admin/manage-inventory">
+                  <div
+                    onClick={toggleInventory}
+                    className="cursor-pointer flex items-center"
+                  >
                     <FaWarehouse />
-                    Quản lý kho
-                  </Link>
+                    <span>Quản lý kho</span>
+                    {inventoryOpen ? (
+                      <AiOutlinePlusCircle className="ml-auto" />
+                    ) : (
+                      <AiOutlinePlusCircle className="ml-auto" />
+                    )}
+                  </div>
+                  {inventoryOpen && (
+                    <ul className="ml-4">
+                      <li>
+                        <Link
+                          className="active-link"
+                          to="/admin/manage-inventory"
+                        >
+                          <FaWarehouse />
+                          Quản lý kho
+                        </Link>
+                      </li>
+                      <li>
+                        <Link className="active-link" to="/admin/add-inventory">
+                          <IoIosAddCircle />
+                          Nhập kho
+                        </Link>
+                      </li>
+                    </ul>
+                  )}
                 </li>
-
                 <li>
-                  <Link className="active-link" to="/admin/manage-menu">
-                    <AiOutlineMenu />
-                    Quản lý menu
-                  </Link>
+                  <div
+                    onClick={toggleMenu}
+                    className="cursor-pointer flex items-center active-link"
+                  >
+                    <VscLayoutMenubar />
+                    <span>Quản lý menu</span>
+                    {menuOpen ? (
+                      <IoIosArrowUp className="ml-auto" />
+                    ) : (
+                      <IoIosArrowDown className="ml-auto" />
+                    )}
+                  </div>
+                  {menuOpen && (
+                    <ul className="ml-4">
+                      <li>
+                        <Link className="active-link" to="/admin/manage-menu">
+                          <AiOutlineMenu />
+                          Tất cả sản phẩm trên menu
+                        </Link>
+                      </li>
+                    </ul>
+                  )}
                 </li>
                 <li>
                   <Link className="active-link" to="/admin/order-tracking">
@@ -93,6 +162,41 @@ const DashBoardLayout = () => {
                     Báo cáo doanh thu
                   </Link>
                 </li>
+                <li>
+                  <div
+                    onClick={togglePromotions}
+                    className="cursor-pointer flex items-center"
+                  >
+                    <img
+                      width="12px"
+                      src="/images/price-tag.png"
+                      alt="Promotion Icon"
+                    />
+                    <span>Quản lý khuyến mãi</span>
+                    {promotionsOpen ? (
+                      <AiOutlinePlusCircle className="ml-auto" />
+                    ) : (
+                      <AiOutlinePlusCircle className="ml-auto" />
+                    )}
+                  </div>
+                  {promotionsOpen && (
+                    <ul className="ml-4">
+                      <li>
+                        <Link className="active-link" to="/admin/add-voucher">
+                          <CiDiscount1 /> Giảm Giá Sản Phẩm
+                        </Link>
+                      </li>
+                      <li>
+                        <Link
+                          className="active-link"
+                          to="/admin/create-voucher"
+                        >
+                          <BiSolidDiscount /> Mã Giảm Giá
+                        </Link>
+                      </li>
+                    </ul>
+                  )}
+                </li>
                 <hr />
                 {shareLinks}
               </ul>
@@ -102,6 +206,7 @@ const DashBoardLayout = () => {
       </div>
     );
   }
+
   return (
     <div>
       {isAdmin ? (
@@ -149,42 +254,113 @@ const DashBoardLayout = () => {
                     </Link>
                   </li>
                   <hr />
-
                   <li>
                     <Link className="active-link" to="/admin">
                       <MdDashboard />
                       Dashboard
                     </Link>
                   </li>
-                  <li className="">
+                  <li>
                     <Link className="active-link" to="/admin/users">
                       <FaUser />
                       Tất cả người dùng
                     </Link>
                   </li>
                   <li>
-                    <Link className="active-link" to="/admin/manage-inventory">
+                    <div
+                      onClick={toggleInventory}
+                      className="cursor-pointer flex items-center active-link"
+                    >
                       <FaWarehouse />
-                      Quản lý kho
-                    </Link>
+                      <span>Quản lý kho</span>
+                      {inventoryOpen ? (
+                        <IoIosArrowUp className="ml-auto" />
+                      ) : (
+                        <IoIosArrowDown className="ml-auto" />
+                      )}
+                    </div>
+                    {inventoryOpen && (
+                      <ul className="ml-4">
+                        <li>
+                          <Link
+                            className="active-link"
+                            to="/admin/manage-inventory"
+                          >
+                            <MdOutlineInventory />
+                            Tất cả sản phẩm trong kho
+                          </Link>
+                        </li>
+                        <li>
+                          <Link
+                            className="active-link"
+                            to="/admin/add-inventory"
+                          >
+                            <IoIosAddCircle />
+                            Nhập kho
+                          </Link>
+                        </li>
+                      </ul>
+                    )}
+                  </li>
+
+                  <li>
+                    <div
+                      onClick={toggleMenu}
+                      className="cursor-pointer flex items-center active-link"
+                    >
+                      <VscLayoutMenubar />
+                      <span>Quản lý menu</span>
+                      {menuOpen ? (
+                        <IoIosArrowUp className="ml-auto" />
+                      ) : (
+                        <IoIosArrowDown className="ml-auto" />
+                      )}
+                    </div>
+                    {menuOpen && (
+                      <ul className="ml-4">
+                        <li>
+                          <Link className="active-link" to="/admin/manage-menu">
+                            <AiOutlineMenu />
+                            Tất cả sản phẩm trên menu
+                          </Link>
+                        </li>
+                      </ul>
+                    )}
                   </li>
                   <li>
-                    <Link className="active-link" to="/admin/add-inventory">
-                      <IoIosAddCircle />
-                      Nhập kho
-                    </Link>
-                  </li>
-                  <li>
-                    <Link className="active-link" to="/admin/manage-menu">
-                      <AiOutlineMenu />
-                      Quản lý menu
-                    </Link>
-                  </li>
-                  <li>
-                    <Link className="active-link" to="/admin/add-voucher">
-                      <img width="12px" src="/images/price-tag.png" alt="" />
-                      Quản lý khuyến mãi
-                    </Link>
+                    <div
+                      onClick={togglePromotions}
+                      className="cursor-pointer flex items-center active-link"
+                    >
+                      <img
+                        width="12px"
+                        src="/images/price-tag.png"
+                        alt="Promotion Icon"
+                      />
+                      <span>Quản lý khuyến mãi</span>
+                      {promotionsOpen ? (
+                        <IoIosArrowUp className="ml-auto" />
+                      ) : (
+                        <IoIosArrowDown className="ml-auto" />
+                      )}
+                    </div>
+                    {promotionsOpen && (
+                      <ul className="ml-4">
+                        <li>
+                          <Link className="active-link" to="/admin/add-voucher">
+                            <CiDiscount1 /> Giảm Giá Sản Phẩm
+                          </Link>
+                        </li>
+                        <li>
+                          <Link
+                            className="active-link"
+                            to="/admin/create-voucher"
+                          >
+                            <BiSolidDiscount /> Mã Giảm Giá
+                          </Link>
+                        </li>
+                      </ul>
+                    )}
                   </li>
                   <li>
                     <Link className="active-link" to="/admin/order-tracking">

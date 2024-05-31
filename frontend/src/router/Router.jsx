@@ -61,6 +61,9 @@ const BlogLazyLoading = lazy(() => import("../pages/Blog/Blog"));
 const AboutLazyLoading = lazy(() => import("../pages/About/About"));
 import LoadingSpinner from "../ultis/LoadingSpinner";
 import PrivateRouter from "../PrivateRouter/PrivateRouter";
+const CreateVoucherLazyLoading = lazy(() =>
+  import("../pages/dashboard/adminNstaff/CreateVoucher")
+);
 const router = createBrowserRouter([
   {
     path: "/",
@@ -279,6 +282,14 @@ const router = createBrowserRouter([
         element: (
           <Suspense fallback={<LoadingSpinner />}>
             <ReportTodayLazyLoading />
+          </Suspense>
+        ),
+      },
+      {
+        path: "create-voucher",
+        element: (
+          <Suspense fallback={<LoadingSpinner />}>
+            <CreateVoucherLazyLoading />
           </Suspense>
         ),
       },

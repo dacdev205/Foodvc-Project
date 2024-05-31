@@ -3,8 +3,10 @@ const voucherSchema = mongoose.Schema({
   name: {
     type: String,
   },
-  voucher_describe: {
+  code: {
     type: String,
+    required: true,
+    unique: true,
   },
   voucher_discount_persent: {
     type: Number,

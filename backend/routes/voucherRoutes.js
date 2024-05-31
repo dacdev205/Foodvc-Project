@@ -4,9 +4,10 @@ const verifyAdmin = require("../middleware/verifyAdmin");
 const router = require("express").Router();
 
 //middleware
-router.post("/", verifyToken, verifyAdmin, voucherAPI.createVoucher);
-router.get("/", verifyToken, voucherAPI.getAllVouchers);
+router.post("/", voucherAPI.createVoucher);
+router.get("/", voucherAPI.getAllVouchers);
 router.get("/:id", voucherAPI.getAllSingleVouchers);
 router.delete("/:id", voucherAPI.deleteVoucher);
 router.put("/:id", voucherAPI.updateVoucher);
+router.post("/apply", voucherAPI.applyVoucherToProduct);
 module.exports = router;

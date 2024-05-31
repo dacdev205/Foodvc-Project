@@ -17,6 +17,7 @@ module.exports = class voucherAPI {
   static async createVoucher(req, res) {
     const {
       name,
+      quantity,
       voucher_describe,
       voucher_discount_persent,
       voucher_status,
@@ -28,6 +29,7 @@ module.exports = class voucherAPI {
     const newVoucher = new Voucher({
       name: name,
       code: code,
+      quantity: quantity,
       voucher_describe: voucher_describe,
       voucher_discount_persent: voucher_discount_persent,
       voucher_status: voucher_status,

@@ -8,12 +8,15 @@ const voucherSchema = mongoose.Schema({
     required: true,
     unique: true,
   },
+  voucher_describe: {
+    type: String,
+  },
   voucher_discount_persent: {
     type: Number,
   },
   voucher_status: {
     type: Boolean,
-    default: true,
+    default: false,
   },
   voucher_experied_date: {
     type: Date,
@@ -22,6 +25,10 @@ const voucherSchema = mongoose.Schema({
       now.setDate(now.getDate() + 30);
       return now;
     },
+  },
+  quantity: {
+    type: Number,
+    default: 1,
   },
 });
 

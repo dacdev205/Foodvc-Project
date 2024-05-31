@@ -1,7 +1,14 @@
 /* eslint-disable react/prop-types */
-import React, { useEffect } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 
 const AddVoucherModal = ({ isModalOpen, setIsModalOpen }) => {
+  const [voucherName, setVoucherName] = useState("");
+  const [voucherDescribe, setVoucherDescribe] = useState("");
+  const [voucherDiscountPercent, setVoucherDiscountPercent] = useState("");
+  const [voucherStatus, setVoucherStatus] = useState("");
+  const [voucherExpiredDate, setVoucherExpiredDate] = useState("");
+
   useEffect(() => {
     if (isModalOpen) {
       document.getElementById("modal-addVoucher").showModal();
@@ -9,11 +16,27 @@ const AddVoucherModal = ({ isModalOpen, setIsModalOpen }) => {
       document.getElementById("modal-addVoucher").close();
     }
   }, [isModalOpen]);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const newVoucher = {
+        name: voucherName,
+        voucher_describe: voucherDescribe,
+        voucher_discount_persent: voucherDiscountPercent,
+        voucher_status: voucherStatus,
+        voucher_experied_date: voucherExpiredDate,
+      };
+      console.log(newVoucher);
+      await axios.post("http://localhost:3000/vouchers", newVoucher);
+      setIsModalOpen(false);
+    } catch (error) {
+      console.error("Error creating voucher:", error);
+    }
+  };
+
   return (
     <div>
-      {/* <button className="btn" onClick={() => handleOpenModal}>
-        open modal
-      </button> */}
       <dialog id="modal-addVoucher" className="modal">
         <div className="modal-box bg-white">
           <form method="dialog">
@@ -25,8 +48,7 @@ const AddVoucherModal = ({ isModalOpen, setIsModalOpen }) => {
             </button>
           </form>
           <h3 className="font-bold text-lg text-black">Thêm mới voucher!</h3>
-          {/* onSubmit={handleSubmit}  */}
-          <form className="card-body text-black" method="dialog">
+          <form className="card-body text-black" onSubmit={handleSubmit}>
             <div className="form-control">
               <div className="grid grid-cols-2 gap-4">
                 <div>
@@ -35,28 +57,67 @@ const AddVoucherModal = ({ isModalOpen, setIsModalOpen }) => {
                     id="voucherName"
                     name="voucherName"
                     type="text"
+                    value={voucherName}
+                    onChange={(e) => setVoucherName(e.target.value)}
                     placeholder="Type here"
                     className="input input-bordered input-success w-full max-w-xs input-sm"
+                    required
                   />
                 </div>
                 <div>
+                  <label htmlFor="voucherDescribe">Mô tả voucher:</label>
                   <input
+                    id="voucherDescribe"
+                    name="voucherDescribe"
                     type="text"
+                    value={voucherDescribe}
+                    onChange={(e) => setVoucherDescribe(e.target.value)}
                     placeholder="Type here"
-                    className="input input-bordered input-success w-full max-w-xs"
+                    className="input input-bordered input-success w-full max-w-xs input-sm"
+                    required
                   />
                 </div>
-                <div className="col-span-2">
-                  {" "}
+                <div>
+                  <label htmlFor="voucherDiscountPercent">
+                    Phần trăm giảm giá:
+                  </label>
                   <input
-                    type="text"
+                    id="voucherDiscountPercent"
+                    name="voucherDiscountPercent"
+                    type="number"
+                    value={voucherDiscountPercent}
+                    onChange={(e) => setVoucherDiscountPercent(e.target.value)}
                     placeholder="Type here"
-                    className="input input-bordered input-success w-full"
+                    className="input input-bordered input-success w-full max-w-xs input-sm"
+                    required
+                  />
+                </div>
+                <div>
+                  <label htmlFor="voucherStatus">Trạng thái:</label>
+                  <select
+                    onChange={(e) => setVoucherStatus(e.target.value)}
+                    name="voucherStatus"
+                    id="voucherStatus"
+                  >
+                    <option value="true">Hoạt động</option>
+                    <option value="false">Không hoạt động</option>
+                  </select>
+                </div>
+                <div className="col-span-2 text-black">
+                  <label htmlFor="voucherExpiredDate">Ngày hết hạn:</label>
+                  <input
+                    id="voucherExpiredDate"
+                    name="voucherExpiredDate"
+                    type="date"
+                    value={voucherExpiredDate}
+                    onChange={(e) => setVoucherExpiredDate(e.target.value)}
+                    placeholder="Type here"
+                    className="input input-bordered input-success w-full bg-white"
+                    required
                   />
                 </div>
               </div>
             </div>
-            <div className="form-control"></div>
             <div className="form-control mt-6">
               <button
                 type="submit"

@@ -30,7 +30,7 @@ const DashBoardLayout = () => {
     return (
       <div>
         <div>
-          <div className="drawer sm:drawer-open">
+          <div className="drawer sm:drawer-open ">
             <input id="my-drawer-2" type="checkbox" className="drawer-toggle" />
             <div className="drawer-content flex flex-col sm:items-start sm:justify-start my-2">
               {/* Page content here */}
@@ -46,17 +46,17 @@ const DashBoardLayout = () => {
                   Log out
                 </button>
               </div>
-              <div className="mt-5 md:mt-2 mx-4">
+              <div className="mt-5 md:mt-2 mx-4 bg bg-white">
                 <Outlet />
               </div>
             </div>
-            <div className="drawer-side">
+            <div className="drawer-side ">
               <label
                 htmlFor="my-drawer-2"
                 aria-label="close sidebar"
                 className="drawer-overlay"
               ></label>
-              <ul className="menu p-4 w-80 min-h-full text-black bg-white">
+              <ul className="menu p-4 w-80 min-h-full text-black bg-green">
                 {/* Sidebar content here */}
                 <li className="font-bold">
                   <Link
@@ -113,7 +113,7 @@ const DashBoardLayout = () => {
                 type="checkbox"
                 className="drawer-toggle"
               />
-              <div className="drawer-content flex flex-col sm:items-start sm:justify-start my-2">
+              <div className="drawer-content flex flex-col sm:items-start sm:justify-start my-2 bg-white">
                 {/* Page content here */}
                 <div className="flex items-center justify-between mx-4">
                   <label
@@ -127,11 +127,11 @@ const DashBoardLayout = () => {
                     Log out
                   </button>
                 </div>
-                <div className="mt-5 md:mt-2 mx-4">
+                <div className="mt-5 md:mt-2 mx-4 bg-white">
                   <Outlet />
                 </div>
               </div>
-              <div className="drawer-side">
+              <div className="drawer-side border shadow-md">
                 <label
                   htmlFor="my-drawer-2"
                   aria-label="close sidebar"
@@ -183,7 +183,7 @@ const DashBoardLayout = () => {
                   <li>
                     <Link className="active-link" to="/admin/add-voucher">
                       <img width="12px" src="/images/price-tag.png" alt="" />
-                      Thêm giảm giá
+                      Quản lý khuyến mãi
                     </Link>
                   </li>
                   <li>

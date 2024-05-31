@@ -5,6 +5,7 @@ import axios from "axios";
 import inventoryAPI from "../../../api/inventoryAPI";
 import FormattedPrice from "../../../ultis/FormatedPriece";
 import { FaCheck } from "react-icons/fa6";
+import AddVoucherModal from "../../../components/AddVoucherModal";
 const AddVoucher = () => {
   const [menu, , refetch] = useMenu();
   const PF = "http://localhost:3000";
@@ -14,10 +15,9 @@ const AddVoucher = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(5);
   const [selectedCategory, setSelectedCategory] = useState("");
-  const [discountPercentage, setDiscountPercentage] = useState("");
   const categories = [...new Set(menu.map((item) => item.category))];
   const [selectedProducts, setSelectedProducts] = useState([]);
-
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const paginate = (pageNumber) => {
     setCurrentPage(pageNumber);
   };
@@ -57,32 +57,6 @@ const AddVoucher = () => {
     return sortOrder === "desc" ? dateA - dateB : dateB - dateA;
   });
   const currentMenu = sortedMenu.slice(indexOfFirstItem, indexOfLastItem);
-
-  const handleApplyVoucher = async () => {
-    try {
-      // Validate inputs
-      if (selectedProducts.length === 0 || !discountPercentage) {
-        alert("Vui lòng chọn ít nhất một sản phẩm và nhập thông tin voucher.");
-        return;
-      }
-      // Send a request to the server to apply voucher for selected products
-      const response = await axios.post("/api/foodvc/apply-voucher", {
-        productId: selectedProducts,
-        discount: parseFloat(discountPercentage),
-      }); // Update the API path accordingly
-      await inventoryAPI.updateProduct(selectedProducts, {
-        applyVoucher: true,
-      });
-      if (response.data.success) {
-        alert("Voucher added succesfully");
-      } else {
-        console.error("Error applying voucher:", response.data.error);
-      }
-    } catch (error) {
-      console.error("Error applying voucher:", error);
-    }
-    refetch();
-  };
 
   const handleCheckboxChange = (e, productId) => {
     const isChecked = e.target.checked;
@@ -148,28 +122,19 @@ const AddVoucher = () => {
           </div>
         </div>
         <div className="flex items-center">
-          <div>
-            <label className="text-black">Phần Trăm Giảm Giá:</label>
-            <input
-              type="number"
-              className="border p-2 rounded-md text-black"
-              placeholder="VD: 5"
-              value={discountPercentage}
-              onChange={(e) => {
-                const inputValue = e.target.value;
-                if (inputValue >= 0 && inputValue <= 100) {
-                  setDiscountPercentage(inputValue);
-                }
-              }}
-            />
-            <span className="ml-1 text-black">%</span>
-          </div>
           <button
+            onClick={() => setIsModalOpen(true)}
             className="btn btn-ghost bg-green text-white ml-10 hover:bg-green hover:opacity-80"
-            onClick={handleApplyVoucher}
           >
-            Áp Dụng Voucher
+            Thêm mới Voucher
           </button>
+          <AddVoucherModal
+            isModalOpen={isModalOpen}
+            setIsModalOpen={setIsModalOpen}
+          />
+          {/* <button className="btn btn-ghost bg-green text-white ml-10 hover:bg-green hover:opacity-80">
+            Áp Dụng Voucher
+          </button> */}
         </div>
       </div>
 

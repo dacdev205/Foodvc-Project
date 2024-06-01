@@ -89,7 +89,7 @@ const DashBoardLayout = () => {
                     className="flex justify-start mb-3 active-link"
                   >
                     Foodvc
-                    <span className="badge badge-primary">Management</span>
+                    <span className="badge badge-primary">Staff</span>
                   </Link>
                 </li>
                 <hr />
@@ -114,7 +114,7 @@ const DashBoardLayout = () => {
                           to="/admin/manage-inventory"
                         >
                           <FaWarehouse />
-                          Quản lý kho
+                          Sản phẩm trong kho
                         </Link>
                       </li>
                       <li>
@@ -144,7 +144,7 @@ const DashBoardLayout = () => {
                       <li>
                         <Link className="active-link" to="/admin/manage-menu">
                           <AiOutlineMenu />
-                          Tất cả sản phẩm trên menu
+                          Sản phẩm trên menu
                         </Link>
                       </li>
                     </ul>
@@ -263,7 +263,7 @@ const DashBoardLayout = () => {
                   <li>
                     <Link className="active-link" to="/admin/users">
                       <FaUser />
-                      Tất cả người dùng
+                      Quản lý người dùng
                     </Link>
                   </li>
                   <li>
@@ -287,7 +287,7 @@ const DashBoardLayout = () => {
                             to="/admin/manage-inventory"
                           >
                             <MdOutlineInventory />
-                            Tất cả sản phẩm trong kho
+                            Sản phẩm trong kho
                           </Link>
                         </li>
                         <li>
@@ -321,7 +321,7 @@ const DashBoardLayout = () => {
                         <li>
                           <Link className="active-link" to="/admin/manage-menu">
                             <AiOutlineMenu />
-                            Tất cả sản phẩm trên menu
+                            Sản phẩm trên menu
                           </Link>
                         </li>
                       </ul>

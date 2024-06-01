@@ -65,11 +65,11 @@ const AddVoucher = () => {
         alert("Vui lòng chọn ít nhất một sản phẩm và nhập thông tin voucher.");
         return;
       }
-      // Send a request to the server to apply voucher for selected products
+
       const response = await axios.post("/api/foodvc/apply-voucher", {
         productId: selectedProducts,
         discount: parseFloat(discountPercentage),
-      }); // Update the API path accordingly
+      });
       await inventoryAPI.updateProduct(selectedProducts, {
         applyVoucher: true,
       });
@@ -121,11 +121,11 @@ const AddVoucher = () => {
       </h2>
       <div>
         <div className="flex items-center">
-          <label className="text-black">Loại Hàng/Mặt Hàng:</label>
+          <label className="text-black">Loại Hàng/Mặt Hàng: </label>
           <select
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
-            className="select-sm"
+            className="select-sm select"
           >
             <option value="">-- Chọn loại --</option>
             {categories.map((category) => (

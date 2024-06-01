@@ -65,7 +65,7 @@ const ManageMenu = () => {
           placeholder="Nhập tên sản phẩm"
           value={searchTerm}
           onChange={handleSearch}
-          className="border p-2 rounded-md text-black"
+          className="border p-2 rounded-md text-black input-sm"
         />
       </div>
       <div>

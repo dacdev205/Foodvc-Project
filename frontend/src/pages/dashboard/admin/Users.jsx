@@ -5,12 +5,11 @@ import useAxiosSecure from "../../../hooks/useAxiosSecure";
 import useAuth from "../../../hooks/useAuth";
 import Pagination from "../../../ultis/Pagination";
 import AddUserModal from "./AddUserModal";
-import { deleteUser } from "firebase/auth";
 const Users = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [filterType, setFilterType] = useState("name"); // Default filter type is 'name'
+  const [filterType, setFilterType] = useState("name");
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(5); // Number of items to show per page
+  const [itemsPerPage] = useState(5);
   const axiosSecure = useAxiosSecure();
   const [addUserModalOpen, setAddUserModalOpen] = useState(false);
   const auth = useAuth();
@@ -39,7 +38,6 @@ const Users = () => {
 
   const handleRoleChange = async (user, role) => {
     try {
-      // Gửi yêu cầu API để cập nhật quyền của người dùng
       const response = await axiosSecure.patch(
         `/users/users/${user._id}/role`,
         {
@@ -47,7 +45,6 @@ const Users = () => {
         }
       );
       if (response.status === 200) {
-        // Nếu cập nhật thành công, hiển thị thông báo và refetch dữ liệu
         alert(`${user.name} bây giờ là ${role}`);
         refetch();
       }
@@ -79,7 +76,7 @@ const Users = () => {
             id="filterType"
             value={filterType}
             onChange={(e) => setFilterType(e.target.value)}
-            className="border p-2 rounded-md"
+            className="select-sm select"
           >
             <option value="name">Tên người dùng</option>
             <option value="role">Chức vụ</option>
@@ -95,7 +92,7 @@ const Users = () => {
               }`}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="border p-2 rounded-md ml-1 "
+              className="ml-1 input input-sm"
             />
           </div>
         </div>

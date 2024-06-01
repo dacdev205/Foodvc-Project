@@ -212,7 +212,7 @@ const ManageInventory = () => {
           placeholder="Nhập tên sản phẩm"
           value={searchTerm}
           onChange={handleSearch}
-          className="border p-2 rounded-md text-black"
+          className="input input-sm text-black"
         />
         <label htmlFor="sort" className="ml-2 mr-2 text-black">
           Sắp xếp theo:
@@ -221,7 +221,7 @@ const ManageInventory = () => {
           id="sort"
           value={sortType}
           onChange={handleSort}
-          className="border p-2 rounded-md text-black"
+          className="select select-sm text-black"
         >
           <option value="name">Tên sản phẩm</option>
           <option value="price">Giá</option>
@@ -235,7 +235,7 @@ const ManageInventory = () => {
           id="order"
           value={sortOrder}
           onChange={handleOrderChange}
-          className="border p-2 rounded-md"
+          className="select select-sm"
         >
           <option value="asc">Tăng dần</option>
           <option value="desc">Giảm dần</option>

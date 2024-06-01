@@ -72,7 +72,6 @@ module.exports = class inventoryAPI {
 
       if (req.file) {
         new_image = req.file.filename;
-        // Remove the old image
         try {
           fs.unlinkSync("./uploads/" + existingProduct.image);
         } catch (err) {
@@ -138,8 +137,17 @@ module.exports = class inventoryAPI {
         await Inventory.findByIdAndDelete(inventoryItem._id);
       }
 
-      await Product.findByIdAndDelete(id);
-
+      const product = await Product.findById(id);
+      if (product) {
+        const imgProduct = await Product.findByIdAndDelete(id);
+        if (imgProduct.image != "") {
+          try {
+            fs.unlinkSync("./uploads/" + imgProduct.image);
+          } catch (err) {
+            console.log(err);
+          }
+        }
+      }
       res.status(200).json({ message: "Product deleted successfully" });
     } catch (err) {
       res.status(500).json({ message: err.message });

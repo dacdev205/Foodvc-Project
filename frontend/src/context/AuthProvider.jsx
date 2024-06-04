@@ -10,6 +10,8 @@ import {
   signOut,
   updateProfile,
   onAuthStateChanged,
+  updatePassword,
+  sendPasswordResetEmail,
 } from "firebase/auth";
 import app from "../firebase/firebase.config";
 import axios from "axios";
@@ -40,7 +42,6 @@ const AuthProvider = ({ children }) => {
       );
       return response.data;
     } catch (error) {
-      // Xử lý lỗi khi tạo người dùng không thành công
       throw error;
     }
   };
@@ -74,7 +75,37 @@ const AuthProvider = ({ children }) => {
       return Promise.reject("User is not authenticated");
     }
   };
-  // check signed-in user
+  const changePassword = async (newPassword) => {
+    const user = auth.currentUser;
+
+    if (!user) {
+      console.error("User is not authenticated");
+      return Promise.reject("User is not authenticated");
+    }
+
+    try {
+      await updatePassword(user, newPassword);
+      console.log("Password updated successfully");
+    } catch (error) {
+      console.error("Error changing password:", error);
+      throw error;
+    }
+  };
+  const forgetPassword = async (password) => {
+    const user = auth.currentUser;
+    if (!user) {
+      console.error("User is not authenticated");
+      return Promise.reject("User is not authenticated");
+    }
+
+    try {
+      await sendPasswordResetEmail(user, password);
+      console.log("Password updated successfully");
+    } catch (error) {
+      console.error("Error changing password:", error);
+      throw error;
+    }
+  };
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
@@ -105,6 +136,8 @@ const AuthProvider = ({ children }) => {
     logOut,
     updateUserProfile,
     loading,
+    changePassword,
+    forgetPassword,
   };
   return (
     <AuthContext.Provider value={authInfo}>{children}</AuthContext.Provider>

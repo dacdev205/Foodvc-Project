@@ -3,22 +3,22 @@ import { Bounce, ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.min.css";
 
 // eslint-disable-next-line react/prop-types
-const ErrorAlert = ({ show, message }) => {
-  useEffect(() => {
-    if (show) {
-      toast.error(message, {
-        position: "bottom-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "colored",
-        transition: Bounce,
-      });
-    }
-  }, [show, message]);
+const WarningMsgAlert = ({ show, message }) => {
+  if (show) {
+    toast.warn(message, {
+      position: "bottom-right",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "colored",
+      transition: Bounce,
+    });
+  } else {
+    return null;
+  }
 
   return (
     <ToastContainer
@@ -37,4 +37,4 @@ const ErrorAlert = ({ show, message }) => {
   );
 };
 
-export default ErrorAlert;
+export default WarningMsgAlert;

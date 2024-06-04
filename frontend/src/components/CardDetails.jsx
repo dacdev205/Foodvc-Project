@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useContext, useEffect, useRef, useState } from "react";
-import { Link, useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import styles from "../CssModule/CardDetails.module.css";
 import menuAPI from "../api/menuAPI";
 import reviewAPI from "../api/reviewAPI";
@@ -18,6 +18,9 @@ import orderAPI from "../api/orderAPI";
 import Modal from "./Modal";
 import LoadingSpinner from "../ultis/LoadingSpinner";
 import { AuthContext } from "../context/AuthProvider";
+import SuccessAlert from "../ultis/SuccessAlert";
+import ErrorAlert from "../ultis/ErrorAlert";
+import WarningMsgAlert from "../ultis/WarningMsgAlert";
 const CardDetails = () => {
   const { id } = useParams();
   const { user } = useContext(AuthContext);
@@ -36,6 +39,13 @@ const CardDetails = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showActions, setShowActions] = useState(false);
   const navigate = useNavigate();
+  const [showAddtoCartAlert, setAddtoCartAlert] = useState(false);
+  const [showErrorMsg, setShowErrorMsg] = useState(false);
+  const [showWarnMsg, setShowWarnMsg] = useState(false);
+
+  const successMessage = "Thêm vào giỏ hàng thành công!";
+  const errorMessage = "Sản phẩm vượt quá giới hạn";
+  const warningMsg = "Vui lòng mua sản phẩm trước khi đánh giá";
   const formatDateTimeProductCreate = (dateTimeString) => {
     const options = {
       year: "numeric",
@@ -109,7 +119,7 @@ const CardDetails = () => {
     const newValue = e.target.value;
     const newQuantity = Math.max(1, parseInt(newValue, 10) || 1);
     if (newQuantity > product.quantity) {
-      alert("Số lượng sản phẩm vượt quá số lượng hiện có");
+      setShowErrorMsg(true);
       setQuantity(1);
     } else {
       setQuantity(newQuantity);
@@ -134,22 +144,10 @@ const CardDetails = () => {
         email: user.email,
       };
       if (product.quantity === 0) {
-        Swal.fire({
-          position: "center",
-          icon: "error",
-          title: `${product.name} is out of stock.`,
-          showConfirmButton: false,
-          timer: 1000,
-        });
+        setShowErrorMsg(!showErrorMsg);
       } else {
         await cartAPI.postProductToCart(cartItem);
-        Swal.fire({
-          position: "center",
-          icon: "success",
-          title: "Food added on the cart.",
-          showConfirmButton: false,
-          timer: 1000,
-        });
+        setAddtoCartAlert(true);
       }
     } else {
       document.getElementById("modal-login").showModal();
@@ -170,7 +168,7 @@ const CardDetails = () => {
     });
 
     if (!productFound) {
-      alert("Vui lòng mua sản phẩm trước khi đánh giá");
+      setShowWarnMsg(!showWarnMsg);
       return;
     }
     await reviewAPI.addReview({
@@ -335,7 +333,10 @@ const CardDetails = () => {
   };
   return (
     <div className="section-container ">
-      <div className="pt-28 max-w-screen-2xl container mx-auto xl:px-28 px-4 text-black">
+      <SuccessAlert show={showAddtoCartAlert} message={successMessage} />
+      <ErrorAlert show={showErrorMsg} message={errorMessage} />
+      <WarningMsgAlert show={showWarnMsg} message={warningMsg} />
+      <div className="max-w-screen-2xl container mx-auto xl:px-28 px-4 text-black">
         <div className="py-3 max-w-7xl m-auto">
           <div className="mt-6 sm:mt-10">
             <div className="grid grid-cols-1 md:grid-cols-2 sm:grid:cols-2 gap-6 h-max">

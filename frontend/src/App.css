@@ -15,11 +15,15 @@
 }
 
 .active-link {
-  @apply active:bg-slate-300 !important;
+  @apply active:bg-slate-300 active:text-black focus:text-black focus:bg-white !important;
 }
 
 .active {
   @apply text-green;
+}
+
+.active-link-2 {
+  @apply active:bg-white focus:bg-white hover:bg-white active:text-green focus:text-green !important;
 }
 
 input::-webkit-outer-spin-button,

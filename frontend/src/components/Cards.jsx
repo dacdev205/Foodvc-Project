@@ -9,8 +9,8 @@ import Swal from "sweetalert2";
 import reviewAPI from "../api/reviewAPI";
 import useCart from "../hooks/useCart";
 import useWishList from "../hooks/useWishList";
-
 import { FaStar } from "react-icons/fa";
+import SuccessAlert from "../ultis/SuccessAlert";
 const Cards = ({ item }) => {
   const {
     name,
@@ -30,6 +30,8 @@ const Cards = ({ item }) => {
   const [reviews, setReviews] = useState([]);
   const [cart, refetchCart, isLoading] = useCart();
   const [wishList, refetchWishList] = useWishList();
+  const [showAddtoCartAlert, setAddtoCartAlert] = useState(false);
+  const successMessage = "Thêm vào giỏ hàng thành công!";
 
   const [heartFilledIds, setHeartFilledIds] = useState(
     JSON.parse(localStorage.getItem("heartFilledIds")) || []
@@ -68,13 +70,7 @@ const Cards = ({ item }) => {
       email: user.email,
     };
     await cartAPI.postProductToCart(cartItem);
-    Swal.fire({
-      position: "center",
-      icon: "success",
-      title: "Food added on the cart.",
-      showConfirmButton: false,
-      timer: 1000,
-    });
+    setAddtoCartAlert(true);
     refetchCart();
   };
 
@@ -149,65 +145,69 @@ const Cards = ({ item }) => {
     return priceNumber;
   };
   return (
-    <div className="card mr-5 md:my-5 shadow-xl relative hover:scale-105 transition-all duration-200">
-      {/* icon wish list */}
-      <div
-        className={`rating gap-1 absolute cursor-pointer right-2 top-2 p-4 z-10 heartStar bg-green ${
-          isHeartFilled ? "text-rose-500" : "text-white"
-        }`}
-        onClick={() => handleAddToWishList(item)}
-      >
-        <FaHeart />
-      </div>
-      {item.quantity === 0 && (
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-          <span className="text-white text-lg font-bold bg-black bg-opacity-50 py-10 px-4 rounded-full no-hover-fade">
-            <p className="text-opacity-100">Hết hàng</p>
-          </span>
-        </div>
-      )}
+    <div>
+      <SuccessAlert show={showAddtoCartAlert} message={successMessage} />
+      <div className="card mr-5 md:my-5 shadow-xl relative hover:scale-105 transition-all duration-200">
+        {/* icon wish list */}
 
-      <Link to={`/product/${item._id}`}>
-        <figure>
-          <img
-            src={PF + "/" + item.image}
-            alt=""
-            className=" md:h-72 cursor-pointer"
-          />
-        </figure>
-      </Link>
-      {/* card content */}
-      <div className="card-body ">
-        <Link to={`/product/${item._id}`}>
-          <h2 className="card-title cursor-pointer text-black">
-            {item.name.slice(0, 20)}...
-          </h2>
-        </Link>
-
-        <div className="flex items-center justify-between">
-          <div className="flex items-center">
-            <span className="flex items-center text-black">
-              <span>{calculateAverageRating(reviews).toFixed(1)}</span>
-              <FaStar color="ffc107"></FaStar>
-            </span>
-            <span className="ml-1 text-xs text-grey-700">
-              ({reviews.length} đánh giá)
-            </span>
-          </div>
-          <div className="flex">
-            <p className="text-md font-bold text-black">
-              {formattedPrice(item.price)} <span>₫</span>
-            </p>
-          </div>
-        </div>
-
-        <button
-          className="btn bg-green text-white hover:bg-green hover:opacity-80 border-style"
-          onClick={() => handleAddToCart()}
-          disabled={item.quantity === 0}
+        <div
+          className={`rating gap-1 absolute cursor-pointer right-2 top-2 p-4 z-10 heartStar bg-green ${
+            isHeartFilled ? "text-rose-500" : "text-white"
+          }`}
+          onClick={() => handleAddToWishList(item)}
         >
-          Thêm vào giỏ hàng
-        </button>
+          <FaHeart />
+        </div>
+        {item.quantity === 0 && (
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <span className="text-white text-lg font-bold bg-black bg-opacity-50 py-10 px-4 rounded-full no-hover-fade">
+              <p className="text-opacity-100">Hết hàng</p>
+            </span>
+          </div>
+        )}
+
+        <Link to={`/product/${item._id}`}>
+          <figure>
+            <img
+              src={PF + "/" + item.image}
+              alt=""
+              className=" md:h-72 cursor-pointer"
+            />
+          </figure>
+        </Link>
+        {/* card content */}
+        <div className="card-body ">
+          <Link to={`/product/${item._id}`}>
+            <h2 className="card-title cursor-pointer text-black">
+              {item.name.slice(0, 20)}...
+            </h2>
+          </Link>
+
+          <div className="flex items-center justify-between">
+            <div className="flex items-center">
+              <span className="flex items-center text-black">
+                <span>{calculateAverageRating(reviews).toFixed(1)}</span>
+                <FaStar color="ffc107"></FaStar>
+              </span>
+              <span className="ml-1 text-xs text-grey-700">
+                ({reviews.length} đánh giá)
+              </span>
+            </div>
+            <div className="flex">
+              <p className="text-md font-bold text-black">
+                {formattedPrice(item.price)} <span>₫</span>
+              </p>
+            </div>
+          </div>
+
+          <button
+            className="btn bg-green text-white hover:bg-green hover:opacity-80 border-style"
+            onClick={() => handleAddToCart()}
+            disabled={item.quantity === 0}
+          >
+            Thêm vào giỏ hàng
+          </button>
+        </div>
       </div>
     </div>
   );

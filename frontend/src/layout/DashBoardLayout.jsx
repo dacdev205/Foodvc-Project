@@ -39,7 +39,6 @@ const DashBoardLayout = () => {
   const [promotionsOpen, setPromotionsOpen] = useState(false);
   const [inventoryOpen, setInventoryOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-
   const togglePromotions = () => {
     setPromotionsOpen(!promotionsOpen);
   };

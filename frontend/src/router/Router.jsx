@@ -61,6 +61,8 @@ const BlogLazyLoading = lazy(() => import("../pages/Blog/Blog"));
 const AboutLazyLoading = lazy(() => import("../pages/About/About"));
 import LoadingSpinner from "../ultis/LoadingSpinner";
 import PrivateRouter from "../PrivateRouter/PrivateRouter";
+import AccountManagement from "../layout/AccountManagement";
+import UpdateProfile from "../pages/dashboard/UpdateProfiles";
 const CreateVoucherLazyLoading = lazy(() =>
   import("../pages/dashboard/adminNstaff/CreateVoucher")
 );
@@ -105,14 +107,7 @@ const router = createBrowserRouter([
           </Suspense>
         ),
       },
-      {
-        path: "/update-profile",
-        element: (
-          <Suspense fallback={<LoadingSpinner />}>
-            <UpdateProfilesLazyLoading />
-          </Suspense>
-        ),
-      },
+
       {
         path: "/product/:id",
         element: (
@@ -146,13 +141,24 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path: "/orders",
-        element: (
-          <Suspense fallback={<LoadingSpinner />}>
-            <UserOrdersLazyLoading />
-          </Suspense>
-        ),
+        path: "/user",
+        element: <AccountManagement />,
+        children: [
+          {
+            path: "update-profile",
+            element: <UpdateProfile></UpdateProfile>,
+          },
+          {
+            path: "orders",
+            element: (
+              <Suspense fallback={<LoadingSpinner />}>
+                <UserOrdersLazyLoading />
+              </Suspense>
+            ),
+          },
+        ],
       },
+
       {
         path: "/admin-chat",
         element: (
@@ -200,7 +206,7 @@ const router = createBrowserRouter([
       {
         path: "",
         element: (
-          <Suspense fallback={<LoadingSpinner />}>
+          <Suspense>
             <DashboardLazyLoading />
           </Suspense>
         ),
@@ -208,7 +214,7 @@ const router = createBrowserRouter([
       {
         path: "users",
         element: (
-          <Suspense fallback={<LoadingSpinner />}>
+          <Suspense>
             <UsersLazyLoading />
           </Suspense>
         ),
@@ -216,7 +222,7 @@ const router = createBrowserRouter([
       {
         path: "add-inventory",
         element: (
-          <Suspense fallback={<LoadingSpinner />}>
+          <Suspense>
             <AddInventoryLazyLoading />
           </Suspense>
         ),
@@ -224,7 +230,7 @@ const router = createBrowserRouter([
       {
         path: "manage-inventory",
         element: (
-          <Suspense fallback={<LoadingSpinner />}>
+          <Suspense>
             <ManageInventoryLazyLoading />
           </Suspense>
         ),
@@ -232,7 +238,7 @@ const router = createBrowserRouter([
       {
         path: "manage-menu",
         element: (
-          <Suspense fallback={<LoadingSpinner />}>
+          <Suspense>
             <ManageMenuLazyLoading />
           </Suspense>
         ),
@@ -240,7 +246,7 @@ const router = createBrowserRouter([
       {
         path: "update-item/:id",
         element: (
-          <Suspense fallback={<LoadingSpinner />}>
+          <Suspense>
             <UpdateItemLazyLoading />
           </Suspense>
         ),
@@ -248,7 +254,7 @@ const router = createBrowserRouter([
       {
         path: "add-voucher",
         element: (
-          <Suspense fallback={<LoadingSpinner />}>
+          <Suspense>
             <AddVoucherLazyLoading />
           </Suspense>
         ),
@@ -256,7 +262,7 @@ const router = createBrowserRouter([
       {
         path: "order-tracking",
         element: (
-          <Suspense fallback={<LoadingSpinner />}>
+          <Suspense>
             <OrdersTrackingLazyLoading />
           </Suspense>
         ),
@@ -264,7 +270,7 @@ const router = createBrowserRouter([
       {
         path: "order-tracking/:id",
         element: (
-          <Suspense fallback={<LoadingSpinner />}>
+          <Suspense>
             <OrderDetailLazyLoading />
           </Suspense>
         ),
@@ -272,7 +278,7 @@ const router = createBrowserRouter([
       {
         path: "help-users",
         element: (
-          <Suspense fallback={<LoadingSpinner />}>
+          <Suspense>
             <HelpUsersLazyLoading />
           </Suspense>
         ),
@@ -280,7 +286,7 @@ const router = createBrowserRouter([
       {
         path: "report",
         element: (
-          <Suspense fallback={<LoadingSpinner />}>
+          <Suspense>
             <ReportTodayLazyLoading />
           </Suspense>
         ),
@@ -288,7 +294,7 @@ const router = createBrowserRouter([
       {
         path: "create-voucher",
         element: (
-          <Suspense fallback={<LoadingSpinner />}>
+          <Suspense>
             <CreateVoucherLazyLoading />
           </Suspense>
         ),

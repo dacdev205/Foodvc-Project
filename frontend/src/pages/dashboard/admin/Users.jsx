@@ -7,9 +7,9 @@ import Pagination from "../../../ultis/Pagination";
 import AddUserModal from "./AddUserModal";
 const Users = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [filterType, setFilterType] = useState("name");
+  const [filterType, setFilterType] = useState("name"); // Default filter type is 'name'
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(5);
+  const [itemsPerPage] = useState(5); // Number of items to show per page
   const axiosSecure = useAxiosSecure();
   const [addUserModalOpen, setAddUserModalOpen] = useState(false);
   const auth = useAuth();
@@ -45,6 +45,7 @@ const Users = () => {
         }
       );
       if (response.status === 200) {
+        //
         alert(`${user.name} bây giờ là ${role}`);
         refetch();
       }
@@ -76,7 +77,7 @@ const Users = () => {
             id="filterType"
             value={filterType}
             onChange={(e) => setFilterType(e.target.value)}
-            className="select-sm select"
+            className="select select-sm"
           >
             <option value="name">Tên người dùng</option>
             <option value="role">Chức vụ</option>
@@ -92,7 +93,7 @@ const Users = () => {
               }`}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="ml-1 input input-sm"
+              className="input input-sm ml-1 "
             />
           </div>
         </div>

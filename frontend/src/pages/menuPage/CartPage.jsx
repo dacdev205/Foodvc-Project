@@ -59,7 +59,6 @@ const CartPage = () => {
 
     const [, decimalPart] = priceNumber.split(",");
 
-    // Check if the part after the decimal point is greater than or equal to 5
     if (decimalPart && parseInt(decimalPart) >= 5) {
       return new Intl.NumberFormat("vi-VN", {
         currency: "VND",
@@ -219,6 +218,7 @@ const CartPage = () => {
                 </h2>
               ) : (
                 <div>
+                  <img src="./public/images/home/cartBanner.png" alt="" />
                   <h2 className="md:text-2xl text-1xl font-bold md:leading-snug leading-snug mb-3 text-black">
                     Chưa có sản phẩm trong{" "}
                     <span className="text-green">giỏ hàng</span>

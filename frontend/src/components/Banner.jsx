@@ -11,7 +11,7 @@ const Banner = () => {
             Nhảy vào niềm vui của những{" "}
             <span className="bg-green">món ngon</span>
           </h2>
-          <p className="text-xl text-[#4A4A4A]">
+          <p className="text-xl text-[#4A4A4A] text-justify">
             Nơi mỗi món ăn là một câu chuyện đầy thú vị, thế giới của ẩm thực
             không chỉ là về việc thưởng thức hương vị ngon lành mà còn là việc
             khám phá những câu chuyện đằng sau từng miếng thức ăn. Mỗi món đều

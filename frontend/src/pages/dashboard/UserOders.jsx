@@ -36,9 +36,7 @@ const UserOders = () => {
           {/* content */}
           <div className=" text-center px-4 space-y-7">
             {orders.length ? (
-              <h2 className="md:text-3xl text-2xl font-bold md:leading-snug leading-snug text-black">
-                Đơn hàng <span className="text-green">đã đặt</span>
-              </h2>
+              ""
             ) : (
               <div>
                 <h2 className="md:text-2xl text-1xl font-bold md:leading-snug leading-snug text-black">

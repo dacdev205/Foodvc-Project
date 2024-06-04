@@ -30,34 +30,31 @@ const Navbar = () => {
   }, []);
   const navItem = (
     <>
-      <li>
-        <Link className="active-link" to="/">
+      <li className="active-link">
+        <Link className="active-link lg:text-white text-black" to="/">
           Trang chủ
         </Link>
       </li>
-      <li>
-        <Link className="active-link" to="/menu">
+      <li className="active-link">
+        <Link className="active-link lg:text-white text-black" to="/menu">
           Menu
         </Link>
       </li>
-      <li>
-        <Link className="active-link" to="/about">
+      <li className="active-link">
+        <Link className="active-link lg:text-white text-black" to="/about">
           Chúng tôi
         </Link>
       </li>
-      <li>
-        <Link className="active-link" to="/blog">
+      <li className="active-link">
+        <Link className="active-link lg:text-white text-black" to="/blog">
           Blogs
         </Link>
       </li>
     </>
   );
-  const handleLogin = () => {
-    const request = document.getElementById("modal-login");
-    console.log(request);
-  };
+
   return (
-    <header className="max-w-screen-2xl container mx-auto fixed top-0 left-0 bg-white z-50 right-0 transition-all duration-300 ease-in-out">
+    <header className="max-w-screen-2xl container mx-auto fixed top-0 left-0 bg-green z-50 right-0 transition-all duration-300 ease-in-out">
       <div
         className={`navbar xl:px-24 ${
           isSticky
@@ -70,7 +67,7 @@ const Navbar = () => {
             <div
               tabIndex={0}
               role="button"
-              className="btn btn-ghost lg:hidden "
+              className="btn btn-ghost lg:hidden text-white"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -89,13 +86,13 @@ const Navbar = () => {
             </div>
             <ul
               tabIndex={0}
-              className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow rounded-box w-52 bg-white"
+              className="dropdown-content mt-3 z-[1] p-2 shadow rounded-box w-52 bg-white"
             >
               {navItem}
             </ul>
           </div>
           <div>
-            <a href="/" className="btn btn-ghost text-xl">
+            <a href="/" className="btn btn-ghost text-xl text-white">
               Foodvc
             </a>
           </div>
@@ -105,7 +102,7 @@ const Navbar = () => {
           <ul className="menu menu-horizontal px-1 text-black ">{navItem}</ul>
         </div>
 
-        <div className="navbar-end text-black">
+        <div className="navbar-end text-white">
           {/* wish start */}
           <Link to="wish-list">
             <label

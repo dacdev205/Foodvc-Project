@@ -1,15 +1,26 @@
 /* eslint-disable react/prop-types */
+import { createTheme } from "@mui/material/styles";
+import Box from "@mui/material/Box";
+
+import Avatar from "@mui/material/Avatar";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import Divider from "@mui/material/Divider";
+import IconButton from "@mui/material/IconButton";
+import Tooltip from "@mui/material/Tooltip";
+import Logout from "@mui/icons-material/Logout";
 import React, { useContext, useState, useRef, useEffect } from "react";
 import { AuthContext } from "../context/AuthProvider";
 import { Link, useNavigate } from "react-router-dom";
-import useAuth from "../hooks/useAuth";
+import { FaCartShopping } from "react-icons/fa6";
+import { MdOutlineAdminPanelSettings } from "react-icons/md";
 import useAdmin from "../hooks/useAdmin";
 import useStaff from "../hooks/useStaff";
 
 const Profile = ({ user }) => {
   const { logOut } = useContext(AuthContext);
   const navigate = useNavigate();
-  const [isStaff, isStaffLoading] = useStaff();
 
   const handleLogout = () => {
     logOut()
@@ -21,117 +32,110 @@ const Profile = ({ user }) => {
       });
   };
 
-  const { loading } = useAuth();
-  const [isAdmin, isAdminLoading] = useAdmin();
-  const [drawerOpen, setDrawerOpen] = useState(false);
-  const drawerRef = useRef(null);
-
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (drawerRef.current && !drawerRef.current.contains(event.target)) {
-        setDrawerOpen(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
-  const closeDrawer = () => {
-    // Lấy thẻ input drawer và thực hiện click để đóng drawer
-    const drawerCheckbox = document.getElementById("my-drawer-4");
-    if (drawerCheckbox) {
-      drawerCheckbox.checked = false;
-    }
+  const [isAdmin] = useAdmin();
+  const [isStaff] = useStaff();
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const open = Boolean(anchorEl);
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
   };
-  const toggleDrawer = () => {
-    setDrawerOpen(!drawerOpen);
+  const handleClose = () => {
+    setAnchorEl(null);
   };
-
-  // if (isStaff) {
-  //   return (
-  //     <div className="h-screen flex justify-center items-center">
-  //       <Link to="/">
-  //         <button className="btn bg-green text-white">Back to Home</button>
-  //       </Link>
-  //     </div>
-  //   );
-  // }
   return (
     <div>
-      <div
-        className={`drawer drawer-end z-50 ${drawerOpen ? "open" : ""}`}
-        ref={drawerRef}
-      >
-        <input id="my-drawer-4" type="checkbox" className="drawer-toggle" />
-        <div className="drawer-content">
-          {/* Page content here */}
-          <label
-            htmlFor="my-drawer-4"
-            className="drawer-button btn btn-ghost btn-circle avatar"
-            onClick={toggleDrawer}
+      <Box sx={{ display: "flex", alignItems: "center", textAlign: "center" }}>
+        <Tooltip title="Account settings">
+          <IconButton
+            onClick={handleClick}
+            size="small"
+            aria-controls={open ? "account-menu" : undefined}
+            aria-haspopup="true"
+            aria-expanded={open ? "true" : undefined}
           >
-            <div className="w-10 rounded-full">
+            <Avatar sx={{ width: 42, height: 42 }}>
               {user.photoURL ? (
                 <img alt="avatar" src={user.photoURL} />
               ) : (
                 <img alt="avatar" src="/images/user.png" />
               )}
-            </div>
-          </label>
-        </div>
-        <div className="drawer-side overflow-hidden">
-          <label
-            htmlFor="my-drawer-4"
-            aria-label="close sidebar"
-            className={`drawer-overlay ${drawerOpen ? "open" : ""}`}
-            onClick={() => setDrawerOpen(false)}
-          ></label>
-          <ul className="menu p-4 w-80 min-h-full bg-white text-black">
-            {/* Sidebar content here */}
-            <li>
-              <Link
-                className="active-link"
-                to="/update-profile"
-                onClick={() => closeDrawer()}
-              >
-                Trang cá nhân
-              </Link>
-            </li>
-            <li>
-              <Link
-                className="active-link"
-                to="orders"
-                onClick={() => closeDrawer()}
-              >
-                Đặt hàng
-              </Link>
-            </li>
-            {isAdmin || isStaff ? (
-              <li>
-                <Link
-                  className="active-link"
-                  to="/admin"
-                  onClick={() => closeDrawer()}
-                >
-                  Trang quản lý
-                </Link>
-              </li>
-            ) : (
-              ""
-            )}
-            <li>
-              <a className="active-link">Cài đặt</a>
-            </li>
-            <li>
-              <a className="active-link" onClick={handleLogout}>
-                Đăng xuất
-              </a>
-            </li>
-          </ul>
-        </div>
-      </div>
+            </Avatar>
+          </IconButton>
+        </Tooltip>
+      </Box>
+      <Menu
+        anchorEl={anchorEl}
+        id="account-menu"
+        open={open}
+        onClose={handleClose}
+        onClick={handleClose}
+        PaperProps={{
+          elevation: 0,
+          sx: {
+            overflow: "visible",
+            filter: "drop-shadow(0px 2px 8px rgba(0,0,0,0.32))",
+            mt: 1.5,
+            "& .MuiAvatar-root": {
+              width: 32,
+              height: 32,
+              ml: -0.5,
+              mr: 1,
+            },
+            "&::before": {
+              content: '""',
+              display: "block",
+              position: "absolute",
+              top: 0,
+              right: 22,
+              width: 10,
+              height: 10,
+              bgcolor: "background.paper",
+              transform: "translateY(-50%) rotate(45deg)",
+              zIndex: 0,
+            },
+          },
+        }}
+        transformOrigin={{ horizontal: "right", vertical: "top" }}
+        anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
+      >
+        <Link to="/user/update-profile">
+          <MenuItem onClick={handleClose}>
+            <Avatar fontSize="small" sx={{ width: 32, height: 32 }}>
+              {user.photoURL ? (
+                <img alt="avatar" src={user.photoURL} />
+              ) : (
+                <img alt="avatar" src="/images/user.png" />
+              )}
+            </Avatar>{" "}
+            Tài khoản của tôi
+          </MenuItem>
+        </Link>
+        <Divider />
+        <MenuItem onClick={handleClose}>
+          <ListItemIcon>
+            <FaCartShopping />
+          </ListItemIcon>
+          Đơn mua
+        </MenuItem>
+        {isAdmin || isStaff ? (
+          <Link to="/admin">
+            <MenuItem onClick={handleClose}>
+              <ListItemIcon>
+                <MdOutlineAdminPanelSettings />
+              </ListItemIcon>
+              Trang quản lý
+            </MenuItem>
+          </Link>
+        ) : (
+          ""
+        )}
+        <MenuItem onClick={handleLogout}>
+          <ListItemIcon>
+            <Logout fontSize="small" />
+          </ListItemIcon>
+          Đăng xuất
+        </MenuItem>
+      </Menu>
     </div>
   );
 };

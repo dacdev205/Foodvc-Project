@@ -106,7 +106,7 @@ const Modal = () => {
               className="card-body"
               method="dialog"
             >
-              <h3 className="font-bold text-lg">Đăng nhập!</h3>
+              <h3 className="font-bold text-lg text-black">Đăng nhập!</h3>
               <div className="form-control">
                 <label className="label">
                   <span className="label-text text-black">Email:</span>
@@ -114,7 +114,7 @@ const Modal = () => {
                 <input
                   type="email"
                   placeholder="email"
-                  className="input input-bordered"
+                  className="input input-bordered text-black"
                   {...register("email")}
                   onChange={(e) => handleChange(e)}
                 />
@@ -178,7 +178,7 @@ const Modal = () => {
               >
                 ✕
               </button>
-              <p className="text-center my-2">
+              <p className="text-center my-2 text-black">
                 Bạn chưa có tài khoản?{" "}
                 <Link to="/register" className="underline text-red">
                   Đăng kí ngay

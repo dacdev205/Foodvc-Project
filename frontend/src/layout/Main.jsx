@@ -14,7 +14,7 @@ const Main = () => {
       ) : (
         <div>
           <div>
-            <div className="relative">
+            <div className="relative mb-16">
               <Navbar></Navbar>
             </div>
           </div>

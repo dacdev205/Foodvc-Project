@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { FaUtensils } from "react-icons/fa";
 import { useForm } from "react-hook-form";
 import inventoryAPI from "../../../api/inventoryAPI";
@@ -8,6 +8,7 @@ import Button from "@mui/material/Button";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import SuccessAlert from "../../../ultis/SuccessAlert";
 import ErrorAlert from "../../../ultis/ErrorAlert";
+import ReactQuill from "react-quill";
 const AddInventory = () => {
   const { register, handleSubmit, setValue, reset } = useForm({
     mode: "onChange",

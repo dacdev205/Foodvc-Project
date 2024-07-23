@@ -2,6 +2,14 @@ const Review = require("../models/reviews");
 const Menu = require("../models/menu");
 
 module.exports = class reviewAPI {
+  static async getAllReviews(req, res) {
+    try {
+      const reviews = await Review.find({});
+      res.status(200).json(reviews);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  }
   static async addReview(req, res) {
     const { productId, userId, userName, rating, comment } = req.body;
     try {

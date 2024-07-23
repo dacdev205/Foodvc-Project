@@ -4,6 +4,8 @@ import reviewAPI from "../../api/reviewAPI";
 import { FaStar } from "react-icons/fa";
 import { AuthContext } from "../../context/AuthProvider";
 import styles from "../../CssModule/ReviewForm.module.css";
+import { Bounce, ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 const ReviewFormEdit = ({
   reviewId,
   isModalOpen,
@@ -14,6 +16,7 @@ const ReviewFormEdit = ({
   const [ratingError, setRatingError] = useState(false);
   const { user } = useContext(AuthContext);
   const [comment, setComment] = useState("");
+
   useEffect(() => {
     if (reviewId) {
       const fetchReview = async () => {
@@ -62,7 +65,17 @@ const ReviewFormEdit = ({
     if (user && user?.email) {
       await reviewAPI.updateReviewByReviewId(reviewId, { comment, rating });
       setIsModalOpen(false);
-      alert("Cảm ơn bạn đã gửi đánh giá!");
+      toast.info("Đánh giá đã được chỉnh sửa!", {
+        position: "bottom-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+        transition: Bounce,
+      });
       updateReviews();
     } else {
       document.getElementById("my_modal_5").showModal();

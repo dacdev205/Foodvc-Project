@@ -2,11 +2,11 @@ import React, { useEffect, useState } from "react";
 import { FaUser } from "react-icons/fa";
 import { FaRegHeart } from "react-icons/fa";
 import { Link } from "react-router-dom";
-import Profile from "./Profile";
+import Profile from "./Account/Profile";
 import useCart from "../hooks/useCart";
 import useAuth from "../hooks/useAuth";
 import useWishList from "../hooks/useWishList";
-import Modal from "./Modal";
+import Modal from "./Account/Modal";
 const Navbar = () => {
   const [isSticky, setSticky] = useState(false);
   const { user, loading } = useAuth();
@@ -30,23 +30,35 @@ const Navbar = () => {
   }, []);
   const navItem = (
     <>
-      <li className="active-link">
-        <Link className="active-link lg:text-white text-black" to="/">
+      <li className="active-link rounded-box">
+        <Link
+          className="active-link rounded-box lg:text-white text-black"
+          to="/"
+        >
           Trang chủ
         </Link>
       </li>
-      <li className="active-link">
-        <Link className="active-link lg:text-white text-black" to="/menu">
+      <li className="active-link rounded-box">
+        <Link
+          className="active-link rounded-box lg:text-white text-black"
+          to="/menu"
+        >
           Menu
         </Link>
       </li>
-      <li className="active-link">
-        <Link className="active-link lg:text-white text-black" to="/about">
+      <li className="active-link rounded-box">
+        <Link
+          className="active-link rounded-box lg:text-white text-black"
+          to="/about"
+        >
           Chúng tôi
         </Link>
       </li>
-      <li className="active-link">
-        <Link className="active-link lg:text-white text-black" to="/blog">
+      <li className="active-link rounded-box">
+        <Link
+          className="active-link rounded-box lg:text-white text-black"
+          to="/blog"
+        >
           Blogs
         </Link>
       </li>

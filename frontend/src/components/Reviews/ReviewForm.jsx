@@ -9,6 +9,7 @@ const ReviewForm = ({ productId, userId, userName, onSubmit }) => {
   const [comment, setComment] = useState("");
   const [ratingError, setRatingError] = useState(false);
   const { user } = useContext(AuthContext);
+
   const handleSubmit = (e) => {
     if (user && user?.email) {
       e.preventDefault();
@@ -17,21 +18,20 @@ const ReviewForm = ({ productId, userId, userName, onSubmit }) => {
         return;
       }
       onSubmit({ productId, userId, userName, rating, comment });
-      setRating(0); // Reset the rating to 0
-      setComment(""); // Reset the comment to an empty string
-      setRatingError(false); // Reset the rating error state
+      setRating(0);
+      setComment("");
+      setRatingError(false);
       document.getElementById("modal-review").close();
-      alert("Cảm ơn bạn đã gửi đánh giá!");
     } else {
-      setRating(0); // Reset the rating to 0
-      setComment(""); // Reset the comment to an empty string
+      setRating(0);
+      setComment("");
       document.getElementById("modal-login").showModal();
     }
   };
   const handleCloseModal = () => {
-    setRating(0); // Reset the rating to 0
-    setComment(""); // Reset the comment to an empty string
-    setRatingError(false); // Reset the rating error state
+    setRating(0);
+    setComment("");
+    setRatingError(false);
     document.getElementById("modal-review").close();
   };
   const handleRatingClick = (selectedRating) => {
@@ -103,7 +103,7 @@ const ReviewForm = ({ productId, userId, userName, onSubmit }) => {
               <div className="form-control mt-6">
                 <button
                   type="submit"
-                  className="btn bg-green hover:bg-green hover:opacity-80 text-white"
+                  className="btn bg-green hover:bg-green hover:opacity-80 text-white border-none"
                 >
                   Gửi đánh giá
                 </button>

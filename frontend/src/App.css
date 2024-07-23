@@ -73,6 +73,13 @@ input[type="tel"] {
   border-color: transparent !important;
 }
 
+.btn.disabled {
+  color: black !important;
+}
+.placeholder-black::placeholder {
+  color: !important;
+  opacity: 1;
+}
 #check-box-1:checked ~ {
   @apply text-opacity-100;
 }

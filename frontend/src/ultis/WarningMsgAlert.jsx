@@ -4,21 +4,21 @@ import "react-toastify/dist/ReactToastify.min.css";
 
 // eslint-disable-next-line react/prop-types
 const WarningMsgAlert = ({ show, message }) => {
-  if (show) {
-    toast.warn(message, {
-      position: "bottom-right",
-      autoClose: 3000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      theme: "colored",
-      transition: Bounce,
-    });
-  } else {
-    return null;
-  }
+  useEffect(() => {
+    if (show) {
+      toast.warn(message, {
+        position: "bottom-right",
+        autoClose: 1000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+        transition: Bounce,
+      });
+    }
+  }, [show, message]);
 
   return (
     <ToastContainer

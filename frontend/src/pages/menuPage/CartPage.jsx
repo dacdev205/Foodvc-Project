@@ -12,6 +12,8 @@ import inventoryAPI from "../../api/inventoryAPI";
 import FormattedPrice from "../../ultis/FormatedPriece";
 import { FaCheck } from "react-icons/fa6";
 import paymentAPI from "../../api/paymentAPI";
+import "react-toastify/dist/ReactToastify.css";
+import { Bounce, ToastContainer, toast } from "react-toastify";
 const CartPage = () => {
   const [cart, refetchCart, isLoading] = useCart();
   const { user } = useContext(AuthContext);
@@ -72,16 +74,30 @@ const CartPage = () => {
   const handleDelete = async (item) => {
     try {
       await cartAPI.deleteProduct(item._id);
-      Swal.fire({
-        position: "center",
-        icon: "error",
-        title: "Food deleted on the cart.",
-        showConfirmButton: false,
-        timer: 700,
-      });
       refetchCart();
+      toast.success("Sản phẩm đã được xóa!", {
+        position: "bottom-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+        transition: Bounce,
+      });
     } catch (error) {
-      console.error("Error deleting product:", error);
+      toast.error("Sản phẩm đã được xóa!", {
+        position: "bottom-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+        transition: Bounce,
+      });
     }
   };
   const handleEditClick = () => {
@@ -92,7 +108,17 @@ const CartPage = () => {
       if (newQuantity > 0) {
         const productInfo = await menuAPI.getProductById(item._id);
         if (item.quantity >= productInfo.quantity) {
-          alert("Số lượng sản phẩm vượt quá số lượng hiện có");
+          toast.warn("Số lượng vượt quá hiện có!", {
+            position: "bottom-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "colored",
+            transition: Bounce,
+          });
         } else {
           await cartAPI.updateProduct(item._id, { quantity: newQuantity });
           refetchCart();
@@ -208,6 +234,19 @@ const CartPage = () => {
     // Render cart page with database load succesfully
     return (
       <div className="section-container">
+        <ToastContainer
+          position="top-right"
+          autoClose={5000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="colored"
+          transition:Bounce
+        />
         <div className="max-w-screen-2xl container mx-auto xl:px-24 px-4 bg-gradient-to-r from-0% from-[#FAFAFA] to-[#FCFCFC] to-100%">
           <div className="py-24 flex flex-col items-center justify-center">
             <div className="text-center px-4 space-y-7">

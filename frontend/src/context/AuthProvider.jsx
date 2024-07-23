@@ -22,6 +22,7 @@ const googleProvider = new GoogleAuthProvider();
 const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isVerified, setIsVerified] = useState(false);
   const apiKeyFirebase = import.meta.env.VITE_APIKEY;
 
   const createUser = (email, password) => {
@@ -92,17 +93,9 @@ const AuthProvider = ({ children }) => {
     }
   };
   const forgetPassword = async (password) => {
-    const user = auth.currentUser;
-    if (!user) {
-      console.error("User is not authenticated");
-      return Promise.reject("User is not authenticated");
-    }
-
     try {
-      await sendPasswordResetEmail(user, password);
-      console.log("Password updated successfully");
+      await sendPasswordResetEmail(auth, password);
     } catch (error) {
-      console.error("Error changing password:", error);
       throw error;
     }
   };
@@ -138,6 +131,8 @@ const AuthProvider = ({ children }) => {
     loading,
     changePassword,
     forgetPassword,
+    isVerified,
+    setIsVerified,
   };
   return (
     <AuthContext.Provider value={authInfo}>{children}</AuthContext.Provider>

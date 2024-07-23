@@ -4,19 +4,25 @@ import {
   MdDashboard,
   MdDashboardCustomize,
   MdOutlineInventory,
+  MdOutlineRateReview,
+  MdOutlineReviews,
 } from "react-icons/md";
 import { VscLayoutMenubar } from "react-icons/vsc";
 import { CiDiscount1 } from "react-icons/ci";
+import { FcStatistics } from "react-icons/fc";
 import { BiSolidDiscount } from "react-icons/bi";
 import {
   FaWarehouse,
   FaUser,
   FaShoppingBag,
   FaQuestionCircle,
+  FaUsers,
+  FaPercentage,
 } from "react-icons/fa";
+import { RiMoneyCnyCircleLine } from "react-icons/ri";
 import { IoIosAddCircle, IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
-import { AiOutlineMenu, AiOutlinePlusCircle } from "react-icons/ai";
-import Login from "../components/Login";
+import { AiOutlineMenu } from "react-icons/ai";
+import Login from "../components/Account/Login";
 import useAuth from "../hooks/useAuth";
 import useAdmin from "../hooks/useAdmin";
 import useStaff from "../hooks/useStaff";
@@ -39,12 +45,16 @@ const DashBoardLayout = () => {
   const [promotionsOpen, setPromotionsOpen] = useState(false);
   const [inventoryOpen, setInventoryOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [usersOpen, setUsersOpen] = useState(false);
   const togglePromotions = () => {
     setPromotionsOpen(!promotionsOpen);
   };
 
   const toggleInventory = () => {
     setInventoryOpen(!inventoryOpen);
+  };
+  const toggleUsers = () => {
+    setUsersOpen(!usersOpen);
   };
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
@@ -54,9 +64,9 @@ const DashBoardLayout = () => {
     return (
       <div>
         <div>
-          <div className="drawer sm:drawer-open ">
+          <div className="drawer sm:drawer-open">
             <input id="my-drawer-2" type="checkbox" className="drawer-toggle" />
-            <div className="drawer-content flex flex-col sm:items-start sm:justify-start my-2">
+            <div className="drawer-content flex flex-col sm:items-start sm:justify-start my-2 bg-white">
               {/* Page content here */}
               <div className="flex items-center justify-between mx-4">
                 <label
@@ -70,17 +80,17 @@ const DashBoardLayout = () => {
                   Log out
                 </button>
               </div>
-              <div className="mt-5 md:mt-2 mx-4 bg bg-white">
+              <div className="mt-5 md:mt-2 mx-4 bg-white">
                 <Outlet />
               </div>
             </div>
-            <div className="drawer-side shadow-md">
+            <div className="drawer-side border shadow-md">
               <label
                 htmlFor="my-drawer-2"
                 aria-label="close sidebar"
                 className="drawer-overlay"
               ></label>
-              <ul className="menu p-4 w-80 min-h-full text-black bg-green">
+              <ul className="menu p-4 w-80 min-h-full text-black bg-white">
                 {/* Sidebar content here */}
                 <li className="font-bold">
                   <Link
@@ -94,15 +104,35 @@ const DashBoardLayout = () => {
                 <hr />
                 <li>
                   <div
+                    onClick={toggleUsers}
+                    className="cursor-pointer flex items-center active-link"
+                  >
+                    <FaUser />
+                    Quản lý khách hàng
+                    {usersOpen ? (
+                      <IoIosArrowUp className="ml-auto" />
+                    ) : (
+                      <IoIosArrowDown className="ml-auto" />
+                    )}
+                  </div>
+                  {usersOpen && (
+                    <ul className="ml-4">
+                      <li>Thống kê đơn hàng và doanh thu</li>
+                      <li>Tỷ lệ đánh giá sản phẩm</li>
+                    </ul>
+                  )}
+                </li>
+                <li>
+                  <div
                     onClick={toggleInventory}
-                    className="cursor-pointer flex items-center"
+                    className="cursor-pointer flex items-center active-link"
                   >
                     <FaWarehouse />
                     <span>Quản lý kho</span>
                     {inventoryOpen ? (
-                      <AiOutlinePlusCircle className="ml-auto" />
+                      <IoIosArrowUp className="ml-auto" />
                     ) : (
-                      <AiOutlinePlusCircle className="ml-auto" />
+                      <IoIosArrowDown className="ml-auto" />
                     )}
                   </div>
                   {inventoryOpen && (
@@ -112,7 +142,7 @@ const DashBoardLayout = () => {
                           className="active-link"
                           to="/admin/manage-inventory"
                         >
-                          <FaWarehouse />
+                          <MdOutlineInventory />
                           Sản phẩm trong kho
                         </Link>
                       </li>
@@ -125,6 +155,7 @@ const DashBoardLayout = () => {
                     </ul>
                   )}
                 </li>
+
                 <li>
                   <div
                     onClick={toggleMenu}
@@ -146,25 +177,19 @@ const DashBoardLayout = () => {
                           Sản phẩm trên menu
                         </Link>
                       </li>
+                      <li>
+                        <Link className="active-link" to="/admin/manage-menu">
+                          <AiOutlineMenu />
+                          Thống kê sản phẩm đã bán
+                        </Link>
+                      </li>
                     </ul>
                   )}
                 </li>
                 <li>
-                  <Link className="active-link" to="/admin/order-tracking">
-                    <FaShoppingBag />
-                    Quản lý đơn hàng
-                  </Link>
-                </li>
-                <li>
-                  <Link className="active-link" to="/admin/report">
-                    <FaShoppingBag />
-                    Báo cáo doanh thu
-                  </Link>
-                </li>
-                <li>
                   <div
                     onClick={togglePromotions}
-                    className="cursor-pointer flex items-center"
+                    className="cursor-pointer flex items-center active-link"
                   >
                     <img
                       width="12px"
@@ -173,9 +198,9 @@ const DashBoardLayout = () => {
                     />
                     <span>Quản lý khuyến mãi</span>
                     {promotionsOpen ? (
-                      <AiOutlinePlusCircle className="ml-auto" />
+                      <IoIosArrowUp className="ml-auto" />
                     ) : (
-                      <AiOutlinePlusCircle className="ml-auto" />
+                      <IoIosArrowDown className="ml-auto" />
                     )}
                   </div>
                   {promotionsOpen && (
@@ -195,6 +220,24 @@ const DashBoardLayout = () => {
                       </li>
                     </ul>
                   )}
+                </li>
+                <li>
+                  <Link className="active-link" to="/admin/order-tracking">
+                    <FaShoppingBag />
+                    Quản lý đơn hàng
+                  </Link>
+                </li>
+                <li>
+                  <Link className="active-link" to="/admin/reviews">
+                    <MdOutlineRateReview />
+                    Quản lý đánh giá
+                  </Link>
+                </li>
+                <li>
+                  <Link className="active-link" to="/admin/report">
+                    <RiMoneyCnyCircleLine />
+                    Báo cáo doanh thu
+                  </Link>
                 </li>
                 <hr />
                 {shareLinks}
@@ -267,6 +310,36 @@ const DashBoardLayout = () => {
                   </li>
                   <li>
                     <div
+                      onClick={toggleUsers}
+                      className="cursor-pointer flex items-center active-link"
+                    >
+                      <FaUsers />
+                      Quản lý khách hàng
+                      {usersOpen ? (
+                        <IoIosArrowUp className="ml-auto" />
+                      ) : (
+                        <IoIosArrowDown className="ml-auto" />
+                      )}
+                    </div>
+                    {usersOpen && (
+                      <ul className="ml-4">
+                        <li>
+                          <Link className="active-link" to="/admin">
+                            <FcStatistics />
+                            Thống kê đơn hàng và doanh thu
+                          </Link>
+                        </li>
+                        <li>
+                          <Link className="active-link" to="/admin">
+                            <FaPercentage />
+                            Tỷ lệ đánh giá sản phẩm
+                          </Link>
+                        </li>
+                      </ul>
+                    )}
+                  </li>
+                  <li>
+                    <div
                       onClick={toggleInventory}
                       className="cursor-pointer flex items-center active-link"
                     >
@@ -323,6 +396,12 @@ const DashBoardLayout = () => {
                             Sản phẩm trên menu
                           </Link>
                         </li>
+                        <li>
+                          <Link className="active-link" to="/admin/manage-menu">
+                            <AiOutlineMenu />
+                            Thống kê sản phẩm đã bán
+                          </Link>
+                        </li>
                       </ul>
                     )}
                   </li>
@@ -365,6 +444,12 @@ const DashBoardLayout = () => {
                     <Link className="active-link" to="/admin/order-tracking">
                       <FaShoppingBag />
                       Quản lý đơn hàng
+                    </Link>
+                  </li>
+                  <li>
+                    <Link className="active-link" to="/admin/reviews">
+                      <MdOutlineRateReview />
+                      Quản lý đánh giá
                     </Link>
                   </li>
                   <hr />

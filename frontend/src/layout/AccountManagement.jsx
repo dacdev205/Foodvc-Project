@@ -18,7 +18,7 @@ const AccountManagement = () => {
       <div>
         <div className="drawer sm:drawer-open mt-16">
           <input id="my-drawer-2" type="checkbox" className="drawer-toggle" />
-          <div className="drawer-content flex flex-col sm:items-start sm:justify-start my-2 bg-white">
+          <div className="drawer-content flex flex-col sm:items-start sm:justify-start my-2 bg-white ">
             {/* Page content here */}
             <div className="flex items-center justify-between mx-4 bg-white">
               <label
@@ -35,13 +35,13 @@ const AccountManagement = () => {
               <Outlet />
             </div>
           </div>
-          <div className="drawer-side">
+          <div className="drawer-side shadow-md rounded-sm">
             <label
               htmlFor="my-drawer-2"
               aria-label="close sidebar"
               className="drawer-overlay"
             ></label>
-            <ul className="menu p-4 w-80 min-h-screen text-black bg-white">
+            <ul className="menu p-4 w-80 min-h-screen text-black bg-white shadow-md rounded-sm">
               {/* Sidebar content here */}
               <div className=" p-4 flex">
                 <div className="mr-2 ">
@@ -93,7 +93,7 @@ const AccountManagement = () => {
                       </Link>
                     </li>
                     <li>
-                      <Link className="active-link-2" to="#">
+                      <Link className="active-link-2" to="/verify/password">
                         Đổi mật khẩu
                       </Link>
                     </li>
@@ -101,7 +101,7 @@ const AccountManagement = () => {
                 )}
               </li>
               <li>
-                <Link to="orders" className="active-link">
+                <Link to="orders" className="active-link-2">
                   <BiNotepad />
                   Đơn mua
                 </Link>

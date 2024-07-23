@@ -14,7 +14,8 @@ import menuAPI from "../../../api/menuAPI";
 import useInventory from "../../../hooks/useInventory";
 import Pagination from "../../../ultis/Pagination";
 import FormattedPrice from "../../../ultis/FormatedPriece";
-
+import { confirmAlert } from "react-confirm-alert";
+import "react-confirm-alert/src/react-confirm-alert.css";
 const ManageInventory = () => {
   const PF = "http://localhost:3000";
   const [inventory, , refetch] = useInventory();

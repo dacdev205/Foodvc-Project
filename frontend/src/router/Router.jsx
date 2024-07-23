@@ -5,13 +5,17 @@ import { createBrowserRouter } from "react-router-dom";
 // Lazy load các components
 const MainLazyLoading = lazy(() => import("../layout/Main"));
 const HomeLazyLoading = lazy(() => import("../pages/home/Home"));
-const RegisterLazyLoading = lazy(() => import("../components/Register"));
-const LoginLazyLoading = lazy(() => import("../components/Login"));
+const RegisterLazyLoading = lazy(() =>
+  import("../components/Account/Register")
+);
+const LoginLazyLoading = lazy(() => import("../components/Account/Login"));
 
 const UpdateProfilesLazyLoading = lazy(() =>
   import("../pages/dashboard/UpdateProfiles")
 );
-const CardDetailsLazyLoading = lazy(() => import("../components/CardDetails"));
+const CardDetailsLazyLoading = lazy(() =>
+  import("../components/CardProduct/CardDetails")
+);
 const CartPageLazyLoading = lazy(() => import("../pages/menuPage/CartPage"));
 const DashBoardLayoutLazyLoading = lazy(() =>
   import("../layout/DashBoardLayout")
@@ -46,7 +50,9 @@ const UserOrdersLazyLoading = lazy(() =>
 const OrdersTrackingLazyLoading = lazy(() =>
   import("../pages/dashboard/adminNstaff/OrdersTracking")
 );
-const OrderDetailLazyLoading = lazy(() => import("../components/OrderDetail"));
+const OrderDetailLazyLoading = lazy(() =>
+  import("../components/Order/OrderDetail")
+);
 const HelpUsersLazyLoading = lazy(() =>
   import("../pages/dashboard/adminNstaff/HelpUsers")
 );
@@ -56,13 +62,28 @@ const ContactAdminLazyLoading = lazy(() =>
 const ReportTodayLazyLoading = lazy(() =>
   import("../pages/dashboard/staff/ReportToday")
 );
+const VerifyPasswordLazyLoading = lazy(() =>
+  import("../components/Account/VerifyPassword")
+);
+const ChangePasswordLazyLoading = lazy(() =>
+  import("../components/Account/ChangePassword")
+);
+const ForgetPasswordLazyLoading = lazy(() =>
+  import("../components/Account/ForgetPassword")
+);
+
 const MenuLazyLoading = lazy(() => import("../pages/menuPage/Menu"));
 const BlogLazyLoading = lazy(() => import("../pages/Blog/Blog"));
 const AboutLazyLoading = lazy(() => import("../pages/About/About"));
+const ReviewsManagementLazyLoading = lazy(() =>
+  import("../pages/dashboard/admin/ReviewsManagement")
+);
+
 import LoadingSpinner from "../ultis/LoadingSpinner";
 import PrivateRouter from "../PrivateRouter/PrivateRouter";
 import AccountManagement from "../layout/AccountManagement";
-import UpdateProfile from "../pages/dashboard/UpdateProfiles";
+import AuthGuard from "../context/ProtectedRoute";
+import ProtectedRoute from "../context/ProtectedRoute";
 const CreateVoucherLazyLoading = lazy(() =>
   import("../pages/dashboard/adminNstaff/CreateVoucher")
 );
@@ -133,6 +154,14 @@ const router = createBrowserRouter([
         ),
       },
       {
+        path: "/forget-password",
+        element: (
+          <Suspense fallback={<LoadingSpinner />}>
+            <ForgetPasswordLazyLoading />
+          </Suspense>
+        ),
+      },
+      {
         path: "/wish-list",
         element: (
           <Suspense fallback={<LoadingSpinner />}>
@@ -146,13 +175,27 @@ const router = createBrowserRouter([
         children: [
           {
             path: "update-profile",
-            element: <UpdateProfile></UpdateProfile>,
+            element: (
+              <Suspense fallback={<LoadingSpinner />}>
+                <UpdateProfilesLazyLoading />
+              </Suspense>
+            ),
           },
           {
             path: "orders",
             element: (
               <Suspense fallback={<LoadingSpinner />}>
                 <UserOrdersLazyLoading />
+              </Suspense>
+            ),
+          },
+          {
+            path: "change-password",
+            element: (
+              <Suspense fallback={<LoadingSpinner />}>
+                <ProtectedRoute>
+                  <ChangePasswordLazyLoading />
+                </ProtectedRoute>
               </Suspense>
             ),
           },
@@ -168,6 +211,14 @@ const router = createBrowserRouter([
         ),
       },
     ],
+  },
+  {
+    path: "verify/password",
+    element: (
+      <Suspense fallback={<LoadingSpinner />}>
+        <VerifyPasswordLazyLoading />
+      </Suspense>
+    ),
   },
   {
     path: "*",
@@ -296,6 +347,14 @@ const router = createBrowserRouter([
         element: (
           <Suspense>
             <CreateVoucherLazyLoading />
+          </Suspense>
+        ),
+      },
+      {
+        path: "reviews",
+        element: (
+          <Suspense>
+            <ReviewsManagementLazyLoading />
           </Suspense>
         ),
       },

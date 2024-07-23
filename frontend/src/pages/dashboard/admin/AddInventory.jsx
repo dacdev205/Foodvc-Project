@@ -1,14 +1,12 @@
+import { styled } from "@mui/material/styles";
 import React, { useEffect, useRef, useState } from "react";
 import { FaUtensils } from "react-icons/fa";
 import { useForm } from "react-hook-form";
 import inventoryAPI from "../../../api/inventoryAPI";
 import QuillEditor from "../../../ultis/QuillEditor";
-import { styled } from "@mui/material/styles";
 import Button from "@mui/material/Button";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import SuccessAlert from "../../../ultis/SuccessAlert";
-import ErrorAlert from "../../../ultis/ErrorAlert";
-import ReactQuill from "react-quill";
 const AddInventory = () => {
   const { register, handleSubmit, setValue, reset } = useForm({
     mode: "onChange",
@@ -48,7 +46,6 @@ const AddInventory = () => {
       setShowSuccessAlert(true);
     } catch (error) {
       setShowErrorAlert(true);
-      console.log("Add menu failed", error);
     }
   };
 

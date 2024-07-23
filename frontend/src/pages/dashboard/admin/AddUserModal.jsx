@@ -155,8 +155,8 @@ const AddUserModal = ({
                 </label>
                 <input
                   type="text"
-                  placeholder="name"
-                  className="input input-bordered text-black"
+                  placeholder="Tên người dùng"
+                  className=" input input-sm input-bordered text-black"
                   {...register("name")}
                 />
               </div>
@@ -168,8 +168,8 @@ const AddUserModal = ({
                 </label>
                 <input
                   type="email"
-                  placeholder="email"
-                  className="input input-bordered text-black"
+                  placeholder="Email"
+                  className="input input-sm input-bordered text-black"
                   {...register("email")}
                   onChange={(e) => handleChange(e)}
                 />
@@ -188,8 +188,8 @@ const AddUserModal = ({
                 <div className="relative">
                   <input
                     type={showPassword ? "text" : "password"}
-                    placeholder="password"
-                    className="input input-bordered w-full text-black"
+                    placeholder="Mật khẩu"
+                    className="input input-sm input-bordered w-full text-black"
                     {...register("password")}
                     onChange={(e) => handleChange(e)}
                   />
@@ -214,7 +214,7 @@ const AddUserModal = ({
                   <span className="label-text text-black">Vài trò:</span>
                 </label>
                 <select
-                  className="input input-bordered"
+                  className="input input-sm input-bordered"
                   value={role}
                   onChange={(e) => setRole(e.target.value)}
                 >

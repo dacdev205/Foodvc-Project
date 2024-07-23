@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import Cards from "../../components/Cards";
+import Cards from "../../components/CardProduct/Cards";
 import { FaFilter } from "react-icons/fa";
 import menuAPI from "../../api/menuAPI";
 const Menu = () => {

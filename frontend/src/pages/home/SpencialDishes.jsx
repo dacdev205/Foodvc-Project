@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import Slider from "react-slick";
-import Cards from "../../components/Cards";
+import Cards from "../../components/CardProduct/Cards";
 import menuAPI from "../../api/menuAPI";
 import { FaAngleRight, FaAngleLeft } from "react-icons/fa6";
 

@@ -41,6 +41,7 @@ const AddressFormEdit = ({
         ward: addressToEdit.ward,
         email: addressToEdit.email,
       });
+      setIsDefaultAddress(addressToEdit.isDefault);
     } else {
       setFormData({
         fullName: "",

@@ -1,6 +1,5 @@
 const Review = require("../models/reviews");
 const Menu = require("../models/menu");
-
 module.exports = class reviewAPI {
   static async getAllReviews(req, res) {
     try {
@@ -26,13 +25,12 @@ module.exports = class reviewAPI {
       menu.reviews.push(review);
       await menu.save();
 
-      res.status(201).json({ message: "Review added successfully" });
+      res.status(201).json(review);
     } catch (error) {
       console.error("Error adding review:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   }
-
   static async getReviewsByProductId(req, res) {
     const productId = req.params.productId;
     try {

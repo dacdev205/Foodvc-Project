@@ -1,14 +1,17 @@
+// VerifyPassword.js
 import React, { useState } from "react";
 import { EmailAuthProvider, reauthenticateWithCredential } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import { FaArrowLeft } from "react-icons/fa";
 import useAuth from "../../hooks/useAuth";
+import { useActiveLink } from "../../context/ActiveLinkProvider";
 
 const VerifyPassword = () => {
   const [currentPassword, setCurrentPassword] = useState("");
   const [error, setError] = useState("");
   const { user, setIsVerified } = useAuth();
   const navigate = useNavigate();
+  const { setActiveLink } = useActiveLink();
 
   const handleConfirmPassword = async (e) => {
     e.preventDefault();
@@ -26,6 +29,7 @@ const VerifyPassword = () => {
     try {
       await reauthenticateWithCredential(user, credential);
       setIsVerified(true);
+      setActiveLink("change-password"); // Update the active link state
       navigate("/user/change-password");
     } catch (error) {
       setError("Mật khẩu hiện tại không chính xác.");

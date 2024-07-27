@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import {
@@ -7,15 +6,17 @@ import {
   FaArrowAltCircleUp,
   FaArrowAltCircleDown,
 } from "react-icons/fa";
-import Swal from "sweetalert2";
 import useAxiosSecure from "../../../hooks/useAxiosSecure";
 import inventoryAPI from "../../../api/inventoryAPI";
 import menuAPI from "../../../api/menuAPI";
 import useInventory from "../../../hooks/useInventory";
 import Pagination from "../../../ultis/Pagination";
 import FormattedPrice from "../../../ultis/FormatedPriece";
-import { confirmAlert } from "react-confirm-alert";
-import "react-confirm-alert/src/react-confirm-alert.css";
+import ConfirmDeleteModal from "../../../ultis/ConfirmDeleteModal";
+import TransferToMenuModal from "../../../components/Modal/TransferToMenuModal";
+import UpdateQuantityModal from "../../../components/Modal/UpdateQuantityModal";
+import "react-toastify/dist/ReactToastify.css";
+import { Bounce, ToastContainer, toast } from "react-toastify";
 const ManageInventory = () => {
   const PF = "http://localhost:3000";
   const [inventory, , refetch] = useInventory();
@@ -28,6 +29,15 @@ const ManageInventory = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(5);
   const [newQuantity, setNewQuantity] = useState(1);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [productToDelete, setProductToDelete] = useState(null);
+  const [showRemoveConfirmModal, setShowRemoveConfirmModal] = useState(false);
+  const [productToRemove, setProductToRemove] = useState(null);
+
+  const [openModal, setOpenModal] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+
+  const [openUpdateQuantityModal, setOpenUpdateQuantityModal] = useState(false);
 
   const paginate = (pageNumber) => {
     setCurrentPage(pageNumber);
@@ -49,6 +59,123 @@ const ManageInventory = () => {
     setCurrentPage(1);
   };
 
+  const handleTransferToMenu = (item) => {
+    setSelectedProduct(item);
+    setOpenModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setOpenModal(false);
+    setSelectedProduct(null);
+  };
+
+  const handleUpdateQuantity = (item) => {
+    setSelectedProduct(item);
+    setOpenUpdateQuantityModal(true);
+  };
+
+  const handleCloseUpdateQuantityModal = () => {
+    setOpenUpdateQuantityModal(false);
+    setSelectedProduct(null);
+  };
+
+  const handleSubmitTransfer = async (data) => {
+    try {
+      const response = await axiosSecure.post("/inventory/transfer-to-menu", {
+        productId: selectedProduct._id,
+        quantity: data.quantity,
+      });
+
+      if (response.data.message === "Product transferred successfully") {
+        toast.success("Sản phẩm đã được đưa lên menu", {
+          position: "bottom-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "colored",
+          transition: Bounce,
+        });
+        refetch();
+      }
+
+      handleCloseModal();
+    } catch (error) {
+      console.error("Error transferring item:", error);
+    }
+  };
+
+  const handleSubmitUpdateQuantity = async (data) => {
+    try {
+      await menuAPI.updateQuantityProduct(`${selectedProduct._id}`, {
+        quantity: data.quantity,
+      });
+
+      toast.success("Số lượng đã được cập nhật", {
+        position: "bottom-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+        transition: Bounce,
+      });
+      refetch();
+      handleCloseUpdateQuantityModal();
+    } catch (error) {
+      console.error("Error updating quantity:", error);
+    }
+  };
+
+  const handleRemoveFromMenu = (item) => {
+    setProductToRemove(item);
+    setShowRemoveConfirmModal(true);
+  };
+
+  const confirmRemoveFromMenu = async () => {
+    try {
+      const response = await axiosSecure.post("/inventory/remove-from-menu", {
+        menuItemId: productToRemove._id,
+      });
+
+      if (response.data.message === "Product removed from menu successfully") {
+        toast.success("Sản phẩm đã được xóa khỏi menu", {
+          position: "bottom-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "colored",
+          transition: Bounce,
+        });
+        refetch();
+      } else {
+        toast.error("Đã xảy ra lỗi khi xóa khỏi menu", {
+          position: "bottom-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "colored",
+          transition: Bounce,
+        });
+      }
+    } catch (error) {
+      console.error("Error removing item:", error);
+    } finally {
+      setShowRemoveConfirmModal(false);
+      setProductToRemove(null);
+    }
+  };
+
   const filteredInventory = inventory.filter(
     (item) =>
       item.name && item.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -68,133 +195,24 @@ const ManageInventory = () => {
     indexOfFirstItem,
     indexOfLastItem
   );
-  const handleDeleteItem = (item) => {
-    Swal.fire({
-      title: "Are you sure?",
-      text: "You won't be able to revert this!",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
-      confirmButtonText: "Yes, delete it!",
-    }).then(async (result) => {
-      if (result.isConfirmed) {
-        const res = await inventoryAPI.deleteProductById(item._id);
-        if (res) {
-          refetch();
-          Swal.fire({
-            title: "Deleted!",
-            text: "Your food has been deleted.",
-            icon: "success",
-          });
-        }
-      }
-    });
-  };
 
-  const handleTransferToMenu = async (item) => {
-    try {
-      const { value: transferQty } = await Swal.fire({
-        title: "Enter quantity",
-        input: "number",
-        inputValue: transferQuantity,
-        inputAttributes: {
-          min: 1,
-          step: 1,
-        },
-        showCancelButton: true,
-      });
-
-      if (transferQty) {
-        const parsedQuantity = parseInt(transferQty, 10);
-        const response = await axiosSecure.post("/inventory/transfer-to-menu", {
-          productId: item._id,
-          quantity: parsedQuantity,
-        });
-
-        if (response.data.message === "Product transferred successfully") {
-          setTransferQuantity(1);
-          refetch();
-          Swal.fire({
-            title: "Transferred!",
-            text: "Your food has been transferred to the menu.",
-            icon: "success",
-          });
-        }
-      }
-    } catch (error) {
-      console.error("Error transferring item:", error);
+  const handleDeleteItem = async (item) => {
+    const res = await inventoryAPI.deleteProductById(item._id);
+    setShowConfirmModal(false);
+    setProductToDelete(null);
+    if (res) {
+      refetch();
     }
   };
 
-  const handleRemoveFromMenu = async (item) => {
-    try {
-      const result = await Swal.fire({
-        title: "Are you sure?",
-        text: "You want to remove this item from the menu.",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33",
-        confirmButtonText: "Yes, remove it!",
-      });
-
-      if (result.isConfirmed) {
-        const response = await axiosSecure.post("/inventory/remove-from-menu", {
-          menuItemId: item._id,
-        });
-
-        if (
-          response.data.message === "Product removed from menu successfully"
-        ) {
-          Swal.fire({
-            title: "Removed!",
-            text: "Your food has been removed from the menu.",
-            icon: "success",
-          });
-
-          refetch();
-        } else {
-          Swal.fire({
-            title: "Error!",
-            text: "An error occurred while removing the product from the menu.",
-            icon: "error",
-          });
-        }
-      }
-    } catch (error) {
-      console.error("Error removing item:", error);
-    }
+  const handleDeleteClick = (id) => {
+    setProductToDelete(id);
+    setShowConfirmModal(true);
   };
 
-  const handleUpdateQuantity = async (item) => {
-    try {
-      const { value: newQty } = await Swal.fire({
-        title: "Enter new quantity",
-        input: "number",
-        inputValue: newQuantity,
-        inputAttributes: {
-          min: 1,
-          step: 1,
-        },
-        showCancelButton: true,
-      });
-
-      if (newQty) {
-        const parsedQuantity = parseInt(newQty, 10);
-        await menuAPI.updateQuantityProduct(`${item._id}`, {
-          quantity: parsedQuantity,
-        });
-        setNewQuantity(parsedQuantity);
-        refetch();
-        Swal.fire({
-          title: "Quantity Updated!",
-          text: "The quantity has been updated successfully.",
-          icon: "success",
-        });
-      }
-    } catch (error) {
-      console.error("Error updating quantity:", error);
+  const confirmDeleteProduct = () => {
+    if (productToDelete) {
+      handleDeleteItem(productToDelete);
     }
   };
 
@@ -244,16 +262,16 @@ const ManageInventory = () => {
       </div>
       <div>
         <div className="overflow-x-auto">
-          <table className="table ">
+          <table className="table">
             <thead>
               <tr className="text-black border-style">
                 <th>#</th>
                 <th>Hình ảnh</th>
                 <th>Tên sản phẩm</th>
                 <th>Giá</th>
-                <th>Số lượng tồn kho</th>
-                <th>Chỉnh sửa</th>
-                <th className="text-center">Xóa</th>
+                <th className="text-center">Số lượng tồn kho</th>
+                <th className="text-center">Chỉnh sửa</th>
+                <th className="">Xóa</th>
                 <th className="text-center">Trạng thái</th>
               </tr>
             </thead>
@@ -270,7 +288,12 @@ const ManageInventory = () => {
                       </div>
                     </div>
                   </td>
-                  <td className="text-black">{item.name.slice(0, 20)}...</td>
+                  <td
+                    className="text-black tooltip mt-4 tooltip-bottom "
+                    data-tip={item.name}
+                  >
+                    {item.name.slice(0, 20)}...
+                  </td>
                   <td>
                     <FormattedPrice price={item.price} />
                   </td>
@@ -284,20 +307,22 @@ const ManageInventory = () => {
                   </td>
                   <td>
                     <button
-                      onClick={() => handleDeleteItem(item)}
+                      onClick={() => handleDeleteClick(item)}
                       className="btn btn-ghost btn-xs text-red"
                     >
                       <FaTrashAlt />
                     </button>
                   </td>
-                  <td>
+                  <td className="text-center">
                     {item.transferredToMenu ? (
-                      <div>
-                        <button
-                          onClick={() => handleUpdateQuantity(item)}
-                          className={`btn btn-ghost btn-xs text-blue-500`}
-                        >
-                          Update Quantity
+                      <div className="flex justify-center">
+                        <button onClick={() => handleUpdateQuantity(item)}>
+                          <img
+                            width={"20px"}
+                            height={"10px"}
+                            src="/images/Quantity.png"
+                            alt=""
+                          />
                         </button>
                         <button
                           onClick={() => handleRemoveFromMenu(item)}
@@ -319,6 +344,31 @@ const ManageInventory = () => {
               ))}
             </tbody>
           </table>
+          <TransferToMenuModal
+            open={openModal}
+            onClose={handleCloseModal}
+            onSubmit={handleSubmitTransfer}
+          />
+          <UpdateQuantityModal
+            open={openUpdateQuantityModal}
+            onClose={handleCloseUpdateQuantityModal}
+            onSubmit={handleSubmitUpdateQuantity}
+            initialQuantity={selectedProduct ? selectedProduct.quantity : 1}
+          />
+          <ConfirmDeleteModal
+            showModal={showConfirmModal}
+            onClose={() => setShowConfirmModal(false)}
+            onConfirm={confirmDeleteProduct}
+            title="Xác nhận xóa sản phẩm"
+            message="Bạn có chắc chắn muốn xóa sản phẩm này?"
+          />
+          <ConfirmDeleteModal
+            showModal={showRemoveConfirmModal}
+            onClose={() => setShowRemoveConfirmModal(false)}
+            onConfirm={confirmRemoveFromMenu}
+            title="Xác nhận gỡ sản phẩm khỏi menu"
+            message="Bạn có chắc chắn muốn gỡ sản phẩm này khỏi menu?"
+          />
           <Pagination
             itemsPerPage={itemsPerPage}
             totalItems={filteredInventory.length}
@@ -327,6 +377,7 @@ const ManageInventory = () => {
           />
         </div>
       </div>
+      <ToastContainer />
     </div>
   );
 };

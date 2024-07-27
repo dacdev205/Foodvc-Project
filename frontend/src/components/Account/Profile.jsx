@@ -15,7 +15,6 @@ import { FaCartShopping } from "react-icons/fa6";
 import { MdOutlineAdminPanelSettings } from "react-icons/md";
 import useAdmin from "../../hooks/useAdmin";
 import useStaff from "../../hooks/useStaff";
-import { NavLink } from "react-router-dom";
 const Profile = ({ user }) => {
   const { logOut } = useContext(AuthContext);
   const navigate = useNavigate();

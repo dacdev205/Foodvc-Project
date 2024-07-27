@@ -23,7 +23,10 @@
 }
 
 .active-link-2 {
-  @apply active:bg-white focus:bg-white hover:bg-white active:text-green focus:text-green !important;
+  @apply active:bg-slate-300 !important;
+}
+.active-link-2.text-green {
+  color: #39d84a;
 }
 
 input::-webkit-outer-spin-button,

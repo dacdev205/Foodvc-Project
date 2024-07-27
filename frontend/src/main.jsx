@@ -4,12 +4,15 @@ import { RouterProvider } from "react-router-dom";
 import AuthProvider from "./context/AuthProvider.jsx";
 import router from "./router/Router.jsx";
 import "./App.css";
+import { ActiveLinkProvider } from "./context/ActiveLinkProvider.jsx";
 
 const queryClient = new QueryClient();
 ReactDOM.createRoot(document.getElementById("root")).render(
   <AuthProvider>
-    <QueryClientProvider client={queryClient}>
-      <RouterProvider router={router} />
-    </QueryClientProvider>
+    <ActiveLinkProvider>
+      <QueryClientProvider client={queryClient}>
+        <RouterProvider router={router} />
+      </QueryClientProvider>
+    </ActiveLinkProvider>
   </AuthProvider>
 );

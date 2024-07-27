@@ -1,5 +1,5 @@
 import { styled } from "@mui/material/styles";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useState } from "react";
 import { FaUtensils } from "react-icons/fa";
 import { useForm } from "react-hook-form";
 import inventoryAPI from "../../../api/inventoryAPI";

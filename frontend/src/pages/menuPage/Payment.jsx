@@ -7,11 +7,12 @@ import useAuth from "../../hooks/useAuth";
 import useCart from "../../hooks/useCart";
 import orderAPI from "../../api/orderAPI";
 import useAddress from "../../hooks/useAddress";
+import useUserCurrent from "../../hooks/useUserCurrent";
 import AddressForm from "../../components/Address/AddressForm";
 import SelectAddress from "../../components/Address/SelectAddress";
-
 const Payment = () => {
   const [payment, refetch, isLoading] = usePayment();
+  const userData = useUserCurrent();
   const [orderTotal, setOrderTotal] = useState(0);
   const [subOrderTotal, setSubOrderTotal] = useState(0);
   const [cart, refetchCart] = useCart();
@@ -20,6 +21,7 @@ const Payment = () => {
   const [addressModalOpen, setAddressModalOpen] = useState(false);
 
   const { user } = useAuth();
+
   const PF = "http://localhost:3000";
   const shippingFee = 35000;
   const [addressUser, setAddress] = useState({
@@ -106,7 +108,9 @@ const Payment = () => {
     setAddress(newAddress);
     setIsModalOpen(false);
   };
-
+  if (!userData || !userData._id) {
+    return null;
+  }
   if (isLoading) {
     return (
       <div>
@@ -219,7 +223,7 @@ const Payment = () => {
                 </div>
                 <div>
                   <AddressForm
-                    paymentId={item._id}
+                    userId={userData._id}
                     setAddress={handleSetAddressWithForm}
                   />
                   <SelectAddress

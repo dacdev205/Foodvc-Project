@@ -1,8 +1,8 @@
 import React, { useContext } from "react";
 import { AuthContext } from "../context/AuthProvider";
 import { Outlet } from "react-router-dom";
-import Navbar from "../components/Navbar";
-import Footer from "../components/Footer";
+import Navbar from "../components/LayoutDisplay/Navbar";
+import Footer from "../components/LayoutDisplay/Footer";
 import "../App.css";
 import LoadingSpinner from "../ultis/LoadingSpinner";
 import { ToastContainer } from "react-toastify";

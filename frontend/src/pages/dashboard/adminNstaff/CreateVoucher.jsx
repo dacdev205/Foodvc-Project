@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import voucherAPI from "../../../api/voucherAPI";
-import AddVoucherModal from "../../../components/AddVoucherModal";
+import AddVoucherModal from "../../../components/Voucher/AddVoucherModal";
 
 const CreateVoucher = () => {
   const [voucher, setVoucher] = useState([]);

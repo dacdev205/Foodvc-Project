@@ -11,7 +11,7 @@ const RegisterLazyLoading = lazy(() =>
 const LoginLazyLoading = lazy(() => import("../components/Account/Login"));
 
 const UpdateProfilesLazyLoading = lazy(() =>
-  import("../pages/dashboard/UpdateProfiles")
+  import("../pages/menuPage/UpdateProfiles")
 );
 const CardDetailsLazyLoading = lazy(() =>
   import("../components/CardProduct/CardDetails")
@@ -44,9 +44,7 @@ const ManageMenuLazyLoading = lazy(() =>
   import("../pages/dashboard/adminNstaff/ManageMenu")
 );
 const PaymentLazyLoading = lazy(() => import("../pages/menuPage/Payment"));
-const UserOrdersLazyLoading = lazy(() =>
-  import("../pages/dashboard/UserOders")
-);
+const UserOrdersLazyLoading = lazy(() => import("../pages/menuPage/UserOders"));
 const OrdersTrackingLazyLoading = lazy(() =>
   import("../pages/dashboard/adminNstaff/OrdersTracking")
 );
@@ -57,7 +55,7 @@ const HelpUsersLazyLoading = lazy(() =>
   import("../pages/dashboard/adminNstaff/HelpUsers")
 );
 const ContactAdminLazyLoading = lazy(() =>
-  import("../components/ContactAdmin")
+  import("../components/Helps/ContactAdmin")
 );
 const ReportTodayLazyLoading = lazy(() =>
   import("../pages/dashboard/staff/ReportToday")
@@ -79,10 +77,13 @@ const ReviewsManagementLazyLoading = lazy(() =>
   import("../pages/dashboard/admin/ReviewsManagement")
 );
 
+const AddressesLazyLoading = lazy(() =>
+  import("../components/Address/AddressManagement")
+);
+
 import LoadingSpinner from "../ultis/LoadingSpinner";
 import PrivateRouter from "../PrivateRouter/PrivateRouter";
 import AccountManagement from "../layout/AccountManagement";
-import AuthGuard from "../context/ProtectedRoute";
 import ProtectedRoute from "../context/ProtectedRoute";
 const CreateVoucherLazyLoading = lazy(() =>
   import("../pages/dashboard/adminNstaff/CreateVoucher")
@@ -186,6 +187,14 @@ const router = createBrowserRouter([
             element: (
               <Suspense fallback={<LoadingSpinner />}>
                 <UserOrdersLazyLoading />
+              </Suspense>
+            ),
+          },
+          {
+            path: "addresses",
+            element: (
+              <Suspense fallback={<LoadingSpinner />}>
+                <AddressesLazyLoading />
               </Suspense>
             ),
           },

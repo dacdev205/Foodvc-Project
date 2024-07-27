@@ -96,7 +96,12 @@ const ManageMenu = () => {
                       </div>
                     </div>
                   </td>
-                  <td>{item.name.slice(0, 20)}...</td>
+                  <td
+                    className="tooltip mt-4 tooltip-bottom"
+                    data-tip={item.name}
+                  >
+                    {item.name.slice(0, 20)}...
+                  </td>
                   <td>
                     <FormattedPrice price={item.price} />
                   </td>

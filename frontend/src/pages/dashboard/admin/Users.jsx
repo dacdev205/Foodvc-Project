@@ -5,14 +5,16 @@ import useAxiosSecure from "../../../hooks/useAxiosSecure";
 import useAuth from "../../../hooks/useAuth";
 import Pagination from "../../../ultis/Pagination";
 import AddUserModal from "./AddUserModal";
+import ConfirmDeleteModal from "../../../ultis/ConfirmDeleteModal";
 const Users = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [filterType, setFilterType] = useState("name"); // Default filter type is 'name'
+  const [filterType, setFilterType] = useState("name");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(5); // Number of items to show per page
   const axiosSecure = useAxiosSecure();
   const [addUserModalOpen, setAddUserModalOpen] = useState(false);
-  const auth = useAuth();
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [userToDelete, setUserToDelete] = useState(null);
   const { refetch, data: users = [] } = useQuery({
     queryKey: ["users"],
     queryFn: async () => {
@@ -55,9 +57,19 @@ const Users = () => {
   };
   const handleDelete = async (user) => {
     axiosSecure.delete(`/users/${user._id}`).then((res) => {
-      alert(`${user.name} da được xóa thành công`);
+      setShowConfirmModal(false);
+      setUserToDelete(null);
       refetch();
     });
+  };
+  const handleDeleteClick = (id) => {
+    setUserToDelete(id);
+    setShowConfirmModal(true);
+  };
+  const confirmDeleteUser = () => {
+    if (userToDelete) {
+      handleDelete(userToDelete);
+    }
   };
   const paginate = (pageNumber) => {
     setCurrentPage(pageNumber);
@@ -144,7 +156,7 @@ const Users = () => {
                 </td>
                 <td>
                   <button
-                    onClick={() => handleDelete(user)}
+                    onClick={() => handleDeleteClick(user)}
                     className="btn btn-xs bg-white hover:bg-slate-300 text-red border-style"
                   >
                     <FaTrash />
@@ -154,6 +166,13 @@ const Users = () => {
             ))}
           </tbody>
         </table>
+        <ConfirmDeleteModal
+          showModal={showConfirmModal}
+          onClose={() => setShowConfirmModal(false)}
+          onConfirm={confirmDeleteUser}
+          title="Xác nhận xóa người dùng"
+          message="Bạn có chắc chắn muốn xóa người dùng này?"
+        />
         {/* Pagination */}
         <Pagination
           itemsPerPage={itemsPerPage}

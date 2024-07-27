@@ -1,13 +1,13 @@
 /* eslint-disable react/prop-types */
-import React, { useEffect, useState } from "react";
-import AddressSearchBar from "./AddressSearchBar";
+import React, { useState, useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { FaCheck } from "react-icons/fa6";
 import addressAPI from "../../api/addressAPI";
 import useAuth from "../../hooks/useAuth";
 import useAddress from "../../hooks/useAddress";
-import { useForm } from "react-hook-form";
-import { FaCheck } from "react-icons/fa6";
+import AddressSearchBar from "./AddressSearchBar";
 
-const AddressForm = ({ setAddress, paymentId }) => {
+const AddressForm = ({ setAddress, userId }) => {
   const { user } = useAuth();
   const [address, refetchAddress] = useAddress();
   const [districts, setDistricts] = useState([]);
@@ -120,14 +120,27 @@ const AddressForm = ({ setAddress, paymentId }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (isDefaultAddress) {
+      const defaultAddress = address.find((addr) => addr.isDefault);
+      if (defaultAddress) {
+        await addressAPI.updateAddressDefault(defaultAddress._id, {
+          ...defaultAddress,
+          isDefault: false,
+        });
+      }
+    }
+
     const formDataWithDefault = {
       ...formData,
-      paymentId: paymentId,
+      userId: userId,
       isDefault: isDefaultAddress,
     };
-    setAddress(formDataWithDefault);
+
     await addressAPI.postAddressToDB(formDataWithDefault);
     refetchAddress();
+    setAddress(formDataWithDefault);
+
     setFormData({
       fullName: "",
       phone: "",
@@ -137,6 +150,7 @@ const AddressForm = ({ setAddress, paymentId }) => {
       ward: "",
       email: user.email,
     });
+
     document.getElementById("modal-address").close();
     reset();
   };

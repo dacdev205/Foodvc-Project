@@ -5,6 +5,7 @@ import addressAPI from "../../api/addressAPI";
 import useAuth from "../../hooks/useAuth";
 import useAddress from "../../hooks/useAddress";
 import { FaCheck } from "react-icons/fa6";
+import axios from "axios";
 
 const AddressFormEdit = ({
   isModalEditOpen,
@@ -18,27 +19,36 @@ const AddressFormEdit = ({
     fullName: "",
     phone: "",
     street: "",
-    city: "",
-    district: "",
-    ward: "",
+    city: { cityId: null, cityName: "" },
+    district: { districtId: null, districtName: "" },
+    ward: { wardCode: "", wardName: "" },
     email: user.email,
   });
   const [districts, setDistricts] = useState([]);
   const [wards, setWards] = useState([]);
   const [cities, setCities] = useState([]);
-  const [citiesIDs, setCitiesIDs] = useState([]);
   const [districtsID, setDistrictsID] = useState([]);
   const [isDefaultAddress, setIsDefaultAddress] = useState(false);
-
+  const [wardsId, setWardsId] = useState([]);
+  const GHN_TOKEN = import.meta.env.VITE_GHN_TOKEN;
   useEffect(() => {
     if (addressToEdit) {
       setFormData({
         fullName: addressToEdit.fullName,
         phone: addressToEdit.phone,
         street: addressToEdit.street,
-        city: addressToEdit.city,
-        district: addressToEdit.district,
-        ward: addressToEdit.ward,
+        city: {
+          cityId: addressToEdit.city.cityId,
+          cityName: addressToEdit.city.cityName,
+        },
+        district: {
+          districtId: addressToEdit.district.districtId,
+          districtName: addressToEdit.district.districtName,
+        },
+        ward: {
+          wardCode: addressToEdit.ward.wardCode,
+          wardName: addressToEdit.ward.wardName,
+        },
         email: addressToEdit.email,
       });
       setIsDefaultAddress(addressToEdit.isDefault);
@@ -47,9 +57,9 @@ const AddressFormEdit = ({
         fullName: "",
         phone: "",
         street: "",
-        city: "",
-        district: "",
-        ward: "",
+        city: { cityId: null, cityName: "" },
+        district: { districtId: null, districtName: "" },
+        ward: { wardCode: "", wardName: "" },
         email: user.email,
       });
       setDistricts([]);
@@ -69,87 +79,125 @@ const AddressFormEdit = ({
   useEffect(() => {
     async function getAPIProvinces() {
       try {
-        const response = await fetch(
-          "https://api.nosomovo.xyz/province/getalllist/193"
+        const response = await axios.get(
+          "https://dev-online-gateway.ghn.vn/shiip/public-api/master-data/province",
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Token: GHN_TOKEN,
+            },
+          }
         );
-        const data = await response.json();
-        if (data && Array.isArray(data)) {
-          const cityNames = data.map((province) => province.name);
-          setCitiesIDs(data);
-          setCities(cityNames);
-        } else {
-          console.error("Unexpected data format:", data);
-          setCities([]);
-        }
+        const data = response.data.data;
+        const formattedData = data.map((province) => ({
+          id: province.ProvinceID,
+          name: province.ProvinceName,
+        }));
+        setCities(formattedData);
       } catch (error) {
         console.error("Failed to fetch provinces:", error);
         setCities([]);
       }
     }
-
     getAPIProvinces();
-  }, []);
+  }, [GHN_TOKEN]);
 
   const handleCitySelect = async (cityName) => {
-    const selectedCity = citiesIDs.find((city) => city.name === cityName);
-    setFormData({
-      ...formData,
-      city: selectedCity.name,
-      district: "",
-      ward: "",
-    });
+    const selectedCity = cities.find((city) => city.name === cityName);
+    if (selectedCity) {
+      setFormData({
+        ...formData,
+        city: { cityId: selectedCity.id, cityName: selectedCity.name },
+        district: { districtId: null, districtName: "" },
+        ward: { wardCode: "", wardName: "" },
+      });
 
-    try {
-      const res = await fetch(
-        `https://api.nosomovo.xyz/district/getalllist/${selectedCity.id}`
-      );
-      const data = await res.json();
-      if (data && Array.isArray(data)) {
-        const districtNames = data.map((district) => district.name);
-        setDistricts(districtNames);
-        setDistrictsID(data);
-      } else {
+      try {
+        const res = await fetch(
+          "https://dev-online-gateway.ghn.vn/shiip/public-api/master-data/district",
+          {
+            method: "POST",
+            headers: {
+              Token: GHN_TOKEN,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              province_id: selectedCity.id,
+            }),
+          }
+        );
+
+        const data = await res.json();
+        if (data && data.data && Array.isArray(data.data)) {
+          setDistricts(data.data.map((district) => district.DistrictName));
+          setDistrictsID(data.data);
+        } else {
+          setDistricts([]);
+        }
+      } catch (error) {
+        console.error("Failed to fetch districts:", error);
         setDistricts([]);
       }
-    } catch (error) {
-      console.error("Failed to fetch districts:", error);
-      setDistricts([]);
     }
   };
 
   const handleDistrictSelect = async (districtName) => {
     const selectedDistrict = districtsID.find(
-      (district) => district.name === districtName
+      (district) => district.DistrictName === districtName
     );
-    setFormData({
-      ...formData,
-      district: districtName,
-      ward: "",
-    });
-    try {
-      const res = await fetch(
-        `https://api.nosomovo.xyz/commune/getalllist/${selectedDistrict.id}`
-      );
-      const data = await res.json();
-      if (data) {
-        const wardNames = data.map((ward) => ward.name);
-        setWards(wardNames || []);
-      } else {
-        console.error("Unexpected data format:", data);
+    if (selectedDistrict) {
+      setFormData({
+        ...formData,
+        district: {
+          districtId: selectedDistrict.DistrictID,
+          districtName: districtName,
+        },
+        ward: { wardCode: "", wardName: "" },
+      });
+
+      try {
+        const res = await fetch(
+          "https://dev-online-gateway.ghn.vn/shiip/public-api/master-data/ward",
+          {
+            method: "POST",
+            headers: {
+              Token: GHN_TOKEN,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              district_id: selectedDistrict.DistrictID,
+            }),
+          }
+        );
+
+        const data = await res.json();
+        if (data && data.data && Array.isArray(data.data)) {
+          setWards(data.data.map((ward) => ward.WardName));
+          setWardsId(data.data);
+        } else {
+          console.error("Unexpected data format:", data);
+          setWards([]);
+        }
+      } catch (error) {
+        console.error("Failed to fetch ward details:", error);
         setWards([]);
       }
-    } catch (error) {
-      console.error("Failed to fetch district details:", error);
-      setWards([]);
     }
   };
 
-  const handleWardsSelect = (ward) => {
-    setFormData({
-      ...formData,
-      ward: ward,
-    });
+  const handleWardsSelect = (wardName) => {
+    const selectedWard = wardsId.find((w) => w.WardName === wardName);
+    if (selectedWard) {
+      setFormData({
+        ...formData,
+        ward: {
+          wardCode: selectedWard.WardCode,
+          wardName: selectedWard.WardName,
+        },
+      });
+    }
   };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({
@@ -215,15 +263,15 @@ const AddressFormEdit = ({
               </div>
               <div className="form-control mt-3">
                 <AddressSearchBar
-                  cities={cities}
+                  cities={cities.map((city) => city.name)}
                   onCitySelect={handleCitySelect}
                   onDistrictSelect={handleDistrictSelect}
                   districts={districts}
                   onWardsSelect={handleWardsSelect}
                   wards={wards}
-                  selectedCity={formData.city}
-                  selectedDistrict={formData.district}
-                  selectedWard={formData.ward}
+                  selectedCity={formData.city.cityName}
+                  selectedDistrict={formData.district.districtName}
+                  selectedWard={formData.ward.wardName}
                   selectedStreet={formData.street}
                 />
               </div>

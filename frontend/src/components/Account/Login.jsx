@@ -5,6 +5,7 @@ import { FaGoogle, FaFacebook, FaEyeSlash, FaEye } from "react-icons/fa";
 import { AuthContext } from "../../context/AuthProvider";
 import useAxiosPublic from "../../hooks/useAxiosPublic";
 import * as Yup from "yup";
+import { Bounce, ToastContainer, toast } from "react-toastify";
 
 const Login = () => {
   const {
@@ -63,6 +64,17 @@ const Login = () => {
           try {
             axiosPublic.post("/users", userInfor);
             reset();
+            toast.success("Chào mừng bạn trở lại", {
+              position: "bottom-right",
+              autoClose: 2000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+              theme: "colored",
+              transition: Bounce,
+            });
             navigate(from, { replace: true });
           } catch (error) {
             console.log("");
@@ -90,9 +102,18 @@ const Login = () => {
           email: result?.user?.email,
         };
         axiosPublic.post("/users", userInfor).then((response) => {
-          console.log(response);
-          alert("Login successful!");
           navigate("/");
+          toast.success("Chào mừng bạn đến với với FOODVC", {
+            position: "bottom-right",
+            autoClose: 2000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "colored",
+            transition: Bounce,
+          });
         });
       })
       .catch((error) => console.log(""));
@@ -196,6 +217,7 @@ const Login = () => {
               </button>
             </div>
           </div>
+          <ToastContainer />
         </dialog>
       ) : (
         <div className="h-screen flex justify-center items-center">

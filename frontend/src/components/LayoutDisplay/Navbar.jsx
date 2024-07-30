@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import Profile from "../Account/Profile";
 import useCart from "../../hooks/useCart";
 import useAuth from "../../hooks/useAuth";
+import useUserCurrent from "../../hooks/useUserCurrent";
 import useWishList from "../../hooks/useWishList";
 import Modal from "../Account/Modal";
 const Navbar = () => {
@@ -168,7 +169,10 @@ const Navbar = () => {
 
           {/* Login btn */}
           {user ? (
-            <Profile user={user} />
+            <div className="flex items-center">
+              <Profile user={user} />
+              <span>{user?.displayName}</span>
+            </div>
           ) : (
             <div>
               <button

@@ -85,6 +85,7 @@ import LoadingSpinner from "../ultis/LoadingSpinner";
 import PrivateRouter from "../PrivateRouter/PrivateRouter";
 import AccountManagement from "../layout/AccountManagement";
 import ProtectedRoute from "../context/ProtectedRoute";
+import OrderSuccess from "../components/Order/OrderSuccess";
 const CreateVoucherLazyLoading = lazy(() =>
   import("../pages/dashboard/adminNstaff/CreateVoucher")
 );
@@ -110,6 +111,14 @@ const router = createBrowserRouter([
         element: (
           <Suspense fallback={<LoadingSpinner />}>
             <MenuLazyLoading />
+          </Suspense>
+        ),
+      },
+      {
+        path: "/order-success",
+        element: (
+          <Suspense fallback={<LoadingSpinner />}>
+            <OrderSuccess />
           </Suspense>
         ),
       },

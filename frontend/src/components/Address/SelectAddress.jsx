@@ -71,8 +71,9 @@ const SelectAddress = ({
                       </div>
                     </div>
                     <p className="text-gray-500 text-sm">
-                      {addressItem.street}, {addressItem.ward},{" "}
-                      {addressItem.district}, {addressItem.city}
+                      {addressItem.street}, {addressItem.ward.wardName},{" "}
+                      {addressItem.district.districtName},{" "}
+                      {addressItem.city.cityName}
                     </p>
                     {addressItem.isDefault && (
                       <p className="text-green text-sm p-1 mt-2 inline-block rounded-lg border-green border-2">

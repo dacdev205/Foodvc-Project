@@ -37,6 +37,10 @@ const AddInventory = () => {
       formData.append("quantity", data.quantity);
       formData.append("price", parseFloat(data.price));
       formData.append("recipe", data.recipe);
+      formData.append("height", data.height);
+      formData.append("weight", data.weight);
+      formData.append("length", data.length);
+      formData.append("width", data.width);
       formData.append("image", data.image[0]);
       formData.append("brand", data.brand);
       formData.append("productionLocation", data.productionLocation);
@@ -161,7 +165,54 @@ const AddInventory = () => {
               />
             </div>
           </div>
+          <div className="flex gap-4">
+            <div className="form-control w-full">
+              <label className="label">
+                <span className="label-text text-black">Độ dài: </span>
+              </label>
+              <input
+                type="text"
+                {...register("length")}
+                placeholder="VD: 5"
+                className="input input-bordered w-full text-black input-sm"
+              />
+            </div>
 
+            <div className="form-control w-full">
+              <label className="label">
+                <span className="label-text text-black">Cân nặng: </span>
+              </label>
+              <input
+                type="text"
+                {...register("weight")}
+                placeholder="VD: 2"
+                className="input input-bordered w-full text-black input-sm"
+              />
+            </div>
+
+            <div className="form-control w-full">
+              <label className="label">
+                <span className="label-text text-black">Độ cao: </span>
+              </label>
+              <input
+                {...register("height")}
+                placeholder="VD: 6"
+                className="input input-bordered w-full text-black input-sm"
+                type="text"
+              />
+            </div>
+            <div className="form-control w-full">
+              <label className="label">
+                <span className="label-text text-black">Độ rộng: </span>
+              </label>
+              <input
+                {...register("width")}
+                placeholder="VD: 6"
+                className="input input-bordered w-full text-black input-sm"
+                type="text"
+              />
+            </div>
+          </div>
           <div className="form-control">
             <label className="label">
               <span className="label-text text-black">

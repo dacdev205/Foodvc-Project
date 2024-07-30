@@ -49,6 +49,12 @@ const UpdateItem = () => {
         recipe: updatedProduct.recipe,
         image: updatedProduct.image,
         brand: updatedProduct.brand,
+        height: updatedProduct.height,
+        weight: updatedProduct.weight,
+        length: updatedProduct.length,
+        width: updatedProduct.width,
+        expirationDate: updatedProduct.expirationDate,
+        createdAt: updatedProduct.createdAt,
         productionLocation: updatedProduct.productionLocation,
         instructions: updatedProduct.instructions,
       };
@@ -74,132 +80,6 @@ const UpdateItem = () => {
       <SuccessAlert show={showSuccessAlert} message={successMessage} />
 
       {product && (
-        // <div>
-        //   <form onSubmit={handleSubmit(onSubmit)}>
-        //     <div className="form-control w-full">
-        //       <label className="label">
-        //         <span className="label-text text-black">Tên sản phẩm</span>
-        //       </label>
-        //       <input
-        //         type="text"
-        //         defaultValue={product.name}
-        //         {...register("name", { required: true })}
-        //         placeholder="Recipe Name"
-        //         className="input input-bordered w-full text-black input-sm"
-        //       />
-        //     </div>
-
-        //     <div className="flex items-center gap-4">
-        //       {/* categories */}
-        //       <div className="form-control w-full">
-        //         <label className="label">
-        //           <span className="label-text text-black">Loại:</span>
-        //         </label>
-        //         <select
-        //           {...register("category", { required: true })}
-        //           className="select select-bordered select-sm"
-        //           defaultValue={product.category}
-        //         >
-        //           <option value="vegetable">RAU CỦ, NẤM, TRÁI CÂY</option>
-        //           <option value="protein">THỊT, CÁ, TRỨNG, HẢI SẢN</option>
-        //           <option value="soup">MÌ, MIẾN, CHÁO, PHỞ</option>
-        //           <option value="milk">SỮA CÁC LOẠI</option>
-        //           <option value="drinks">BIA, NƯỚC GIẢI KHÁT</option>
-        //           <option value="popular">NỔI BẬT</option>
-        //         </select>
-        //       </div>
-
-        //       {/* prices */}
-        //       <div className="form-control w-50">
-        //         <label className="label">
-        //           <span className="label-text text-black">Giá:</span>
-        //         </label>
-        //         <input
-        //           type="number"
-        //           defaultValue={product.price}
-        //           {...register("price", { required: true })}
-        //           placeholder="Price"
-        //           className="input input-bordered w-full text-black input-sm"
-        //         />
-        //       </div>
-        //       {/* quantity */}
-        //       <div className="form-control w-50">
-        //         <label className="label">
-        //           <span className="label-text text-black">Số lượng:</span>
-        //         </label>
-        //         <input
-        //           type="number"
-        //           defaultValue={product.quantity}
-        //           {...register("quantity", { required: true })}
-        //           placeholder="Quantity"
-        //           className="input input-bordered w-full text-black input-sm"
-        //         />
-        //       </div>
-        //     </div>
-        //     <div className="form-control">
-        //       <label className="label">
-        //         <span className="label-text text-black">
-        //           Chi tiết sản phẩm:
-        //         </span>
-        //       </label>
-        //       <QuillEditor
-        //         defaultValue={product.recipe}
-        //         onChange={(value) => setValue("recipe", value)}
-        //       />
-        //     </div>
-
-        //     <div className="form-control w-full">
-        //       <label className="label">
-        //         <span className="label-text text-black">Thương hiệu:</span>
-        //       </label>
-        //       <input
-        //         type="text"
-        //         defaultValue={product.brand}
-        //         {...register("brand")}
-        //         placeholder="Brand"
-        //         className="input input-bordered w-full text-black input-sm"
-        //       />
-        //     </div>
-
-        //     <div className="form-control w-full">
-        //       <label className="label">
-        //         <span className="label-text text-black">Nơi sản xuất:</span>
-        //       </label>
-        //       <input
-        //         type="text"
-        //         defaultValue={product.productionLocation}
-        //         {...register("productionLocation")}
-        //         placeholder="Production Location"
-        //         className="input input-bordered w-full text-black input-sm"
-        //       />
-        //     </div>
-
-        //     <div className="form-contro w-full">
-        //       <label className="label">
-        //         <span className="label-text text-black">Bảo quản:</span>
-        //       </label>
-        //       <input
-        //         defaultValue={product.instructions}
-        //         {...register("instructions")}
-        //         placeholder="Instructions"
-        //         type="text"
-        //         className="w-full text-black input-sm input"
-        //       />
-        //     </div>
-
-        //     <div className="w-full my-2">
-        //       <input
-        //         {...register("image")}
-        //         type="file"
-        //         className="file-input w-full max-w-xs"
-        //       />
-        //     </div>
-
-        //     <button className="btn bg-green text-white px-6 hover:bg-green hover:opacity-80 border-none">
-        //       Chỉnh sửa sản phẩm <FaUtensils />
-        //     </button>
-        //   </form>
-        // </div>
         <div>
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className="form-control">
@@ -312,7 +192,46 @@ const UpdateItem = () => {
                 />
               </div>
             </div>
+            <div className="flex gap-4">
+              <div className="form-control w-full">
+                <label className="label">
+                  <span className="label-text text-black">Độ dài: </span>
+                </label>
+                <input
+                  type="text"
+                  {...register("length")}
+                  defaultValue={product.length}
+                  placeholder="VD: 5"
+                  className="input input-bordered w-full text-black input-sm"
+                />
+              </div>
 
+              <div className="form-control w-full">
+                <label className="label">
+                  <span className="label-text text-black">Cân nặng: </span>
+                </label>
+                <input
+                  type="text"
+                  {...register("weight")}
+                  defaultValue={product.weight}
+                  placeholder="VD: 2"
+                  className="input input-bordered w-full text-black input-sm"
+                />
+              </div>
+
+              <div className="form-control w-full">
+                <label className="label">
+                  <span className="label-text text-black">Độ cao: </span>
+                </label>
+                <input
+                  defaultValue={product.height}
+                  {...register("height")}
+                  placeholder="VD: 6"
+                  className="input input-bordered w-full text-black input-sm"
+                  type="text"
+                />
+              </div>
+            </div>
             <div className="form-control">
               <label className="label">
                 <span className="label-text text-black">

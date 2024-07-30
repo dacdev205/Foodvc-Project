@@ -10,6 +10,8 @@ import useAddress from "../../hooks/useAddress";
 import useUserCurrent from "../../hooks/useUserCurrent";
 import AddressForm from "../../components/Address/AddressForm";
 import SelectAddress from "../../components/Address/SelectAddress";
+import ghnAPI from "../../api/ghnAPI";
+import axios from "axios";
 const Payment = () => {
   const [payment, refetch, isLoading] = usePayment();
   const userData = useUserCurrent();
@@ -19,20 +21,32 @@ const Payment = () => {
   const [address, refetchAddress] = useAddress();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [addressModalOpen, setAddressModalOpen] = useState(false);
-
   const { user } = useAuth();
-
   const PF = "http://localhost:3000";
-  const shippingFee = 35000;
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [shopData, setShopData] = useState();
+  const [note, setNote] = useState("");
+  const [shippingFee, setShippingFee] = useState(0);
+  const [productData, setProductData] = useState([]);
   const [addressUser, setAddress] = useState({
-    street: "",
-    city: "",
-    district: "",
-    ward: "",
     fullName: "",
     phone: "",
+    street: "",
+    city: { cityId: null, cityName: "" },
+    district: { districtId: null, districtName: "" },
+    ward: { wardCode: "", wardName: "" },
   });
-
+  useEffect(() => {
+    const fetchShopData = async () => {
+      try {
+        const res = await ghnAPI.getAddressFOODVC();
+        setShopData(res.data.shops[0]);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    fetchShopData();
+  }, []);
   useEffect(() => {
     let total = 0;
     payment.forEach((item) => {
@@ -71,27 +85,197 @@ const Payment = () => {
     return result;
   }
 
-  const randomId = generateRandomString(20);
-
-  const handleBuyItem = async () => {
+  const sendEmailToUser = async (email, orderId) => {
     try {
-      payment.forEach(async (item) => {
-        await orderAPI.postProductToOrder({
-          userId: user.uid,
-          email: user.email,
-          products: item.products,
-          totalAmount: orderTotal,
-          orderCode: randomId,
-          address: addressUser,
-        });
-        refetchCart();
+      await axios.post("http://localhost:3000/email", {
+        email: email,
+        subject: "Xác nhận đơn hàng từ FOODVC",
+        html: `
+        <html>
+        <head>
+          <style>
+            @import url('https://unpkg.com/tailwindcss@^2.0/dist/tailwind.min.css');
+          </style>
+        </head>
+        <body class="font-sans bg-gray-100">
+          <div class="max-w-xl mx-auto p-8 bg-white rounded shadow">
+            <h1 class="text-2xl font-bold text-center text-gray-800 mb-4">Xác nhận đơn hàng của bạn</h1>
+            <h2 class="text-lg font-semibold text-gray-700 mb-2">Mã đơn hàng: ${orderId}</h2>
+            <p class="text-gray-600 mb-2"><span class="font-semibold">Email:</span> ${email}</p>
+            <p class="text-gray-600 mb-4">Cảm ơn bạn đã mua sắm tại FOODVC. Chúng tôi sẽ xử lý đơn hàng của bạn trong thời gian sớm nhất.</p>
+          </div>
+        </body>
+        </html>
+      `,
       });
-      alert("Đơn hàng đã được đặt thành công");
-      window.location.href = "/";
     } catch (error) {
-      console.error("Lỗi khi xử lý mua hàng:", error);
+      console.error("Error sending email to:", email, error);
     }
   };
+  function getPickShifts() {
+    let currentHour = new Date().getHours();
+    if (currentHour < 12) {
+      return [1];
+    } else if (currentHour < 18) {
+      return [2];
+    } else {
+      return [3];
+    }
+  }
+  const extractProductData = (payment) => {
+    let totalHeight = 0;
+    let totalLength = 0;
+    let totalWeight = 0;
+    let totalWidth = 0;
+
+    payment.forEach((item) => {
+      item.products.forEach((product) => {
+        const { height, length, weight, width, quantity } = product;
+        totalHeight += height;
+        totalLength += length;
+        totalWeight += weight;
+        totalWidth += width;
+      });
+    });
+    return {
+      totalHeight,
+      totalLength,
+      totalWeight,
+      totalWidth,
+    };
+  };
+  const handleBuyItem = async () => {
+    const randomId = generateRandomString(20);
+    const productData = extractProductData(payment);
+    setIsSubmitting(true);
+    const payload = {
+      payment_type_id: 2,
+      note: note,
+      required_note: "CHOXEMHANGKHONGTHU",
+      return_phone: `${shopData.phone}`,
+      return_address: `${shopData.address}`,
+      return_district_id: `${shopData.district_id}`,
+      return_ward_code: "",
+      client_order_code: randomId,
+      from_name: `${shopData.name}`,
+      from_phone: `${shopData.phone}`,
+      from_address: `${shopData.address}`,
+      from_ward_name: "Xuân Khánh",
+      from_district_name: "Ninh Kiều",
+      from_province_name: "Cần Thơ",
+      to_name: addressUser.fullName,
+      to_phone: addressUser.phone,
+      to_address: `${addressUser?.street}, ${addressUser?.ward.wardName}, ${addressUser?.district.districtName}, ${addressUser?.city.cityName}`,
+      to_ward_name: addressUser?.ward.wardName,
+      to_district_name: addressUser?.district.districtName,
+      to_province_name: addressUser?.city.cityName,
+      cod_amount: orderTotal,
+      content: note,
+      weight: productData.totalWeight,
+      length: productData.totalLength,
+      width: productData.totalWidth,
+      height: productData.totalHeight,
+      cod_failed_amount: 2000,
+      pick_station_id: 1444,
+      deliver_station_id: null,
+      insurance_value: Math.min(orderTotal, 5000000),
+      service_id: 0,
+      service_type_id: 2,
+      coupon: null,
+      pickup_time: Math.floor(Date.now() / 1000),
+      pick_shift: getPickShifts(),
+      items: payment.flatMap((item) =>
+        item.products.map((product) => ({
+          name: product.name,
+          quantity: product.quantity,
+          price: parseInt(product.price),
+        }))
+      ),
+    };
+    const createOrderGhn = await ghnAPI.createOrder(payload);
+    if (!createOrderGhn.status === 200) {
+      console.error("Lỗi tạo đơn hàng GHN:", createOrderGhn.message);
+      return;
+    } else {
+      try {
+        payment.forEach(async (item) => {
+          await orderAPI.postProductToOrder({
+            userId: user.uid,
+            email: user.email,
+            products: item.products,
+            totalAmount: orderTotal,
+            note: note,
+            orderCode: randomId,
+            address: addressUser,
+          });
+          refetchCart();
+        });
+        await sendEmailToUser(user.email, randomId);
+        window.location.href = "/order-success";
+      } catch (error) {
+        console.error("Lỗi khi xử lý mua hàng:", error);
+      } finally {
+        setIsSubmitting(false);
+      }
+    }
+  };
+  useEffect(() => {
+    payment.forEach((item) => {
+      item.products.forEach((product) => {
+        setProductData(product);
+      });
+    });
+  }, [payment]);
+  useEffect(() => {
+    const productData = extractProductData(payment);
+    const calculateShippingFee = async () => {
+      if (
+        addressUser.city.cityId &&
+        addressUser.district.districtId &&
+        addressUser.ward.wardCode
+      ) {
+        const items = payment.forEach((item) =>
+          item.products.map((product) => ({
+            name: product.name,
+            quantity: product.quantity,
+            height: product.height,
+            length: product.length,
+            width: product.width,
+            weight: product.weight,
+          }))
+        );
+        try {
+          const response = await axios.post(
+            "https://dev-online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/fee",
+            {
+              service_type_id: 2,
+              from_district_id: shopData?.district_id,
+              to_district_id: addressUser.district.districtId,
+              to_ward_code: addressUser.ward.wardCode,
+              height: productData.totalHeight,
+              length: productData.totalLength,
+              weight: productData.totalWeight,
+              width: productData.totalWidth,
+              items: items,
+            },
+            {
+              headers: {
+                Token: "6ea4d8bb-4c99-11ef-8e53-0a00184fe694",
+                ShopId: "193151",
+                "Content-Type": "application/json",
+              },
+            }
+          );
+          setShippingFee(response.data.data.total);
+        } catch (error) {
+          console.error("Error fetching shipping fee:", error);
+        }
+      }
+    };
+
+    calculateShippingFee();
+  }, [addressUser, shopData, payment]);
+
   useEffect(() => {
     address.forEach((addressDefault) => {
       if (addressDefault.isDefault) {
@@ -121,6 +305,11 @@ const Payment = () => {
     refetch();
     return (
       <div>
+        {isSubmitting && (
+          <div className="fixed inset-0 flex items-center justify-center bg-gray-600 bg-opacity-50 z-50">
+            <LoadingSpinner />
+          </div>
+        )}
         <div className="section-container">
           <div className="max-w-screen-2xl container mx-auto px-4">
             <div className="py-24 flex flex-col items-center justify-center">
@@ -162,10 +351,13 @@ const Payment = () => {
                   </div>
                   <div className="mr-3">
                     <p className="text-black">
-                      {addressUser.street && `${addressUser.street}, `}
-                      {addressUser.ward && `${addressUser.ward}, `}
-                      {addressUser.district && `${addressUser.district}, `}
-                      {addressUser.city && `${addressUser.city}`}
+                      {addressUser?.street && `${addressUser.street}, `}
+                      {addressUser.ward.wardName &&
+                        `${addressUser.ward.wardName}, `}
+                      {addressUser.district.districtName &&
+                        `${addressUser.district.districtName}, `}
+                      {addressUser.city.cityName &&
+                        `${addressUser.city.cityName}`}
                     </p>
                   </div>
                 </div>
@@ -242,7 +434,9 @@ const Payment = () => {
                   <input
                     type="text"
                     placeholder="Lưu ý cho người bán..."
-                    className="border input input-bordered "
+                    className="border input input-bordered"
+                    value={note}
+                    onChange={(e) => setNote(e.target.value)}
                   />
                 </div>
               </div>
@@ -325,6 +519,7 @@ const Payment = () => {
                 <button
                   className="btn bg-green text-white hover:bg-green hover:opacity-80 px-5 w-full border-style"
                   onClick={handleBuyItem}
+                  disabled={isSubmitting}
                 >
                   Đặt hàng
                 </button>

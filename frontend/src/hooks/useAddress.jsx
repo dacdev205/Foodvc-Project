@@ -5,7 +5,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 const useAddress = () => {
   const { user } = useContext(AuthContext);
   const token = localStorage.getItem("access-token");
-  const queryClient = useQueryClient(); // Initialize the queryClient
+  const queryClient = useQueryClient();
 
   const refetchAddress = async () => {
     if (!email) {

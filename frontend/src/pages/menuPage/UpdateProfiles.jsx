@@ -3,9 +3,11 @@ import { useForm } from "react-hook-form";
 import { AuthContext } from "../../context/AuthProvider";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Bounce, ToastContainer, toast } from "react-toastify";
-
+import axios from "axios";
+import useUserCurrent from "../../hooks/useUserCurrent";
 const UpdateProfile = () => {
   const { updateUserProfile, user } = useContext(AuthContext);
+  const userData = useUserCurrent();
   const {
     register,
     handleSubmit,
@@ -16,42 +18,49 @@ const UpdateProfile = () => {
   const navigate = useNavigate();
   const from = location.state?.from?.pathname || "/";
 
-  const onSubmit = (data) => {
+  const onSubmit = async (data) => {
     const { name: formDataName, photoURL } = data;
     const name = formDataName.trim() === "" ? user.displayName : formDataName;
-    const updatedPhotoURL = photoURL || user.photoURL; // Use current photoURL if no new one provided
-    updateUserProfile(name, updatedPhotoURL)
-      .then(() => {
-        toast.success("Cập nhật thông tin thành công", {
-          position: "bottom-right",
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "colored",
-          transition: Bounce,
-        });
-        navigate(from, { replace: true });
-      })
-      .catch((error) => {
-        toast.error("Cập nhật thông tin thất bại", {
-          position: "bottom-right",
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "colored",
-          transition: Bounce,
-        });
+    const updatedPhotoURL = photoURL || user.photoURL;
+
+    try {
+      await updateUserProfile(name, updatedPhotoURL);
+      const response = await axios.put(
+        `http://localhost:3000/users/${userData._id}`,
+        {
+          name,
+          photoURL: updatedPhotoURL,
+        }
+      );
+      toast.success("Cập nhật thông tin thành công", {
+        position: "bottom-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+        transition: Bounce,
       });
+      navigate(from, { replace: true });
+    } catch (error) {
+      toast.error("Cập nhật thông tin thất bại", {
+        position: "bottom-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+        transition: Bounce,
+      });
+    }
   };
 
   return (
-    <div className="min-h-full bg-neutral-50 lg:w-[890px] md:w-full sm:w-full shadow-md rounded-sm">
+    <div className="min-h-full lg:w-[890px] md:w-full sm:w-full shadow-md rounded-sm bg-white">
       <div className="px-8 py-4">
         <h1 className="text-black font-sans text-2xl">Hồ sơ của tôi</h1>
         <p className="text-black font-sans text-sm">

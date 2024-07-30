@@ -5,6 +5,7 @@ import { FaGoogle, FaFacebook, FaEye, FaEyeSlash } from "react-icons/fa";
 import { AuthContext } from "../../context/AuthProvider";
 import useAxiosPublic from "../../hooks/useAxiosPublic";
 import * as Yup from "yup";
+import { Bounce, toast, ToastContainer } from "react-toastify";
 
 const Register = () => {
   const {
@@ -70,7 +71,7 @@ const Register = () => {
           .then((result) => {
             // Signed up
             const user = result.user;
-            updateUserProfile(data.email, data.photoURL).then(() => {
+            updateUserProfile(data.name, data.photoURL).then(() => {
               const userInfor = {
                 name: data.name,
                 email: data.email,
@@ -109,7 +110,17 @@ const Register = () => {
       axiosPublic.post("/users", userInfor).then((response) => {
         alert("Đăng nhập thành công!");
         navigate("/");
-        console.log(response);
+        toast.success("Chào mừng bạn đến với với FOODVC", {
+          position: "bottom-right",
+          autoClose: 2000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "colored",
+          transition: Bounce,
+        });
       });
     });
   };
@@ -240,6 +251,8 @@ const Register = () => {
           </button>
         </div>
       </div>
+      <ToastContainer />
+
       <Link
         to="/"
         className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2 text-black"

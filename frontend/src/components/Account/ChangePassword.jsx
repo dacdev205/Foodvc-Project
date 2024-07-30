@@ -48,7 +48,6 @@ const ChangePassword = () => {
         transition: Bounce,
       });
 
-      // Redirect after 2 seconds
       setTimeout(() => {
         navigate("/");
       }, 2000);
@@ -87,7 +86,7 @@ const ChangePassword = () => {
       setShowConfirmPassword(!showConfirmPassword);
     }
   };
-
+  //
   return (
     <div className="min-h-screen bg-neutral-50 lg:w-[890px] md:w-full sm:w-full shadow-md rounded-sm">
       <div className="px-8 py-4">
@@ -121,7 +120,7 @@ const ChangePassword = () => {
               </button>
             </div>
             {errors.newPassword && (
-              <p className="text-red-500 text-xs italic">
+              <p className="text-rose-500 text-xs italic">
                 {errors.newPassword}
               </p>
             )}
@@ -147,7 +146,7 @@ const ChangePassword = () => {
               </button>
             </div>
             {errors.confirmPassword && (
-              <p className="text-red-500 text-xs italic">
+              <p className="text-rose-500 text-xs italic">
                 {errors.confirmPassword}
               </p>
             )}

@@ -51,7 +51,7 @@ const AddressManagement = () => {
   const sortedAddresses = addresses.sort((a, b) => b.isDefault - a.isDefault);
 
   return (
-    <div className="min-h-full bg-neutral-50 lg:w-[890px] md:w-full sm:w-full shadow-md rounded-sm">
+    <div className="min-h-full lg:w-[890px] md:w-full sm:w-full shadow-md rounded-sm bg-white">
       <div className="px-8 py-4">
         <div className="my-3">
           <div className="flex items-center justify-between">

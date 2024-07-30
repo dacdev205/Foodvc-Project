@@ -1,10 +1,13 @@
+// src/components/Modal.jsx
 import React, { useContext, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { FaGoogle, FaFacebook, FaEyeSlash, FaEye } from "react-icons/fa";
 import { AuthContext } from "../../context/AuthProvider";
 import useAxiosPublic from "../../hooks/useAxiosPublic";
-import * as Yup from "yup"; // Import Yup
+import * as Yup from "yup";
+import { Bounce, ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css"; // Import CSS
 
 const Modal = () => {
   const {
@@ -12,13 +15,12 @@ const Modal = () => {
     handleSubmit,
     reset,
     formState: { errors },
-  } = useForm(); // Initialize useForm
+  } = useForm();
 
   const { signUpWithGmail, login } = useContext(AuthContext);
   const axiosPublic = useAxiosPublic();
   const [errorMessage, setErrorMessage] = useState({});
   const [errorMessageSubmit, setErrorMessageSubmit] = useState("");
-  // Redirecting to home page or specific page
   const location = useLocation();
   const navigate = useNavigate();
   const from = location.state?.from?.pathname || "/";
@@ -49,9 +51,11 @@ const Modal = () => {
     const { name, value } = e.target;
     validateInput(name, value);
   };
+
   const togglePasswordVisibility = (fieldName) => {
     fieldName === "password" ? setShowPassword(!showPassword) : "";
   };
+
   const onSubmit = async (data) => {
     try {
       await schema.validate(data, { abortEarly: false });
@@ -65,8 +69,18 @@ const Modal = () => {
             email: data.email,
           };
           axiosPublic.post("/users", userInfor);
-          alert("Login successfull");
           reset();
+          toast.success("Chào mừng bạn trở lại", {
+            position: "bottom-right",
+            autoClose: 2000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "colored",
+            transition: Bounce,
+          });
           navigate(from, { replace: true });
         })
         .catch(() => {
@@ -81,16 +95,26 @@ const Modal = () => {
     }
   };
 
-  // Google signin
   const handleLogin = async () => {
     try {
       const result = await signUpWithGmail();
       const userInfor = {
         name: result?.user?.displayName,
         email: result?.user?.email,
+        photoURL: result?.user?.photoURL,
       };
       await axiosPublic.post("/users", userInfor);
-      alert("Login successful");
+      toast.success("Chào mừng bạn đến với FOODVC", {
+        position: "bottom-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+        transition: Bounce,
+      });
     } catch (error) {
       console.error("Error during login:", error);
     }
@@ -164,7 +188,6 @@ const Modal = () => {
               <p className="text-red text-xs italic">
                 {Object.values(errorMessageSubmit)}
               </p>
-              {/* login btn */}
               <div className="form-control mt-4">
                 <input
                   type="submit"
@@ -188,7 +211,6 @@ const Modal = () => {
                 </Link>
               </p>
             </form>
-            {/* social sign in */}
             <div className="text-center space-x-3 mb-5">
               <button
                 className="btn btn-circle hover:bg-green hover:text-white bg-slate-200 text-black border-none"
@@ -203,6 +225,7 @@ const Modal = () => {
           </div>
         </div>
       </dialog>
+      <ToastContainer />
     </div>
   );
 };

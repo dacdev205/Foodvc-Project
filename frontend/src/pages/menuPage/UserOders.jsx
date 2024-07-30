@@ -21,13 +21,15 @@ const UserOrders = () => {
   };
 
   useEffect(() => {
-    const products = orders.flatMap((order) =>
-      order.products.map((product) => ({
-        orderCode: order.orderCode,
-        ...product,
-      }))
-    );
-    setProductDetails(products);
+    if (orders.length) {
+      const products = orders.flatMap((order) =>
+        order.products.map((product) => ({
+          orderCode: order.orderCode,
+          ...product,
+        }))
+      );
+      setProductDetails(products);
+    }
   }, [orders]);
 
   const filteredOrders = orders.filter((order) => {
@@ -75,32 +77,9 @@ const UserOrders = () => {
   };
 
   return (
-    <div className="">
-      <div className="max-w-screen-2xl container mx-auto xl:px-24 px-4 bg-gradient-to-r from-0% from-[#FAFAFA] to-[#FCFCFC] to-100%">
-        <div className="flex flex-col items-center justify-center">
-          <div className="text-center px-4 space-y-7">
-            {orders.length ? (
-              ""
-            ) : (
-              <div>
-                <h2 className="md:text-2xl text-1xl font-bold md:leading-snug leading-snug text-black">
-                  Chưa có đơn nào <span className="text-green">đã đặt</span>
-                </h2>
-                <div>
-                  <Link to="/menu">
-                    <button className="btn bg-green text-white hover:bg-green hover:opacity-80 border-none">
-                      Tiếp tục mua sắm
-                    </button>
-                  </Link>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-
+    <div className="w-[1100px] bg-white shadow-lg">
       {orders.length ? (
-        <div>
+        <div className="p-3">
           <Box
             sx={{ borderBottom: 1, borderColor: "divider", width: 1100 }}
             className="mb-3"
@@ -205,7 +184,9 @@ const UserOrders = () => {
           </div>
         </div>
       ) : (
-        ""
+        <div className="h-screen flex justify-center items-center">
+          <p className="text-lg text-gray-600">Chưa có đơn hàng nào.</p>
+        </div>
       )}
     </div>
   );

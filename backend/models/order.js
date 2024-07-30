@@ -11,6 +11,7 @@ const orderSchema = mongoose.Schema({
     required: true,
     unique: true,
   },
+  note: { type: String },
   address: {
     street: { type: String, required: true },
     city: { type: String, required: true },

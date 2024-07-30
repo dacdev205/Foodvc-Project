@@ -14,6 +14,10 @@ const productSchema = mongoose.Schema({
   price: Number,
   quantity: Number,
   productionLocation: String,
+  height: Number,
+  length: Number,
+  weight: Number,
+  width: Number,
   instructions: String,
   expirationDate: {
     type: Date,

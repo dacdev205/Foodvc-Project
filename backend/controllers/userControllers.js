@@ -44,6 +44,25 @@ module.exports = class usersAPI {
       res.status(500).json({ message: error.message });
     }
   }
+  static async updateUser(req, res) {
+    const userId = req.params.id;
+    const { name, photoURL } = req.body;
+
+    try {
+      const updatedUser = await User.findByIdAndUpdate(
+        userId,
+        { name, photoURL },
+        { new: true, runValidators: true }
+      );
+
+      if (!updatedUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      res.status(200).json(updatedUser);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  }
 
   // delete a user
   static async deleteUser(req, res) {

@@ -11,22 +11,33 @@ module.exports = class AddressAPI {
       district,
       ward,
       email,
+      note,
       isDefault,
     } = req.body;
+
     try {
       const address = new Address({
         userId,
         fullName,
         phone,
         street,
-        city,
-        district,
-        ward,
         email,
+        note,
         isDefault,
+        city: {
+          cityId: city.cityId,
+          cityName: city.cityName,
+        },
+        district: {
+          districtId: district.districtId,
+          districtName: district.districtName,
+        },
+        ward: {
+          wardCode: ward.wardCode,
+          wardName: ward.wardName,
+        },
       });
       await address.save();
-
       let user = await User.findById(userId);
       user.addresses.push(address);
       await user.save();

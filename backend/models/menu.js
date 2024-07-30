@@ -13,6 +13,10 @@ const menuSchema = mongoose.Schema({
   category: String,
   price: Number,
   quantity: Number,
+  height: Number,
+  weight: Number,
+  length: Number,
+  width: Number,
   productionLocation: String,
   instructions: String,
   expirationDate: {

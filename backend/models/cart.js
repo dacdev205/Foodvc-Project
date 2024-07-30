@@ -7,35 +7,39 @@ const cartSchema = mongoose.Schema({
   recipe: String,
   image: String,
   quantity: Number,
+  height: Number,
+  width: Number,
+  length: Number,
+  weight: Number,
   price: String,
-  brand: String, 
-  productionLocation: String, 
-  instructions: String, 
+  brand: String,
+  productionLocation: String,
+  instructions: String,
   expirationDate: {
     type: Date,
-    default: function() {
+    default: function () {
       const now = new Date();
       now.setDate(now.getDate() + 4);
       return now;
-    }
+    },
   },
   storage: {
     temperature: {
       type: Number,
-      min: -273.15, 
-      max: 4,        
-      default: 4    
+      min: -273.15,
+      max: 4,
+      default: 4,
     },
     unit: {
       type: String,
       enum: ["Celsius", "Fahrenheit"],
-      default: "Celsius"
-    }
+      default: "Celsius",
+    },
   },
   created: {
     type: Date,
-    default: Date.now()
+    default: Date.now(),
   },
 });
 
-module.exports = mongoose.model("Cart", cartSchema)
+module.exports = mongoose.model("Cart", cartSchema);

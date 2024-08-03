@@ -23,12 +23,12 @@ const Cards = ({ item }) => {
   const [heartFilledIds, setHeartFilledIds] = useState(
     JSON.parse(localStorage.getItem("heartFilledIds")) || []
   );
-  const isHeartFilled = heartFilledIds.includes(item.productId._id);
-
   useEffect(() => {
     const fetchProductDetail = async () => {
       try {
-        const reviewsData = await reviewAPI.getProductById(item.productId._id);
+        const reviewsData = await reviewAPI.getProductById(
+          item?.productId?._id
+        );
         setReviews(reviewsData);
       } catch (error) {
         console.error("Error fetching product detail:", error);
@@ -36,16 +36,18 @@ const Cards = ({ item }) => {
     };
 
     fetchProductDetail();
-  }, [item.productId._id]);
+  }, [item?.productId?._id]);
 
   useEffect(() => {
     localStorage.setItem("heartFilledIds", JSON.stringify(heartFilledIds));
   }, [heartFilledIds]);
 
+  const isHeartFilled = heartFilledIds.includes(item?.productId?._id);
+
   const handleAddToCart = async () => {
     const cartItem = {
       userId: userData._id,
-      productId: item.productId._id,
+      productId: item?.productId?._id,
       quantity: 1,
     };
 
@@ -72,7 +74,7 @@ const Cards = ({ item }) => {
     if (user && user?.email) {
       const wishItem = {
         userId: userData._id,
-        product: item.productId._id,
+        product: item?.productId?._id,
       };
 
       try {
@@ -88,10 +90,10 @@ const Cards = ({ item }) => {
             progress: undefined,
             theme: "colored",
           });
-          setHeartFilledIds((prevIds) => [...prevIds, item.productId._id]);
+          setHeartFilledIds((prevIds) => [...prevIds, item?.productId?._id]);
         } else {
           const wishListItem = await wishListAPI.getProductToWishList(
-            item.productId._id
+            item?.productId?._id
           );
 
           await wishListAPI.deleteProduct(wishListItem._id);
@@ -106,7 +108,7 @@ const Cards = ({ item }) => {
             theme: "colored",
           });
           setHeartFilledIds((prevIds) =>
-            prevIds.filter((id) => id !== item.productId._id)
+            prevIds.filter((id) => id !== item?.productId?._id)
           );
         }
       } catch (error) {
@@ -162,20 +164,23 @@ const Cards = ({ item }) => {
           </div>
         )}
 
-        <Link to={`/product/${item.productId._id}`}>
+        <Link to={`/product/${item?.productId?._id}`}>
           <figure>
             <img
-              src={PF + "/" + item.productId.image}
-              alt=""
+              src={PF + "/" + item?.productId?.image}
+              alt={item?.productId?.name || "Product Image"}
               className=" md:h-72 cursor-pointer"
             />
           </figure>
         </Link>
         {/* card content */}
         <div className="card-body ">
-          <Link to={`/product/${item.productId._id}`}>
+          <Link to={`/product/${item?.productId?._id}`}>
             <h2 className="card-title cursor-pointer text-black">
-              {item.productId.name.slice(0, 20)}...
+              {item?.productId?.name
+                ? item?.productId?.name.slice(0, 20)
+                : "Tên sản phẩm"}
+              ...
             </h2>
           </Link>
 
@@ -191,7 +196,7 @@ const Cards = ({ item }) => {
             </div>
             <div className="flex">
               <p className="text-md font-bold text-black">
-                {formattedPrice(item.productId.price)} <span>₫</span>
+                {formattedPrice(item?.productId?.price)} <span>₫</span>
               </p>
             </div>
           </div>

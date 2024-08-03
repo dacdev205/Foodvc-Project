@@ -14,8 +14,12 @@ const Menu = () => {
     const fetchData = async () => {
       try {
         const data = await menuAPI.getAllMenu();
-        setMenu(data);
-        setFilteredItems(data); // Initially, display all items
+        if (data) {
+          setMenu(data);
+          setFilteredItems(data);
+        } else {
+          return;
+        }
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -164,7 +168,7 @@ const Menu = () => {
         {/* product card */}
         <div className="grid lg:grid-cols-4 sm:grid-cols-2 grid-cols-1 gap-4 ">
           {currentItems.map((item) => (
-            <Cards key={item.productId._id} item={item} />
+            <Cards key={item?.productId?._id} item={item} />
           ))}
         </div>
       </div>

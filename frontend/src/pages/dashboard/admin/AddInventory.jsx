@@ -58,7 +58,6 @@ const AddInventory = () => {
         Thêm sản phẩm mới vào <span className="text-green">kho</span>
       </h2>
       <SuccessAlert show={showSuccessAlert} message={successMessage} />
-      {/* <ErrorAlert show={showErrorAlert} message={errorMessage} /> */}
       <div>
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="form-control">

@@ -16,13 +16,10 @@ const WishListPage = () => {
   //handleDelete(item)
   const handleDelete = async (item) => {
     try {
-      // Call deleteProduct
       await wishListAPI.deleteProduct(item._id);
 
-      // Remove the item ID from the local state
       setHeartFilledIds((prevIds) => prevIds.filter((id) => id !== item._id));
 
-      // Remove the item ID from localStorage
       const updatedHeartFilledIds = heartFilledIds.filter(
         (id) => id !== item._id
       );
@@ -30,7 +27,6 @@ const WishListPage = () => {
         "heartFilledIds",
         JSON.stringify(updatedHeartFilledIds)
       );
-      // Refetch data or update the UI as needed
       refetchWishList();
     } catch (error) {
       console.error("Error deleting product:", error);
@@ -56,7 +52,7 @@ const WishListPage = () => {
         <div className="max-w-screen-2xl container mx-auto xl:px-24 px-4 bg-gradient-to-r from-0% from-[#FAFAFA] to-[#FCFCFC] to-100%">
           <div className="py-24 flex flex-col items-center justify-center">
             <div className=" text-center px-4 space-y-7">
-              {wishList.length ? (
+              {wishList?.length ? (
                 <h2 className="md:text-3xl text-2xl font-bold md:leading-snug leading-snug text-black">
                   Sản phẩm <span className="text-green">yêu thích</span>
                 </h2>
@@ -79,7 +75,7 @@ const WishListPage = () => {
           </div>
         </div>
         {/* table for the wishlist */}
-        {wishList.length ? (
+        {wishList?.length ? (
           <div>
             <div className="overflow-x-auto">
               <table className="hidden md:table text-center border">
@@ -102,16 +98,19 @@ const WishListPage = () => {
                         <Link to={`/product/${item._id}`}>
                           <div className="avatar">
                             <div className="mask mask-squircle w-12 h-12">
-                              <img src={PF + "/" + item.image} alt="product" />
+                              <img
+                                src={PF + "/" + item?.product.image}
+                                alt="product"
+                              />
                             </div>
                           </div>
                         </Link>
                       </td>
                       <td>
-                        <div className="">{item.name}</div>
+                        <div className="">{item?.product.name}</div>
                       </td>
                       <td>
-                        <FormattedPrice price={item.price} />
+                        <FormattedPrice price={item?.product.price} />
                       </td>
                       <td>
                         <button
@@ -135,17 +134,20 @@ const WishListPage = () => {
                     <div className="p-3 text-black">{index + 1} </div>
                     <div className="avatar hover:scale-105 transition-all duration-200 mr-3">
                       <Link
-                        to={`/product/${item._id}`}
+                        to={`/product/${item.product._id}`}
                         className="mask mask-squircle w-12 h-12"
                       >
-                        <img src={PF + "/" + item.image} alt="product" />
+                        <img
+                          src={PF + "/" + item.product.image}
+                          alt="product"
+                        />
                       </Link>
                     </div>
                     <div className="cart-item-details">
                       <div className="cart-item-name text-black">
-                        {item.name.slice(0, 20)}...
+                        {item.product.name.slice(0, 20)}...
                       </div>
-                      <FormattedPrice price={item.price} />
+                      <FormattedPrice price={item.product.price} />
                     </div>
                   </div>
                   <div className="text-center flex align-center">

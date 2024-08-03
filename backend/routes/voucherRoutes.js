@@ -9,5 +9,5 @@ router.get("/", voucherAPI.getAllVouchers);
 router.get("/:id", voucherAPI.getAllSingleVouchers);
 router.delete("/:id", voucherAPI.deleteVoucher);
 router.put("/:id", voucherAPI.updateVoucher);
-router.post("/apply", voucherAPI.applyVoucherToProduct);
+router.post("/apply", voucherAPI.applyVoucherToPayment);
 module.exports = router;

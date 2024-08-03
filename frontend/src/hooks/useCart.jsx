@@ -1,28 +1,27 @@
-import React, { useContext, useState } from "react";
-import { AuthContext } from "../context/AuthProvider";
-import { useQuery, useQueryClient } from "@tanstack/react-query"; // Import useQueryClient
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import useUserCurrent from "./useUserCurrent";
+import { useEffect } from "react";
 
 const useCart = () => {
-  const { user } = useContext(AuthContext);
+  const userData = useUserCurrent();
   const token = localStorage.getItem("access-token");
-  const email = user?.email || "";
-  const queryClient = useQueryClient(); // Initialize the queryClient
+  const id = userData?._id || "";
+  const queryClient = useQueryClient();
 
   const refetchCart = async () => {
-    if (!email) {
+    if (!id) {
       return;
     }
-    // Manually fetch wish list data
-    await queryClient.invalidateQueries(["cart", email]);
+    await queryClient.invalidateQueries(["cart", id]);
   };
 
   const { data: cart = [], isLoading } = useQuery({
-    queryKey: ["cart", email],
+    queryKey: ["cart", id],
     queryFn: async () => {
-      if (!email) {
+      if (!id) {
         return [];
       }
-      const res = await fetch(`http://localhost:3000/cart?email=${email}`, {
+      const res = await fetch(`http://localhost:3000/cart/user/${id}`, {
         headers: {
           authorization: `Bearer ${token}`,
         },

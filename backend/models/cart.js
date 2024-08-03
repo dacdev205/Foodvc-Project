@@ -1,45 +1,17 @@
 const mongoose = require("mongoose");
-const cartSchema = mongoose.Schema({
-  //
-  email: String,
-  name: String,
-  category: String,
-  recipe: String,
-  image: String,
-  quantity: Number,
-  height: Number,
-  width: Number,
-  length: Number,
-  weight: Number,
-  price: String,
-  brand: String,
-  productionLocation: String,
-  instructions: String,
-  expirationDate: {
-    type: Date,
-    default: function () {
-      const now = new Date();
-      now.setDate(now.getDate() + 4);
-      return now;
-    },
-  },
-  storage: {
-    temperature: {
-      type: Number,
-      min: -273.15,
-      max: 4,
-      default: 4,
-    },
-    unit: {
-      type: String,
-      enum: ["Celsius", "Fahrenheit"],
-      default: "Celsius",
-    },
-  },
-  created: {
-    type: Date,
-    default: Date.now(),
-  },
+const Schema = mongoose.Schema;
+
+const cartItemSchema = new Schema({
+  productId: { type: Schema.Types.ObjectId, ref: "Product", required: true },
+  quantity: { type: Number, required: true, min: 1 },
 });
 
-module.exports = mongoose.model("Cart", cartSchema);
+const cartSchema = new Schema({
+  userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
+  products: [cartItemSchema],
+  totalAmount: { type: Number, default: 0 },
+});
+
+const Cart = mongoose.model("Cart", cartSchema);
+
+module.exports = Cart;

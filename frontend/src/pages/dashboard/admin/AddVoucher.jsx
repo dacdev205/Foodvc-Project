@@ -66,7 +66,7 @@ const AddVoucher = () => {
         return;
       }
 
-      const response = await axios.post("/api/foodvc/apply-voucher", {
+      const response = await axios.post(PF + "/api/foodvc/apply-voucher", {
         productId: selectedProducts,
         discount: parseFloat(discountPercentage),
       });

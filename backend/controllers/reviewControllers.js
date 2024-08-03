@@ -10,34 +10,34 @@ module.exports = class reviewAPI {
     }
   }
   static async addReview(req, res) {
-    const { productId, userId, userName, rating, comment } = req.body;
     try {
-      const review = new Review({
-        productId,
+      const { productId, userId, rating, comment } = req.body;
+
+      const menu = await Menu.findOne({ productId });
+      if (!menu) {
+        return res.status(404).json({ message: "Menu item not found" });
+      }
+      const newReview = await Review.create({
+        productId: menu.productId._id,
         userId,
-        userName,
         rating,
         comment,
       });
-      await review.save();
 
-      const menu = await Menu.findById(productId);
-      menu.reviews.push(review);
+      menu.reviews.push(newReview._id);
       await menu.save();
 
-      res.status(201).json(review);
+      res
+        .status(201)
+        .json({ message: "Review added successfully", review: newReview });
     } catch (error) {
-      console.error("Error adding review:", error);
-      res.status(500).json({ message: "Internal server error" });
+      res.status(500).json({ message: error.message });
     }
   }
   static async getReviewsByProductId(req, res) {
     const productId = req.params.productId;
     try {
-      const reviews = await Review.find({ productId }).populate(
-        "userId",
-        "displayName"
-      );
+      const reviews = await Review.find({ productId }).populate("userId");
       res.json(reviews);
     } catch (error) {
       console.error("Error getting reviews:", error);

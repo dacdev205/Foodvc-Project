@@ -1,37 +1,22 @@
 const mongoose = require("mongoose");
-//
+
 const orderSchema = mongoose.Schema({
-  userId: { type: String, required: true },
-  email: {
-    type: String,
-    required: true,
-  },
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
   orderCode: {
     type: String,
     required: true,
     unique: true,
   },
   note: { type: String },
-  address: {
-    street: { type: String, required: true },
-    city: { type: String, required: true },
-    district: { type: String, required: true },
-    ward: { type: String, required: true },
-    fullName: { type: String, required: true },
-    phone: { type: String, required: true },
+  addressId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Address",
+    required: true,
   },
-  status: {
-    type: String,
-    enum: [
-      "Pending",
-      "Waiting4Pickup",
-      "InTransit",
-      "Delivery",
-      "Completed",
-      "Cancelled",
-      "ReturnedRefunded",
-    ],
-    default: "Pending",
+  statusId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "OrderStatus",
+    required: true,
   },
   totalAmount: {
     type: Number,
@@ -39,18 +24,15 @@ const orderSchema = mongoose.Schema({
   },
   products: [
     {
-      name: String,
-      category: String,
-      recipe: String,
-      image: String,
-      quantity: Number,
-      price: String,
-      productionLocation: String,
-      instructions: String,
-      expirationDate: Date,
-      storage: {
-        temperature: Number,
-        unit: String,
+      productId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Product",
+        required: true,
+      },
+      quantity: {
+        type: Number,
+        required: true,
+        min: 1,
       },
     },
   ],

@@ -2,64 +2,76 @@ const Payment = require("../models/payment");
 
 module.exports = class PaymentAPI {
   static async createPayment(req, res) {
-    const { email, products } = req.body;
+    const { userId, products } = req.body;
 
     try {
-      const payment = await Payment.findOne({ email: email });
+      let payment = await Payment.findOne({ userId: userId });
       if (!payment) {
         payment = await Payment.create({
-          email: email,
-          products: products,
+          userId,
+          products,
         });
-        return res.status(201).json({ message: "Payment created succesfully" });
+        return res
+          .status(201)
+          .json({ message: "Payment created successfully" });
       }
 
       payment.products = products;
-
       await payment.save();
 
-      res.status(200).json({ message: "Update order succesfully" });
+      res.status(200).json({ message: "Payment updated successfully" });
     } catch (error) {
       res.status(500).json({ message: error.message });
     }
   }
-  //fetch all product
-  static async fetchAllPaymentWithEmail(req, res) {
+  static async fetchAllPaymentWithUserId(req, res) {
     try {
-      const email = req.query.email;
-      const payments = await Payment.find({ email: email });
-      if (payments) {
+      const userId = req.query.userId;
+      const payments = await Payment.find({ userId }).populate(
+        "products.productId"
+      );
+      if (payments.length > 0) {
         res.status(200).json(payments);
       } else {
-        res.status(404).json({ message: "Product not found" });
+        res.status(404).json({ message: "Payments not found" });
       }
     } catch (err) {
       res.status(500).json({ message: err.message });
     }
   }
-
-  //update product by id
   static async updateProductInPayment(req, res) {
-    const productId = req.params.productId;
-    const { quantity } = req.body;
+    const paymentId = req.params.paymentId;
+    const { productId, quantity } = req.body;
 
     try {
-      await Payment.findOneAndUpdate(
-        { "products._id": productId },
-        { $set: { "products.$.quantity": quantity } }
+      const payment = await Payment.findOneAndUpdate(
+        { _id: paymentId, "products.productId": productId },
+        { $set: { "products.$.quantity": quantity } },
+        { new: true }
       );
 
-      res.status(200).json({ message: "Quantity updated successfully" });
+      if (payment) {
+        res.status(200).json({ message: "Quantity updated successfully" });
+      } else {
+        res.status(404).json({ message: "Payment or product not found" });
+      }
     } catch (error) {
       res.status(500).json({ message: error.message });
     }
   }
 
-  static async fetchPaymentByID(req, res) {
-    const id = req.params.id;
+  static async fetchPaymentByUserID(req, res) {
+    const userId = req.params.userId;
     try {
-      const product = await Payment.findById(id);
-      res.status(200).json(product);
+      const payments = await Payment.find({ userId: userId }).populate(
+        "products.productId"
+      );
+
+      if (payments.length > 0) {
+        res.status(200).json(payments);
+      } else {
+        res.status(404).json({ message: "No payments found for this user" });
+      }
     } catch (err) {
       res.status(500).json({ message: err.message });
     }

@@ -217,7 +217,6 @@ const Login = () => {
               </button>
             </div>
           </div>
-          <ToastContainer />
         </dialog>
       ) : (
         <div className="h-screen flex justify-center items-center">

@@ -1,35 +1,13 @@
 const mongoose = require("mongoose");
-//
+const Schema = mongoose.Schema;
+
+const cartItemSchema = new Schema({
+  productId: { type: Schema.Types.ObjectId, ref: "Product", required: true },
+  quantity: { type: Number, required: true, min: 1 },
+});
 const paymentSchema = mongoose.Schema({
-  email: {
-    type: String,
-    required: true,
-  },
-  products: [
-    {
-      type: {
-        email: String,
-        name: String,
-        category: String,
-        recipe: String,
-        image: String,
-        quantity: Number,
-        price: String,
-        height: Number,
-        weight: Number,
-        width: Number,
-        length: Number,
-        brand: String,
-        productionLocation: String,
-        instructions: String,
-        expirationDate: Date,
-        storage: {
-          temperature: Number,
-          unit: String,
-        },
-      },
-    },
-  ],
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+  products: [cartItemSchema],
   createdAt: {
     type: Date,
     default: Date.now,

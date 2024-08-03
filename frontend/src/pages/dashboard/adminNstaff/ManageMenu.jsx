@@ -21,7 +21,7 @@ const ManageMenu = () => {
   };
 
   const filteredMenu = menu.filter((item) =>
-    item.name.toLowerCase().includes(searchTerm.toLowerCase())
+    item?.productId?.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const sortedMenu = filteredMenu.sort((a, b) => {
@@ -92,18 +92,18 @@ const ManageMenu = () => {
                   <td>
                     <div className="avatar">
                       <div className="mask mask-squircle w-12 h-12">
-                        <img src={PF + "/" + item.image} alt="" />
+                        <img src={PF + "/" + item.productId.image} alt="" />
                       </div>
                     </div>
                   </td>
                   <td
                     className="tooltip mt-4 tooltip-bottom"
-                    data-tip={item.name}
+                    data-tip={item.productId.name}
                   >
-                    {item.name.slice(0, 20)}...
+                    {item.productId.name.slice(0, 20)}...
                   </td>
                   <td>
-                    <FormattedPrice price={item.price} />
+                    <FormattedPrice price={item.productId.price} />
                   </td>
 
                   <td className="text-center">{item.quantity}</td>

@@ -31,7 +31,7 @@ module.exports = class inventoryAPI {
     try {
       const product = await Product.create(productData);
 
-      const inventoryItem = await Inventory.create({ product: product._id });
+      const inventoryItem = await Inventory.create({ productId: product._id });
 
       return res.status(201).json(inventoryItem);
     } catch (error) {
@@ -97,16 +97,31 @@ module.exports = class inventoryAPI {
   }
   static async removeProductFromMenu(req, res) {
     try {
-      const { menuItemId } = req.body;
-      const menuItem = await Menu.findById(menuItemId);
+      const { productId } = req.body;
+
+      // Find the menu item associated with the given product ID
+      const menuItem = await Menu.findOne({ product: productId });
 
       if (!menuItem) {
-        return res.status(404).json({ message: "Product not found in menu" });
+        console.log("Menu item not found for product ID:", productId);
+        return res
+          .status(404)
+          .json({ message: "Menu item not found for the product" });
       }
-      const productInInventory = await Product.findById(menuItem._id);
+
+      const productInInventory = await Product.findById(productId);
+      if (!productInInventory) {
+        return res
+          .status(404)
+          .json({ message: "Product not found in inventory" });
+      }
+
+      // Update the product quantity in inventory
       productInInventory.quantity += menuItem.quantity;
       productInInventory.transferredToMenu = false;
       await productInInventory.save();
+
+      // Remove the product from the menu
       await menuItem.remove();
 
       res

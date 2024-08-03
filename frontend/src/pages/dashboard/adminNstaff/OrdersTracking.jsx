@@ -11,7 +11,9 @@ const OrdersTracking = () => {
   const [searchStatus, setSearchStatus] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(5);
-
+  const [statuses, setStatuses] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   useEffect(() => {
     const fetchAllOrders = async () => {
       try {
@@ -24,14 +26,27 @@ const OrdersTracking = () => {
 
     fetchAllOrders();
   }, []);
+  useEffect(() => {
+    const fetchStatuses = async () => {
+      try {
+        const response = await orderAPI.getAllStatuses();
+        setStatuses(response);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
 
+    fetchStatuses();
+  }, []);
   const paginate = (pageNumber) => {
     setCurrentPage(pageNumber);
   };
 
-  const handleStatusChange = async (orderId, newStatus) => {
+  const handleStatusChange = async (orderId, newStatusId) => {
     try {
-      await orderAPI.updateOrderStatus(orderId, newStatus);
+      await orderAPI.updateOrderStatus(orderId, newStatusId);
       const updatedOrders = await orderAPI.getAllOrder();
       setAllOrders(updatedOrders);
     } catch (error) {
@@ -60,7 +75,7 @@ const OrdersTracking = () => {
   const filteredOrders = allOrders.filter((order) => {
     return (
       order.orderCode.toLowerCase().includes(searchTerm.toLowerCase()) &&
-      (searchStatus === "" || order.status === searchStatus)
+      (searchStatus === "" || order.status.name === searchStatus)
     );
   });
 
@@ -127,21 +142,17 @@ const OrdersTracking = () => {
                     </td>
                     <td>
                       <select
-                        value={order.status}
+                        value={order.statusId._id}
                         onChange={(e) =>
                           handleStatusChange(order._id, e.target.value)
                         }
-                        disabled={order.status === "Cancelled"}
+                        disabled={order.statusId.name === "Cancelled"}
                       >
-                        <option value="Pending">Chờ xác nhận</option>
-                        <option value="Waiting4Pickup">Chờ lấy hàng</option>
-                        <option value="InTransit">Vận chuyển</option>
-                        <option value="Delivery">Chờ giao hàng</option>
-                        <option value="Completed">Hoàn thành</option>
-                        <option value="Cancelled">Đã hủy</option>
-                        <option value="ReturnedRefunded">
-                          Trả hàng/Hoàn tiền
-                        </option>
+                        {statuses.map((status) => (
+                          <option key={status._id} value={status._id}>
+                            {status.description}
+                          </option>
+                        ))}
                       </select>
                     </td>
                     <td className="text-center">
@@ -150,7 +161,7 @@ const OrdersTracking = () => {
                           <FaEye />
                         </Link>
                       </button>
-                      {order.status === "Pending" && (
+                      {order.statusId.name === "Pending" && (
                         <button
                           onClick={() => handleCancelOrder(order._id)}
                           className="ml-2 text-red-500"

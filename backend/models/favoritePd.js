@@ -1,17 +1,10 @@
 const mongoose = require("mongoose");
-// 
-const favoriteSchema = mongoose.Schema({
-  email: String,
-  name: String,
-  category: String,
-  recipe: String,
-  image: String,
-  quantity: Number,
-  price: String,
-  created: {
-    type: Date,
-    default: Date.now()
-  },
+const Schema = mongoose.Schema;
+
+const wishListSchema = new Schema({
+  userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
+  product: { type: Schema.Types.ObjectId, ref: "Product" },
+  created: { type: Date, default: Date.now },
 });
 
-module.exports = mongoose.model("WishList", favoriteSchema)
+module.exports = mongoose.model("WishList", wishListSchema);

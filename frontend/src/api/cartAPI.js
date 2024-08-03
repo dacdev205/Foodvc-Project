@@ -11,9 +11,10 @@ export default class cartAPI {
       throw error;
     }
   }
+
   static async getProductToCart(cartItem) {
     try {
-      const productId = cartItem._id;
+      const productId = cartItem.productId;
       const res = await axios.get(`${url}/${productId}`);
       return res.data;
     } catch (error) {
@@ -22,36 +23,26 @@ export default class cartAPI {
     }
   }
 
-  static async postProductToCart(cartItem) {
+  static async updateProduct(cartId, productId, updateData) {
     try {
-      const existingProduct = await this.getProductToCart(cartItem);
-
-      if (existingProduct && existingProduct._id) {
-        const updatedQuantity = existingProduct.quantity + 1;
-        await this.updateProduct(existingProduct._id, {
-          quantity: updatedQuantity,
-        });
-      } else {
-        const res = await axios.post(url, cartItem);
-      }
-      return cartItem;
-    } catch (error) {
-      console.error("Error adding/updating product to cart:", error);
-      throw error;
-    }
-  }
-
-  static async updateProduct(productId, updateData) {
-    try {
-      const res = await axios.patch(`${url}/${productId}`, updateData);
+      const res = await axios.patch(
+        `${url}/${cartId}/product/${productId}`,
+        updateData
+      );
       return res.data;
     } catch (error) {
       console.error("Error updating product:", error);
       throw error;
     }
   }
-  static async deleteProduct(id) {
-    const res = await axios.delete(`${url}/${id}`);
-    return res.data;
+
+  static async deleteProduct(cartId, id) {
+    try {
+      const res = await axios.delete(`${url}/${cartId}/product/${id}`);
+      return res.data;
+    } catch (error) {
+      console.error("Error deleting product:", error);
+      throw error;
+    }
   }
 }

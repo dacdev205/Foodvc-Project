@@ -1,16 +1,22 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
 import useOrders from "../../hooks/useOrders";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Box from "@mui/material/Box";
 import FormattedPrice from "../../ultis/FormatedPriece";
+import Modal from "@mui/material/Modal";
+import Button from "@mui/material/Button";
+import MenuItem from "@mui/material/MenuItem";
+import Select from "@mui/material/Select";
 
 const UserOrders = () => {
   const [orders, refetch, isLoading] = useOrders();
-  const [value, setValue] = React.useState(0);
+  const [value, setValue] = useState(0);
   const [searchTerm, setSearchTerm] = useState("");
   const [productDetails, setProductDetails] = useState([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [cancelReason, setCancelReason] = useState("");
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -18,6 +24,18 @@ const UserOrders = () => {
 
   const handleSearchChange = (e) => {
     setSearchTerm(e.target.value);
+  };
+
+  const openCancelModal = (order) => {
+    setSelectedOrder(order);
+    setIsModalOpen(true);
+  };
+
+  const handleCancel = () => {
+    // Xử lý logic hủy đơn hàng với lý do cancelReason và đơn hàng selectedOrder
+    console.log("Hủy đơn hàng:", selectedOrder, "Lý do:", cancelReason);
+    setIsModalOpen(false);
+    setCancelReason("");
   };
 
   useEffect(() => {
@@ -48,19 +66,6 @@ const UserOrders = () => {
       order.orderCode.toLowerCase().includes(searchTerm.toLowerCase())
     );
   });
-
-  const formatDateTime = (dateTimeString) => {
-    const options = {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
-    };
-    const dateTime = new Date(dateTimeString);
-    return dateTime.toLocaleDateString("vi-VN", options);
-  };
 
   const displayStatus = (status) => {
     const statusMap = {
@@ -113,9 +118,8 @@ const UserOrders = () => {
               <Tab label="Trả hàng/Hoàn tiền" />
             </Tabs>
           </Box>
-
           {value === 0 && (
-            <div className="my-2">
+            <div className="my-2 flex items-center">
               <input
                 type="text"
                 placeholder="Tìm kiếm theo mã đơn hàng"
@@ -125,69 +129,107 @@ const UserOrders = () => {
               />
             </div>
           )}
-
-          <div className="overflow-x-auto">
-            <table className="table text-center">
-              <thead className="bg-green text-white rounded-sm">
-                <tr>
-                  <th>#</th>
-                  <th>Ngày đặt hàng</th>
-                  <th>Mã đơn hàng</th>
-                  <th>Tổng đơn hàng</th>
-                  <th>Trạng thái</th>
-                  <th>Thao tác</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredOrders.map((order, index) => (
-                  <React.Fragment key={index}>
-                    <tr className="text-black">
-                      <td>{index + 1}</td>
-                      <td>{formatDateTime(order.createdAt)}</td>
-                      <td>
-                        <div>{order.orderCode}</div>
-                      </td>
-                      <td>
-                        <FormattedPrice price={order.totalAmount} />
-                      </td>
-                      <td>{displayStatus(order.status)}</td>
-                      <td>
-                        <Link to="/admin-chat">
-                          <button className="btn">Liên hệ</button>
-                        </Link>
-                      </td>
-                    </tr>
-                    {order.products.map((product, productIndex) => (
-                      <tr key={productIndex} className="text-black">
-                        <td colSpan="6" className="text-left">
-                          <div className="flex items-center">
-                            <img
-                              src={`http://localhost:3000/${product.image}`}
-                              alt={product.name}
-                              className="w-20 h-20 object-cover mr-4"
-                            />
-                            <div>
-                              <p className="font-semibold">{product.name}</p>
-                              <p>
-                                <FormattedPrice price={product.price} />
-                              </p>
-                              <p>Số lượng: {product.quantity}</p>
-                            </div>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </React.Fragment>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          {filteredOrders.map((order, index) => (
+            <div key={index} className="mb-6">
+              <div className="overflow-x-auto border-b border-gray-200 pb-4">
+                <div className="mb-2 flex justify-between">
+                  <p className="text-sm text-gray-600">
+                    Trạng thái:{" "}
+                    <span className="font-medium text-red-500">
+                      {displayStatus(order.status)}
+                    </span>
+                  </p>
+                  {order.status === "Pending" && (
+                    <Button
+                      variant="outlined"
+                      color="error"
+                      onClick={() => openCancelModal(order)}
+                    >
+                      Hủy đơn
+                    </Button>
+                  )}
+                </div>
+                <React.Fragment>
+                  {order.products.map((product, productIndex) => (
+                    <div
+                      key={productIndex}
+                      className="flex items-center justify-between py-2 border-b border-gray-100"
+                    >
+                      <div className="flex items-center">
+                        <img
+                          src={`http://localhost:3000/${product.image}`}
+                          alt={product.name}
+                          className="w-20 h-20 object-cover rounded-lg mr-4"
+                        />
+                        <div>
+                          <p className="font-semibold text-lg text-black">
+                            {product.name}
+                          </p>
+                          <p className="text-black">x{product.quantity}</p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <FormattedPrice price={product.price} />
+                      </div>
+                    </div>
+                  ))}
+                </React.Fragment>
+              </div>
+            </div>
+          ))}
         </div>
       ) : (
         <div className="h-screen flex justify-center items-center">
           <p className="text-lg text-gray-600">Chưa có đơn hàng nào.</p>
         </div>
       )}
+
+      {/* Modal for canceling order */}
+      <Modal
+        open={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        aria-labelledby="cancel-order-modal"
+        aria-describedby="cancel-order-description"
+      >
+        <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center p-4">
+          <div className="bg-white p-6 rounded-lg w-full max-w-md">
+            <h2 className="text-lg font-semibold mb-4" id="cancel-order-modal">
+              Chọn lý do hủy đơn
+            </h2>
+            <Select
+              value={cancelReason}
+              onChange={(e) => setCancelReason(e.target.value)}
+              displayEmpty
+              className="w-full mb-4"
+            >
+              <MenuItem value="" disabled>
+                Chọn lý do
+              </MenuItem>
+              <MenuItem value="Reason1">Lý do 1</MenuItem>
+              <MenuItem value="Reason2">Lý do 2</MenuItem>
+              <MenuItem value="Reason3">Lý do 3</MenuItem>
+              <MenuItem value="Reason4">Lý do 4</MenuItem>
+            </Select>
+            <div className="flex justify-end">
+              <Button
+                variant="contained"
+                color="error"
+                onClick={handleCancel}
+                disabled={!cancelReason}
+              >
+                Hủy đơn
+              </Button>
+              <Button
+                variant="outlined"
+                onClick={() => setIsModalOpen(false)}
+                className="ml-2"
+              >
+                Đóng
+              </Button>
+            </div>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 };

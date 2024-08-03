@@ -1,23 +1,22 @@
 /* eslint-disable react/prop-types */
 import React, { useContext, useState } from "react";
 import { FaStar } from "react-icons/fa";
-import { AuthContext } from "../../context/AuthProvider";
 import styles from "../../CssModule/ReviewForm.module.css";
+import useUserCurrent from "../../hooks/useUserCurrent";
 
-const ReviewForm = ({ productId, userId, userName, onSubmit }) => {
+const ReviewForm = ({ productId, userId, onSubmit }) => {
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState("");
   const [ratingError, setRatingError] = useState(false);
-  const { user } = useContext(AuthContext);
-
+  const userData = useUserCurrent();
   const handleSubmit = (e) => {
-    if (user && user?.email) {
+    if (userData?._id) {
       e.preventDefault();
       if (rating === 0) {
         setRatingError(true);
         return;
       }
-      onSubmit({ productId, userId, userName, rating, comment });
+      onSubmit({ productId, userId, rating, comment });
       setRating(0);
       setComment("");
       setRatingError(false);

@@ -26,7 +26,7 @@ module.exports = class usersAPI {
       const user = await User.findOne({ email });
       res.status(200).json(user);
     } catch (error) {
-      res.status(500).json({ message: err.message });
+      res.status(500).json({ message: error.message });
     }
   }
   // post a new user

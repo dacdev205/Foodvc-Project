@@ -1,5 +1,5 @@
 const Voucher = require("../models/voucher");
-const Product = require("../models/product");
+const Payment = require("../models/payment");
 
 function generateVoucherCode(name) {
   const prefix = "FOODVC";
@@ -94,8 +94,8 @@ module.exports = class voucherAPI {
     }
   }
 
-  static async applyVoucherToProduct(req, res) {
-    const { voucherCode, productId } = req.body;
+  static async applyVoucherToPayment(req, res) {
+    const { voucherCode, paymentId } = req.body;
 
     try {
       const voucher = await Voucher.findOne({ code: voucherCode });
@@ -103,18 +103,24 @@ module.exports = class voucherAPI {
         return res.status(404).json({ message: "Voucher not found" });
       }
 
-      const product = await Product.findById(productId);
-      if (!product) {
-        return res.status(404).json({ message: "Product not found" });
+      const now = new Date();
+      if (voucher.voucher_experied_date < now) {
+        return res.status(400).json({ message: "Voucher has expired" });
       }
 
-      const discount = (product.price * voucher.voucher_discount_persent) / 100;
-      product.price = product.price - discount;
-      await product.save();
+      const payment = await Payment.findById(paymentId);
+      if (!payment) {
+        return res.status(404).json({ message: "Payment not found" });
+      }
 
-      res
-        .status(200)
-        .json({ message: "Voucher applied successfully", product });
+      const discount =
+        (payment.totalAmount * voucher.voucher_discount_persent) / 100;
+      const newTotalAmount = payment.totalAmount - discount;
+
+      res.status(200).json({
+        message: "Voucher applied successfully",
+        discountedAmount: Math.max(newTotalAmount, 0),
+      });
     } catch (error) {
       res.status(500).json({ message: error.message });
     }

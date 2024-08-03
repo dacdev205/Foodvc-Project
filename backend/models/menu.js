@@ -1,32 +1,8 @@
 const mongoose = require("mongoose");
-//
+
 const menuSchema = mongoose.Schema({
-  name: {
-    type: String,
-    trim: true,
-    required: true,
-    minlength: 3,
-  },
-  recipe: String,
-  image: String,
-  brand: String,
-  category: String,
-  price: Number,
-  quantity: Number,
-  height: Number,
-  weight: Number,
-  length: Number,
-  width: Number,
-  productionLocation: String,
-  instructions: String,
-  expirationDate: {
-    type: Date,
-    default: function () {
-      const now = new Date();
-      now.setDate(now.getDate() + 4);
-      return now;
-    },
-  },
+  productId: { type: mongoose.Schema.Types.ObjectId, ref: "Product" },
+  quantity: { type: Number, default: 1 },
   reviews: [{ type: mongoose.Schema.Types.ObjectId, ref: "Review" }],
   createdAt: {
     type: Date,

@@ -19,9 +19,11 @@ import LoadingSpinner from "../../ultis/LoadingSpinner";
 import { AuthContext } from "../../context/AuthProvider";
 import "react-toastify/dist/ReactToastify.css";
 import { Bounce, ToastContainer, toast } from "react-toastify";
-import Swal from "sweetalert2";
+
 import { confirmAlert } from "react-confirm-alert";
 import "react-confirm-alert/src/react-confirm-alert.css";
+import useUserCurrent from "../../hooks/useUserCurrent";
+import axios from "axios";
 
 const CardDetails = () => {
   const { id } = useParams();
@@ -41,6 +43,8 @@ const CardDetails = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showActions, setShowActions] = useState(false);
   const navigate = useNavigate();
+  const userData = useUserCurrent();
+
   const formatDateTimeProductCreate = (dateTimeString) => {
     const options = {
       year: "numeric",
@@ -72,17 +76,13 @@ const CardDetails = () => {
     const fetchProductDetail = async () => {
       try {
         const response = await menuAPI.getProductById(id);
-        setProduct(response);
+        setProduct(response.productId);
         const reviewsData = await reviewAPI.getProductById(id);
         setReviews(reviewsData);
         const priceOriginalData = await inventoryAPI.getProductById(id);
         setPrices(priceOriginalData);
-        const commentedByUser = localStorage.getItem(`${id}-${user.uid}`);
-        if (commentedByUser) {
-          setCommented(true);
-        }
       } catch (error) {
-        if (!user && !user?.email) {
+        if (!userData?._id) {
           return;
         }
         console.error("Error fetching product detail:", error);
@@ -91,6 +91,12 @@ const CardDetails = () => {
 
     fetchProductDetail();
   }, [id]);
+  useEffect(() => {
+    const commentedByUser = localStorage.getItem(`${id}-${userData?._id}`);
+    if (commentedByUser) {
+      setCommented(true);
+    }
+  });
   // handleIncrease
   const handleIncrease = () => {
     const newQuantity = quantityDefault + 1;
@@ -123,29 +129,13 @@ const CardDetails = () => {
   const handleAddToCart = async (product) => {
     if (user && user?.email) {
       const cartItem = {
-        _id: product._id,
-        name: product.name,
+        userId: userData._id,
+        productId: product._id,
         quantity: quantityDefault,
-        price: product.price,
-        recipe: product.recipe,
-        height: product.height,
-        width: product.width,
-        length: product.length,
-        weight: product.weight,
-        description: product.description,
-        brand: product.brand,
-        category: product.category,
-        productionLocation: product.productionLocation,
-        instructions: product.instructions,
-        expirationDate: product.expirationDate,
-        createdAt: product.createdAt,
-        storage: product.storage,
-        image: product.image,
-        email: user.email,
       };
 
       try {
-        await cartAPI.postProductToCart(cartItem);
+        await axios.post("http://localhost:3000/cart", cartItem);
         refetchCart();
         toast.success("Thêm vào giỏ hàng thành công!", {
           position: "bottom-right",
@@ -179,19 +169,19 @@ const CardDetails = () => {
   };
 
   const handleReviewSubmit = async (reviewData) => {
-    const userOrders = await orderAPI.getUserOrders(user.uid);
+    const userOrders = await orderAPI.getUserOrders(userData._id);
     let productFound = false;
     userOrders.forEach((userOrder) => {
       userOrder.products.forEach((productOrder) => {
-        if (productOrder._id === product._id) {
+        if (productOrder.productId.toString() === product._id.toString()) {
           productFound = true;
-          return;
         }
       });
     });
     if (!productFound) {
       return;
     }
+
     toast.success("Cảm ơn bạn đã gửi đánh giá!", {
       position: "bottom-right",
       autoClose: 5000,
@@ -205,11 +195,10 @@ const CardDetails = () => {
     });
     await reviewAPI.addReview({
       ...reviewData,
-      userId: user.uid,
-      userName: user.displayName,
+      userId: userData._id,
     });
 
-    localStorage.setItem(`${id}-${user.uid}`, "commented");
+    localStorage.setItem(`${id}-${userData?._id}`, "commented");
     setCommented(true);
     const updatedReviews = await reviewAPI.getProductById(id);
     setReviews(updatedReviews);
@@ -360,6 +349,7 @@ const CardDetails = () => {
   const handleToggleActions = () => {
     setShowActions(!showActions);
   };
+
   const handleCheckOutNow = async () => {
     try {
       if (!user && !user?.email) {
@@ -367,9 +357,10 @@ const CardDetails = () => {
         return;
       }
       await paymentAPI.postProductToPayment({
-        email: user.email,
+        userId: userData?._id,
+        totalAmount: product.price,
         products: {
-          ...product,
+          productId: product._id,
           quantity: quantityDefault,
         },
       });
@@ -402,19 +393,6 @@ const CardDetails = () => {
   };
   return (
     <div className="section-container ">
-      <ToastContainer
-        position="top-right"
-        autoClose={5000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="colored"
-        transition:Bounce
-      />
       <div className="max-w-screen-2xl container mx-auto xl:px-28 px-4 text-black">
         <div className="py-3 max-w-7xl m-auto">
           <div className="mt-6 sm:mt-10">
@@ -604,7 +582,7 @@ const CardDetails = () => {
           {currentReviews.map((review) => (
             <div key={review._id} className="border p-3 mb-3 rounded-lg">
               <div className="flex justify-between">
-                <p className="font-semibold">{review.userName}</p>
+                <p className="font-semibold">{review.userId.name}</p>
               </div>
               <p className="text-xs text-grey-300">
                 {formatDateTime(review.createdAt)}
@@ -613,7 +591,7 @@ const CardDetails = () => {
                 <span>{renderRating(review.rating)}</span>
               </div>
               <p className="text-gray-700">{review.comment}</p>
-              {user && user.uid === review.userId && (
+              {userData?._id === review?.userId?._id && (
                 <div>
                   <button
                     onClick={handleToggleActions}

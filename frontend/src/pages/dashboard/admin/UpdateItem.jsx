@@ -38,6 +38,10 @@ const UpdateItem = () => {
       formData.append("brand", data.brand);
       formData.append("productionLocation", data.productionLocation);
       formData.append("instructions", data.instructions);
+      formData.append("weight", data.weight);
+      formData.append("length", data.length);
+      formData.append("width", data.width);
+      formData.append("height", data.height);
 
       await productsAPI.updateProduct(product._id, formData);
       setShowSuccessAlert(true);
@@ -231,7 +235,20 @@ const UpdateItem = () => {
                   type="text"
                 />
               </div>
+              <div className="form-control w-full">
+                <label className="label">
+                  <span className="label-text text-black">Độ rộng: </span>
+                </label>
+                <input
+                  type="text"
+                  {...register("width")}
+                  defaultValue={product.width}
+                  placeholder="VD: 5"
+                  className="input input-bordered w-full text-black input-sm"
+                />
+              </div>
             </div>
+
             <div className="form-control">
               <label className="label">
                 <span className="label-text text-black">
@@ -258,7 +275,7 @@ const UpdateItem = () => {
             </div>
 
             <button className="btn bg-green text-white px-6 border-none hover:bg-green hover:opacity-80">
-              Nhập kho <FaUtensils />
+              Cập nhật <FaUtensils />
             </button>
           </form>
         </div>

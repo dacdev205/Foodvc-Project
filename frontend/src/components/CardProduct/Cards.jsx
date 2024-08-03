@@ -5,47 +5,30 @@ import { FaHeart, FaStar } from "react-icons/fa";
 import { AuthContext } from "../../context/AuthProvider";
 import cartAPI from "../../api/cartAPI";
 import wishListAPI from "../../api/wishListAPI";
-import Swal from "sweetalert2";
 import reviewAPI from "../../api/reviewAPI";
 import useCart from "../../hooks/useCart";
 import useWishList from "../../hooks/useWishList";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import SuccessAlert from "../../ultis/SuccessAlert";
+import useUserCurrent from "../../hooks/useUserCurrent";
+import axios from "axios";
+
 const Cards = ({ item }) => {
-  const {
-    name,
-    image,
-    price,
-    recipe,
-    _id,
-    category,
-    height,
-    width,
-    weight,
-    length,
-    productionLocation,
-    instructions,
-    expirationDate,
-    storage,
-    createdAt,
-  } = item;
   const { user } = useContext(AuthContext);
+  const userData = useUserCurrent();
   const PF = "http://localhost:3000";
   const [reviews, setReviews] = useState([]);
   const [, refetchCart] = useCart();
   const [, refetchWishList] = useWishList();
-  const [showSuccessAlert, setShowSuccessAlert] = useState(false);
-  const message = "Thêm vào giỏ hàng thành công!";
   const [heartFilledIds, setHeartFilledIds] = useState(
     JSON.parse(localStorage.getItem("heartFilledIds")) || []
   );
-  const isHeartFilled = heartFilledIds.includes(_id);
+  const isHeartFilled = heartFilledIds.includes(item.productId._id);
 
   useEffect(() => {
     const fetchProductDetail = async () => {
       try {
-        const reviewsData = await reviewAPI.getProductById(_id);
+        const reviewsData = await reviewAPI.getProductById(item.productId._id);
         setReviews(reviewsData);
       } catch (error) {
         console.error("Error fetching product detail:", error);
@@ -53,7 +36,7 @@ const Cards = ({ item }) => {
     };
 
     fetchProductDetail();
-  }, [_id]);
+  }, [item.productId._id]);
 
   useEffect(() => {
     localStorage.setItem("heartFilledIds", JSON.stringify(heartFilledIds));
@@ -61,27 +44,13 @@ const Cards = ({ item }) => {
 
   const handleAddToCart = async () => {
     const cartItem = {
-      _id,
-      name,
+      userId: userData._id,
+      productId: item.productId._id,
       quantity: 1,
-      price,
-      recipe,
-      height,
-      width,
-      weight,
-      length,
-      category,
-      image,
-      productionLocation,
-      instructions,
-      expirationDate,
-      createdAt,
-      storage,
-      email: user.email,
     };
+
     try {
-      await cartAPI.postProductToCart(cartItem);
-      refetchCart();
+      await axios.post("http://localhost:3000/cart", cartItem);
       toast.success("Thêm vào giỏ hàng thành công!", {
         position: "bottom-right",
         autoClose: 3000,
@@ -92,33 +61,21 @@ const Cards = ({ item }) => {
         progress: undefined,
         theme: "colored",
       });
+      refetchCart();
     } catch (error) {
       console.error("Error adding to cart:", error);
       toast.error("Lỗi khi thêm vào giỏ hàng.");
     }
   };
 
-  const handleAddToWishList = async (item) => {
+  const handleAddToWishList = async () => {
     if (user && user?.email) {
       const wishItem = {
-        _id,
-        name,
-        quantity: 1,
-        price,
-        recipe,
-        category,
-        image,
-        email: user.email,
+        userId: userData._id,
+        product: item.productId._id,
       };
-      try {
-        setHeartFilledIds((prevIds) => {
-          if (!prevIds.includes(_id)) {
-            return [...prevIds, _id];
-          } else {
-            return prevIds.filter((id) => id !== _id);
-          }
-        });
 
+      try {
         if (!isHeartFilled) {
           await wishListAPI.addProductToWishList(wishItem);
           toast.success("Đã thêm vào sản phẩm yêu thích!", {
@@ -131,8 +88,13 @@ const Cards = ({ item }) => {
             progress: undefined,
             theme: "colored",
           });
+          setHeartFilledIds((prevIds) => [...prevIds, item.productId._id]);
         } else {
-          await wishListAPI.deleteProduct(wishItem._id);
+          const wishListItem = await wishListAPI.getProductToWishList(
+            item.productId._id
+          );
+
+          await wishListAPI.deleteProduct(wishListItem._id);
           toast.info("Đã xóa khỏi sản phẩm yêu thích!", {
             position: "bottom-right",
             autoClose: 3000,
@@ -143,12 +105,16 @@ const Cards = ({ item }) => {
             progress: undefined,
             theme: "colored",
           });
+          setHeartFilledIds((prevIds) =>
+            prevIds.filter((id) => id !== item.productId._id)
+          );
         }
       } catch (error) {
         console.log(error);
+        toast.error("Lỗi khi quản lý sản phẩm yêu thích.");
       }
     }
-    refetchWishList();
+    refetchWishList(); // Refetch danh sách yêu thích
   };
 
   const calculateAverageRating = (reviews) => {
@@ -178,14 +144,13 @@ const Cards = ({ item }) => {
 
   return (
     <div>
-      <SuccessAlert show={showSuccessAlert} message={message} />
       <div className="card mr-5 md:my-5 shadow-xl relative hover:scale-105 transition-all duration-200">
         {/* icon wish list */}
         <div
           className={`rating gap-1 absolute cursor-pointer right-2 top-2 p-4 z-10 heartStar bg-green ${
             isHeartFilled ? "text-rose-500" : "text-white"
           }`}
-          onClick={() => handleAddToWishList(item)}
+          onClick={handleAddToWishList}
         >
           <FaHeart />
         </div>
@@ -197,10 +162,10 @@ const Cards = ({ item }) => {
           </div>
         )}
 
-        <Link to={`/product/${item._id}`}>
+        <Link to={`/product/${item.productId._id}`}>
           <figure>
             <img
-              src={PF + "/" + item.image}
+              src={PF + "/" + item.productId.image}
               alt=""
               className=" md:h-72 cursor-pointer"
             />
@@ -208,9 +173,9 @@ const Cards = ({ item }) => {
         </Link>
         {/* card content */}
         <div className="card-body ">
-          <Link to={`/product/${item._id}`}>
+          <Link to={`/product/${item.productId._id}`}>
             <h2 className="card-title cursor-pointer text-black">
-              {item.name.slice(0, 20)}...
+              {item.productId.name.slice(0, 20)}...
             </h2>
           </Link>
 
@@ -226,7 +191,7 @@ const Cards = ({ item }) => {
             </div>
             <div className="flex">
               <p className="text-md font-bold text-black">
-                {formattedPrice(item.price)} <span>₫</span>
+                {formattedPrice(item.productId.price)} <span>₫</span>
               </p>
             </div>
           </div>
@@ -235,7 +200,7 @@ const Cards = ({ item }) => {
             className={`btn bg-green text-white hover:bg-green hover:opacity-80 border-style ${
               item.quantity === 0 ? "disabled" : ""
             }`}
-            onClick={() => handleAddToCart()}
+            onClick={handleAddToCart}
             disabled={item.quantity === 0}
           >
             Thêm vào giỏ hàng

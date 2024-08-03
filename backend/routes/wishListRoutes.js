@@ -2,9 +2,9 @@ const favoritePdAPI = require("../controllers/favoritePd");
 const verifyToken = require("../middleware/verifyToken");
 const router = require("express").Router();
 //middleware
-router.get("/", verifyToken, favoritePdAPI.fetchAllWishListProductWithEmail);
-router.get("/:id", favoritePdAPI.fetchProductWishListByID);
-router.post("/", favoritePdAPI.postProductToWistLish);
+router.get("/user/:userId", favoritePdAPI.fetchAllWishListProductWithUserId);
+router.get("/:productId", favoritePdAPI.fetchProductWishListByProductId);
+router.post("/", favoritePdAPI.postProductToWishList);
 router.put("/:id", favoritePdAPI.updateProductWishList);
 router.delete("/:id", favoritePdAPI.deleteProductInWishList);
 

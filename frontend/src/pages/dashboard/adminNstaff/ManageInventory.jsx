@@ -138,8 +138,9 @@ const ManageInventory = () => {
 
   const confirmRemoveFromMenu = async () => {
     try {
+      const productIdToRemove = productToRemove._id;
       const response = await axiosSecure.post("/inventory/remove-from-menu", {
-        menuItemId: productToRemove._id,
+        productId: productIdToRemove,
       });
 
       if (response.data.message === "Product removed from menu successfully") {

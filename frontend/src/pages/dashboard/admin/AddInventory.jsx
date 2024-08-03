@@ -15,7 +15,6 @@ const AddInventory = () => {
   const [showErrorAlert, setShowErrorAlert] = useState(false);
 
   const successMessage = "Thêm thành công!";
-  const errorMessage = "Thêm thất bại!";
 
   const VisuallyHiddenInput = styled("input")({
     clip: "rect(0 0 0 0)",

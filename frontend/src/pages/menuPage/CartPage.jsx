@@ -1,11 +1,9 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import styles from "../../CssModule/CartnWishPage.module.css";
 import useCart from "../../hooks/useCart";
 import { FaTrash } from "react-icons/fa";
 import cartAPI from "../../api/cartAPI";
-import { AuthContext } from "../../context/AuthProvider";
 import LoadingSpinner from "../../ultis/LoadingSpinner";
-import Swal from "sweetalert2";
 import menuAPI from "../../api/menuAPI";
 import { Link } from "react-router-dom";
 import inventoryAPI from "../../api/inventoryAPI";
@@ -14,9 +12,10 @@ import { FaCheck } from "react-icons/fa6";
 import paymentAPI from "../../api/paymentAPI";
 import "react-toastify/dist/ReactToastify.css";
 import { Bounce, ToastContainer, toast } from "react-toastify";
+import useUserCurrent from "../../hooks/useUserCurrent";
 const CartPage = () => {
   const [cart, refetchCart, isLoading] = useCart();
-  const { user } = useContext(AuthContext);
+  const userData = useUserCurrent();
   const PF = "http://localhost:3000";
   const [originalPrices, setOriginalPrices] = useState({});
   const [selectedItems, setSelectedItems] = useState([]);
@@ -26,26 +25,32 @@ const CartPage = () => {
     if (selectAll) {
       setSelectedItems([]);
     } else {
-      const allItemIds = cart.map((item) => item._id);
+      const allItemIds = cart.products.map((item) => item.productId._id);
       setSelectedItems(allItemIds);
     }
     setSelectAll(!selectAll);
   };
+
   useEffect(() => {
     const fetchProductList = async () => {
       try {
-        const updatedOriginalPrices = {};
-        await Promise.all(
-          cart.map(async (item) => {
-            const priceOriginalData = await inventoryAPI.getProductById(
-              item._id
-            );
-            if (priceOriginalData.applyVoucher) {
-              updatedOriginalPrices[item._id] = priceOriginalData.price;
-            }
-          })
-        );
-        setOriginalPrices(updatedOriginalPrices);
+        if (cart && Array.isArray(cart.products)) {
+          const updatedOriginalPrices = {};
+          await Promise.all(
+            cart.products.map(async (item) => {
+              if (item.productId && item.productId._id) {
+                const priceOriginalData = await inventoryAPI.getProductById(
+                  item.productId._id
+                );
+                if (priceOriginalData && priceOriginalData.applyVoucher) {
+                  updatedOriginalPrices[item.productId._id] =
+                    priceOriginalData.price;
+                }
+              }
+            })
+          );
+          setOriginalPrices(updatedOriginalPrices);
+        }
       } catch (error) {
         console.error("Error fetching product detail:", error);
       }
@@ -73,7 +78,7 @@ const CartPage = () => {
   //handleDelete(item)
   const handleDelete = async (item) => {
     try {
-      await cartAPI.deleteProduct(item._id);
+      await cartAPI.deleteProduct(cart._id, item.productId._id);
       refetchCart();
       toast.success("Sản phẩm đã được xóa!", {
         position: "bottom-right",
@@ -87,7 +92,7 @@ const CartPage = () => {
         transition: Bounce,
       });
     } catch (error) {
-      toast.error("Sản phẩm đã được xóa!", {
+      toast.error("Lỗi khi xóa sản phẩm!", {
         position: "bottom-right",
         autoClose: 5000,
         hideProgressBar: false,
@@ -106,7 +111,7 @@ const CartPage = () => {
   const handleQuantityChange = async (item, newQuantity) => {
     try {
       if (newQuantity > 0) {
-        const productInfo = await menuAPI.getProductById(item._id);
+        const productInfo = await menuAPI.getProductById(item.productId._id);
         if (item.quantity >= productInfo.quantity) {
           toast.warn("Số lượng vượt quá hiện có!", {
             position: "bottom-right",
@@ -120,19 +125,24 @@ const CartPage = () => {
             transition: Bounce,
           });
         } else {
-          await cartAPI.updateProduct(item._id, { quantity: newQuantity });
+          await cartAPI.updateProduct(item.productId._id, {
+            quantity: newQuantity,
+          });
           refetchCart();
         }
       } else {
-        await cartAPI.deleteProduct(item._id);
-        Swal.fire({
-          position: "center",
-          icon: "error",
-          title: "Sản phẩm đã bị xóa khỏi giỏ hàng.",
-          showConfirmButton: false,
-          timer: 700,
+        await cartAPI.deleteProduct(item.productId._id);
+        toast.info("Sản phẩm đã được xóa!", {
+          position: "bottom-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "colored",
+          transition: Bounce,
         });
-        // Làm mới giỏ hàng sau khi xóa
         refetchCart();
       }
     } catch (error) {
@@ -142,20 +152,26 @@ const CartPage = () => {
   //handleDecrease
   const handleDecrease = async (item) => {
     try {
-      // Decrease the quantity by 1 (or adjust as needed)
-      const updatedProduct = await cartAPI.updateProduct(item._id, {
-        quantity: item.quantity - 1,
-      });
+      const updatedProduct = await cartAPI.updateProduct(
+        cart._id,
+        item.productId._id,
+        {
+          quantity: item.quantity - 1,
+        }
+      );
       refetchCart();
-
       if (updatedProduct.quantity < 1) {
-        await cartAPI.deleteProduct(item._id);
-        Swal.fire({
-          position: "center",
-          icon: "error",
-          title: "Food deleted on the cart.",
-          showConfirmButton: false,
-          timer: 700,
+        await cartAPI.deleteProduct(item.productId._id);
+        toast.warn("Số lượng vượt quá hiện có!", {
+          position: "bottom-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "colored",
+          transition: Bounce,
         });
         refetchCart();
       } else {
@@ -168,12 +184,12 @@ const CartPage = () => {
 
   //handleIncrease
   const handleIncrease = async (item) => {
-    const productInfo = await menuAPI.getProductById(item._id);
+    const productInfo = await menuAPI.getProductById(item.productId._id);
 
     if (item.quantity >= productInfo.quantity) {
       alert("Số lượng sản phẩm vượt quá số lượng hiện có");
     } else {
-      await cartAPI.updateProduct(item._id, {
+      await cartAPI.updateProduct(cart._id, item.productId._id, {
         quantity: item.quantity + 1,
       });
     }
@@ -183,8 +199,8 @@ const CartPage = () => {
 
   //calculatePrice
   const calculatePrice = (item) => {
-    if (item && item.price) {
-      const totalPrice = item.price * item.quantity;
+    if (item && item.productId.price) {
+      const totalPrice = item.productId.price * item.quantity;
       return parseFloat(totalPrice.toFixed(2));
     }
     return 0;
@@ -199,7 +215,7 @@ const CartPage = () => {
         return updatedSelected;
       } else {
         const updatedSelected = [...prevSelected, itemId];
-        if (updatedSelected.length === cart.length) {
+        if (updatedSelected.length === cart?.products?.length) {
           setSelectAll(true);
         }
         return updatedSelected;
@@ -207,7 +223,9 @@ const CartPage = () => {
     });
   };
   const cartSubTotal = selectedItems.reduce((totalPrice, itemId) => {
-    const selectedItem = cart.find((item) => item._id === itemId);
+    const selectedItem = cart.products.find(
+      (item) => item.productId._id === itemId
+    );
     return totalPrice + calculatePrice(selectedItem);
   }, 0);
   const orderTotal = cartSubTotal;
@@ -215,8 +233,10 @@ const CartPage = () => {
   const handleCheckOut = async () => {
     try {
       await paymentAPI.postProductToPayment({
-        email: user.email,
-        products: cart.filter((item) => selectedItems.includes(item._id)),
+        userId: userData._id,
+        products: cart.products.filter((item) =>
+          selectedItems.includes(item.productId._id)
+        ),
       });
     } catch (error) {
       console.error("Error during check-out:", error);
@@ -251,7 +271,7 @@ const CartPage = () => {
           <div className="py-24 flex flex-col items-center justify-center">
             <div className="text-center px-4 space-y-7">
               {/* content */}
-              {cart.length ? (
+              {cart?.products?.length ? (
                 <h2 className="md:text-3xl text-2xl font-bold md:leading-snug leading-snug text-black">
                   Sản phẩm trong <span className="text-green">giỏ hàng</span>
                 </h2>
@@ -276,7 +296,7 @@ const CartPage = () => {
         </div>
 
         {/* table for the cart */}
-        {cart.length ? (
+        {cart?.products?.length ? (
           <div>
             {/* PC devices */}
             <div className="overflow-x-auto">
@@ -311,26 +331,31 @@ const CartPage = () => {
                 </thead>
                 <tbody className="">
                   {/* row 1 */}
-                  {cart.map((item, index) => (
-                    <tr key={index} className={styles.styleBordered}>
+                  {cart.products.map((item) => (
+                    <tr
+                      key={item.productId._id}
+                      className={styles.styleBordered}
+                    >
                       <td>
                         <label
-                          htmlFor={`check-box-${index}`}
+                          htmlFor={`check-box-${item.productId._id}`}
                           className="cursor-pointer relative"
                         >
                           <input
                             type="checkbox"
-                            id={`check-box-${index}`}
-                            checked={selectedItems.includes(item._id)}
-                            onChange={() => toggleItemSelection(item._id)}
+                            id={`check-box-${item.productId._id}`}
+                            checked={selectedItems.includes(item.productId._id)}
+                            onChange={() =>
+                              toggleItemSelection(item.productId._id)
+                            }
                             className="appearance-none w-4 h-4 rounded-sm bg-white border-2 border-[#39d84A] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
                           />
                           <FaCheck
                             className={`absolute top-0 left-[1px] text-green ${
-                              selectedItems.includes(item._id)
+                              selectedItems.includes(item?.productId?._id)
                                 ? "text-opacity-100"
                                 : "text-opacity-0"
-                            } check-${item._id} transition`}
+                            } check-${item?.productId?._id} transition`}
                           />
                         </label>
                       </td>
@@ -338,16 +363,20 @@ const CartPage = () => {
                         <div className="flex items-center gap-3">
                           <div className="avatar hover:">
                             <Link
-                              to={`/product/${item._id}`}
+                              to={`/product/${item.productId._id}`}
                               className="mask mask-squircle w-12 h-12"
                             >
-                              <img src={PF + "/" + item.image} alt="product" />
+                              <img
+                                src={PF + "/" + item.productId.image}
+                                alt="product"
+                              />
                             </Link>
                           </div>
                         </div>
                       </td>
                       <td>
-                        <div className="">{item.name.slice(0, 30)}... </div>
+                        <div>{item.productId.name.slice(0, 30)}...</div>{" "}
+                        {/* Use item.productId.name here */}
                       </td>
                       <td className="text-center">
                         <div>
@@ -378,9 +407,9 @@ const CartPage = () => {
                       </td>
                       <td>
                         <FormattedPrice price={calculatePrice(item)} />
-                        {originalPrices[item._id] && (
+                        {originalPrices[item.productId._id] && (
                           <span className="flex text-gray-600 line-through text-sm">
-                            {formattedPrice(originalPrices[item._id])}
+                            {formattedPrice(originalPrices[item.productId._id])}
                           </span>
                         )}
                       </td>
@@ -446,7 +475,7 @@ const CartPage = () => {
                     {isEditing ? "Xong" : "Sửa"}
                   </button>
                 </div>
-                {cart.map((item, index) => (
+                {cart?.products.map((item, index) => (
                   <div className={styles.cartItemWrapper} key={index}>
                     <div
                       className={`${styles.cartItem} ${
@@ -460,32 +489,39 @@ const CartPage = () => {
                         <input
                           type="checkbox"
                           id={`check-box-${index}`}
-                          checked={selectedItems.includes(item._id)}
-                          onChange={() => toggleItemSelection(item._id)}
+                          checked={selectedItems.includes(item.productId_id)}
+                          onChange={() =>
+                            toggleItemSelection(item.productId._id)
+                          }
                           className="appearance-none w-4 h-4 rounded-sm bg-white border-2 border-[#39d84A] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
                         />
                         <FaCheck
                           className={`absolute top-0 left-[1px] text-green ${
-                            selectedItems.includes(item._id)
+                            selectedItems.includes(item.productId._id)
                               ? "text-opacity-100"
                               : "text-opacity-0"
                           } check-1 transition`}
                         />
                       </label>
                       <div className={styles.cartItemImage}>
-                        <Link to={`/product/${item._id}`}>
-                          <img src={PF + "/" + item.image} alt="product" />
+                        <Link to={`/product/${item.productId._id}`}>
+                          <img
+                            src={PF + "/" + item.productId.image}
+                            alt="product"
+                          />
                         </Link>
                       </div>
                       <div className={styles.cartItemDetails}>
                         <div className={styles.cartItemName}>
-                          {item.name.slice(0, 20)}...
+                          {item.productId.name.slice(0, 20)}...
                         </div>
                         <div className="text-black">
-                          {/* <FormattedPrice price={calculatePrice(item)} /> */}
-                          {originalPrices[item._id] && (
+                          <FormattedPrice price={calculatePrice(item)} />
+                          {originalPrices[item.productId._id] && (
                             <span className="original-price">
-                              {formattedPrice(originalPrices[item._id])}
+                              {formattedPrice(
+                                originalPrices[item.productId._id]
+                              )}
                             </span>
                           )}
                         </div>

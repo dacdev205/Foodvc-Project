@@ -1,9 +1,7 @@
 const inventoryAPI = require("../controllers/inventoryControllers");
 const router = require("express").Router();
 const multer = require("multer");
-const express = require("express");
-const path = require("path");
-//multer middleware
+
 let storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, "uploads");

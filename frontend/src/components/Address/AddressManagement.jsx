@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import useAddress from "../../hooks/useAddress";
 import useUserCurrent from "../../hooks/useUserCurrent";
 import addressAPI from "../../api/addressAPI";
-import { FaPlus } from "react-icons/fa6";
+import { FaPlus } from "react-icons/fa";
 import AddressFormv2 from "./AddressFormv2";
 import AddressFormEditv2 from "./AdressFormEditv2";
 
@@ -13,11 +13,9 @@ const AddressManagement = () => {
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [addressToDelete, setAddressToDelete] = useState(null);
   const userData = useUserCurrent();
-
   if (!userData || !userData._id) {
     return null;
   }
-
   const handleEditAddress = (addressItem) => {
     setSelectedAddress(addressItem);
     setShowAddressEditForm(true);
@@ -76,8 +74,8 @@ const AddressManagement = () => {
         <h1 className="text-black font-sans text-xl mb-4">Địa chỉ</h1>
         <div>
           {sortedAddresses && sortedAddresses.length > 0 ? (
-            sortedAddresses.map((addressItem, index) => (
-              <div key={index} className="">
+            sortedAddresses.map((addressItem) => (
+              <div key={addressItem._id} className="">
                 <div className="mb-3">
                   <div className="flex items-center py-2 justify-between text-black">
                     <div>
@@ -116,8 +114,9 @@ const AddressManagement = () => {
                     </div>
                   </div>
                   <p className="text-gray-500 text-sm">
-                    {addressItem.street}, {addressItem.ward},{" "}
-                    {addressItem.district}, {addressItem.city}
+                    {addressItem.street}, {addressItem.ward.wardName},{" "}
+                    {addressItem.district.districtName},{" "}
+                    {addressItem.city.cityName}
                   </p>
                   {addressItem.isDefault && (
                     <p className="text-green text-sm p-1 mt-2 inline-block rounded-lg border-green border-2">

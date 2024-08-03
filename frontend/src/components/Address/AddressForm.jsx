@@ -173,7 +173,6 @@ const AddressForm = ({ setAddress, userId }) => {
       userId: userId,
       isDefault: isDefaultAddress,
     };
-    console.log(formDataWithDefault);
     await addressAPI.postAddressToDB(formDataWithDefault);
     refetchAddress();
     setAddress(formDataWithDefault);

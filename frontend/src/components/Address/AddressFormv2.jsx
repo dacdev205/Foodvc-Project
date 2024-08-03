@@ -5,6 +5,7 @@ import useAuth from "../../hooks/useAuth";
 import useAddress from "../../hooks/useAddress";
 import { useForm } from "react-hook-form";
 import { FaCheck } from "react-icons/fa6";
+import axios from "axios";
 
 // eslint-disable-next-line react/prop-types
 const AddressFormv2 = ({ userId }) => {
@@ -14,59 +15,75 @@ const AddressFormv2 = ({ userId }) => {
   const [cities, setCities] = useState([]);
   const [districtsID, setDistrictsID] = useState([]);
   const [wards, setWards] = useState([]);
+  const [wardsId, setWardsId] = useState([]);
   const [isDefaultAddress, setIsDefaultAddress] = useState(false);
   const { reset } = useForm();
+  const GHN_TOKEN = import.meta.env.VITE_GHN_TOKEN;
 
   const [formData, setFormData] = useState({
     fullName: "",
     phone: "",
     street: "",
-    city: "",
-    district: "",
-    ward: "",
+    city: { cityId: null, cityName: "" },
+    district: { districtId: null, districtName: "" },
+    ward: { wardCode: "", wardName: "" },
     email: user.email,
   });
 
   useEffect(() => {
     async function getAPIProvinces() {
       try {
-        const response = await fetch(
-          "https://api.nosomovo.xyz/province/getalllist/193"
+        const response = await axios.get(
+          "https://dev-online-gateway.ghn.vn/shiip/public-api/master-data/province",
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Token: GHN_TOKEN,
+            },
+          }
         );
-        const data = await response.json();
-        if (data && Array.isArray(data)) {
-          setCities(data);
-        } else {
-          console.error("Unexpected data format:", data);
-          setCities([]);
-        }
+        const data = response.data.data;
+        const formattedData = data.map((province) => ({
+          id: province.ProvinceID,
+          name: province.ProvinceName,
+        }));
+        setCities(formattedData);
       } catch (error) {
         console.error("Failed to fetch provinces:", error);
         setCities([]);
       }
     }
-
     getAPIProvinces();
-  }, []);
+  }, [GHN_TOKEN]);
 
   const handleCitySelect = async (cityName) => {
     const selectedCity = cities.find((city) => city.name === cityName);
     setFormData({
       ...formData,
-      city: selectedCity.name,
-      district: "",
-      ward: "",
+      city: { cityId: selectedCity.id, cityName: selectedCity.name },
+      district: { districtId: null, districtName: "" },
+      ward: { wardCode: "", wardName: "" },
     });
 
     try {
       const res = await fetch(
-        `https://api.nosomovo.xyz/district/getalllist/${selectedCity.id}`
+        "https://dev-online-gateway.ghn.vn/shiip/public-api/master-data/district",
+        {
+          method: "POST",
+          headers: {
+            Token: GHN_TOKEN,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            province_id: selectedCity.id,
+          }),
+        }
       );
+
       const data = await res.json();
-      if (data && Array.isArray(data)) {
-        const districtNames = data.map((district) => district.name);
-        setDistricts(districtNames);
-        setDistrictsID(data);
+      if (data && data.data && Array.isArray(data.data)) {
+        setDistricts(data.data.map((district) => district.DistrictName));
+        setDistrictsID(data.data);
       } else {
         setDistricts([]);
       }
@@ -78,35 +95,55 @@ const AddressFormv2 = ({ userId }) => {
 
   const handleDistrictSelect = async (districtName) => {
     const selectedDistrict = districtsID.find(
-      (district) => district.name === districtName
+      (district) => district.DistrictName === districtName
     );
     setFormData({
       ...formData,
-      district: districtName,
-      ward: "",
+      district: {
+        districtId: selectedDistrict.DistrictID,
+        districtName: districtName,
+      },
+      ward: { wardCode: "", wardName: "" },
     });
+
     try {
       const res = await fetch(
-        `https://api.nosomovo.xyz/commune/getalllist/${selectedDistrict.id}`
+        "https://dev-online-gateway.ghn.vn/shiip/public-api/master-data/ward",
+        {
+          method: "POST",
+          headers: {
+            Token: GHN_TOKEN,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            district_id: selectedDistrict.DistrictID,
+          }),
+        }
       );
+
       const data = await res.json();
-      if (data) {
-        const wardNames = data.map((ward) => ward.name);
-        setWards(wardNames || []);
+      if (data && data.data && Array.isArray(data.data)) {
+        setWards(data.data.map((ward) => ward.WardName));
+        setWardsId(data.data);
+        setDistrictsID(data.data);
       } else {
         console.error("Unexpected data format:", data);
         setWards([]);
       }
     } catch (error) {
-      console.error("Failed to fetch district details:", error);
+      console.error("Failed to fetch ward details:", error);
       setWards([]);
     }
   };
 
-  const handleWardsSelect = (ward) => {
+  const handleWardsSelect = (wardName) => {
+    const selectedWard = wardsId.find((w) => w.WardName === wardName);
     setFormData({
       ...formData,
-      ward: ward,
+      ward: {
+        wardCode: selectedWard.WardCode,
+        wardName: selectedWard.WardName,
+      },
     });
   };
 
@@ -114,6 +151,7 @@ const AddressFormv2 = ({ userId }) => {
     const { name, value } = e.target;
     setFormData({
       ...formData,
+      userId: userId,
       [name]: value,
     });
   };

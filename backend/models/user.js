@@ -16,11 +16,12 @@ const userSchema = mongoose.Schema({
     type: String,
   },
   addresses: [{ type: mongoose.Schema.Types.ObjectId, ref: "Address" }],
-  role: {
-    type: String,
-    enum: ["user", "admin", "staff"],
-    default: "user",
-  },
+  roles: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Role",
+    },
+  ],
 });
 
 // create a model instance

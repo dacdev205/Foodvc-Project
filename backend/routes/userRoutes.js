@@ -2,21 +2,63 @@ const express = require("express");
 const router = express.Router();
 const usersAPI = require("../controllers/userControllers");
 const verifyToken = require("../middleware/verifyToken");
-const verifyAdmin = require("../middleware/verifyAdmin");
-//
-router.get("/", verifyToken, verifyAdmin, usersAPI.getAllUsers);
-router.post("/", usersAPI.createUser);
-router.get("/:id", usersAPI.getSigleUser);
-router.put("/:id", usersAPI.updateUser);
-router.get("/getUserByEmail/:email", usersAPI.getUserByEmail);
-router.delete("/:id", verifyToken, verifyAdmin, usersAPI.deleteUser);
-router.get("/getAdmin/:email", verifyToken, usersAPI.getAdmin);
-router.get("/getStaff/:email", verifyToken, usersAPI.getStaff);
+const checkPermission = require("../middleware/checkPermission");
+const multer = require("multer");
 
-router.patch(
-  "/users/:id/role",
+let storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "uploads");
+  },
+  filename: function (req, file, cb) {
+    cb(null, file.fieldname + "_" + Date.now() + "_" + file.originalname);
+  },
+});
+
+let upload = multer({
+  storage: storage,
+}).single("image");
+
+router.get(
+  "/",
   verifyToken,
-  verifyAdmin,
+  checkPermission("manage_users"),
+  usersAPI.getAllUsers
+);
+router.post(
+  "/admin/create-user",
+  verifyToken,
+  checkPermission("create_user"),
+  usersAPI.createUserAdmin
+);
+
+router.post("/", usersAPI.createUser);
+
+router.get("/:id", verifyToken, checkPermission("read"), usersAPI.getSigleUser);
+router.patch(
+  "/:id",
+  upload,
+  verifyToken,
+  checkPermission("update_profile"),
+  usersAPI.updateUser
+);
+router.get(
+  "/getUserByEmail/:email",
+  verifyToken,
+  checkPermission("read"),
+  usersAPI.getUserByEmail
+);
+router.delete(
+  "/:id",
+  verifyToken,
+  checkPermission("delete_user"),
+  usersAPI.deleteUser
+);
+router.get("/getPermissions/:email", usersAPI.getPermissions);
+router.patch(
+  "/:id/role",
+  verifyToken,
+  checkPermission("update_role"),
   usersAPI.updateUserRole
 );
+router.get("/roles/getAll", usersAPI.getAllRoles);
 module.exports = router;

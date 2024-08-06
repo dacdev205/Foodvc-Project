@@ -121,7 +121,16 @@ module.exports = class cartAPI {
       res.status(500).json({ message: "Error updating product in cart" });
     }
   }
-
+  static async clearCart(req, res) {
+    const { userId } = req.body;
+    try {
+      await Cart.deleteMany({ userId: userId });
+      res.status(200).json({ message: "Giỏ hàng đã được xóa thành công." });
+    } catch (error) {
+      console.error("Lỗi khi xóa giỏ hàng:", error);
+      res.status(500).json({ message: "Có lỗi xảy ra khi xóa giỏ hàng." });
+    }
+  }
   static async deleteProductInCart(req, res) {
     const cartId = req.params.cartId;
     const productId = req.params.productId;

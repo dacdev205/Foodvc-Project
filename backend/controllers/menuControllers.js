@@ -50,13 +50,15 @@ module.exports = class menuAPI {
       res.status(500).json({ error: "Internal Server Error" });
     }
   }
-  // updateProductInMenu
+  // Update product details in the menu
   static async updateProductInMenu(req, res) {
-    const id = req.params.id;
+    const menuItemId = req.params.id;
     let new_image = "";
 
     try {
-      const existingMenuProduct = await Menu.findById(id).populate("productId");
+      const existingMenuProduct = await Menu.findById(menuItemId).populate(
+        "productId"
+      );
 
       if (!existingMenuProduct) {
         return res.status(404).json({ message: "Product not found in menu" });
@@ -68,7 +70,7 @@ module.exports = class menuAPI {
         try {
           fs.unlinkSync("./uploads/" + existingMenuProduct.productId.image);
         } catch (err) {
-          console.log(err);
+          console.log("Error deleting old image:", err);
         }
       } else {
         new_image = existingMenuProduct.productId.image;
@@ -79,78 +81,69 @@ module.exports = class menuAPI {
         image: new_image,
       };
 
+      // Update product details in the inventory
       await existingMenuProduct.productId.set(updatedProduct);
       await existingMenuProduct.productId.save();
 
       res.status(200).json({ message: "Product updated successfully" });
     } catch (err) {
       console.error("Error updating product:", err);
-      res.status(500).json({ message: "Internal server error" });
-    }
-  }
-
-  // updateProductQuantityInMenu
-  static async updateProductQuantityInMenu(req, res) {
-    const id = req.params.id;
-    try {
-      const existingMenuProduct = await Menu.findById(id);
-      if (!existingMenuProduct) {
-        return res.status(404).json({ message: "Menu item not found" });
-      }
-      // Save current quantity in menu
-      const oldQuantityInMenu = existingMenuProduct.quantity;
-
-      if (req.body.quantity > oldQuantityInMenu) {
-        const quantityDifference = req.body.quantity - oldQuantityInMenu;
-        existingMenuProduct.quantity = req.body.quantity;
-        await existingMenuProduct.save();
-        // Update quantity in inventory
-        const existingInventoryProduct = await Product.findById(
-          existingMenuProduct.product
-        );
-        if (existingInventoryProduct) {
-          existingInventoryProduct.quantity -= quantityDifference;
-          await existingInventoryProduct.save();
-        }
-      } else if (req.body.quantity < oldQuantityInMenu) {
-        const quantityDifference = oldQuantityInMenu - req.body.quantity;
-        // Update quantity in menu
-        existingMenuProduct.quantity = req.body.quantity;
-        await existingMenuProduct.save();
-
-        // Update quantity in inventory
-        const existingInventoryProduct = await Product.findById(
-          existingMenuProduct.product
-        );
-        if (existingInventoryProduct) {
-          existingInventoryProduct.quantity += quantityDifference;
-          await existingInventoryProduct.save();
-        }
-      } else {
-        // If quantity not changed, just update quantity in menu
-        existingMenuProduct.quantity = req.body.quantity;
-        await existingMenuProduct.save();
-      }
-
-      res.status(200).json({ message: "Product updated successfully" });
-    } catch (err) {
       res.status(500).json({ message: "Internal Server Error" });
     }
   }
 
-  // applyVoucher
+  // Update product quantity in the menu
+  static async updateProductQuantityInMenu(req, res) {
+    const productId = req.params.id;
+    const { quantity } = req.body;
+
+    try {
+      const existingMenuProduct = await Menu.findOne({ productId: productId });
+      if (!existingMenuProduct) {
+        return res.status(404).json({ message: "Menu item not found" });
+      }
+
+      const oldQuantityInMenu = existingMenuProduct.quantity;
+
+      if (quantity !== oldQuantityInMenu) {
+        const quantityDifference = quantity - oldQuantityInMenu;
+
+        existingMenuProduct.quantity = quantity;
+        await existingMenuProduct.save();
+
+        const existingInventoryProduct = await Product.findById(
+          existingMenuProduct.productId
+        );
+
+        if (existingInventoryProduct) {
+          existingInventoryProduct.quantity -= quantityDifference;
+          await existingInventoryProduct.save();
+        }
+      }
+
+      res
+        .status(200)
+        .json({ message: "Product quantity updated successfully" });
+    } catch (err) {
+      console.error("Error updating product quantity in menu:", err);
+      res.status(500).json({ message: "Internal Server Error" });
+    }
+  }
+
+  // Apply voucher to products in the menu
   static async applyVoucher(req, res) {
     try {
       const { productId, discount } = req.body;
-      // Validate inputs
+
       if (!productId || isNaN(discount)) {
         return res.status(400).json({ success: false, error: "Invalid input" });
       }
-      // Update prices for items in the selected category
+
       await Menu.updateMany(
-        { product: { $in: productId } },
+        { productId: { $in: productId } },
         { $mul: { price: 1 - discount / 100 } }
       );
+
       res
         .status(200)
         .json({ success: true, message: "Voucher applied successfully" });

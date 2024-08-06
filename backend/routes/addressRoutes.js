@@ -1,15 +1,40 @@
 const router = require("express").Router();
 const addressAPI = require("../controllers/addressControllers");
+const checkPermission = require("../middleware/checkPermission");
 const verifyToken = require("../middleware/verifyToken");
-
 //import modal
-router.post("/", addressAPI.createAddress);
+router.post(
+  "/",
+  verifyToken,
+  checkPermission("create_address"),
+  addressAPI.createAddress
+);
 router.get("/", verifyToken, addressAPI.fetchAllAddressWithEmail);
-router.get("/:id", addressAPI.fetchAddressByID);
-router.patch("/:id", addressAPI.updateAddress);
-router.delete("/:id", addressAPI.deleteAddressByID);
+router.get("/:id", verifyToken, addressAPI.fetchAddressByID);
+router.patch(
+  "/:id",
+  verifyToken,
+  checkPermission("update_address"),
+  addressAPI.updateAddress
+);
+router.delete(
+  "/:id",
+  verifyToken,
+  checkPermission("detele_address"),
+  addressAPI.deleteAddressByID
+);
 
-router.patch("/isDefault/:id", addressAPI.updateAddressDefault);
-router.patch("/:id/setDefault", addressAPI.setDefaultAddress);
+router.patch(
+  "/isDefault/:id",
+  verifyToken,
+  checkPermission("update_address"),
+  addressAPI.updateAddressDefault
+);
+router.patch(
+  "/:id/setDefault",
+  verifyToken,
+  checkPermission("update_address"),
+  addressAPI.setDefaultAddress
+);
 
 module.exports = router;

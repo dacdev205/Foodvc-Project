@@ -46,7 +46,9 @@ module.exports = class orderAPI {
   static async fetchAllOrderWithEmail(req, res) {
     try {
       const email = req.query.email;
-      const orders = await Order.find({ email }).populate("statusId");
+      const orders = await Order.find({ email })
+        .populate("statusId")
+        .populate("products.productId");
       if (orders.length > 0) {
         res.status(200).json(orders);
       } else {

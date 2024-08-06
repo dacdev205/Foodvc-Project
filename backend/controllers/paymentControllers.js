@@ -2,7 +2,7 @@ const Payment = require("../models/payment");
 
 module.exports = class PaymentAPI {
   static async createPayment(req, res) {
-    const { userId, products } = req.body;
+    const { userId, products, totalAmount } = req.body;
 
     try {
       let payment = await Payment.findOne({ userId: userId });
@@ -10,6 +10,7 @@ module.exports = class PaymentAPI {
         payment = await Payment.create({
           userId,
           products,
+          totalAmount,
         });
         return res
           .status(201)
@@ -17,6 +18,7 @@ module.exports = class PaymentAPI {
       }
 
       payment.products = products;
+      payment.totalAmount = totalAmount;
       await payment.save();
 
       res.status(200).json({ message: "Payment updated successfully" });

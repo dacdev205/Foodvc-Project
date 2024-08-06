@@ -1,10 +1,11 @@
 const User = require("../models/user");
 const fs = require("fs");
+const Role = require("../models/roles");
 module.exports = class usersAPI {
   // get all users
   static async getAllUsers(req, res) {
     try {
-      const users = await User.find({});
+      const users = await User.find({}).populate("roles");
       res.status(200).json(users);
     } catch (error) {
       res.status(500).json({ message: error.message });
@@ -31,14 +32,55 @@ module.exports = class usersAPI {
   }
   // post a new user
   static async createUser(req, res) {
-    const user = req.body;
-    const query = { email: user.email };
+    const { email, name, photoURL, role = "Người dùng" } = req.body;
+    const query = { email };
+
     try {
       const existingUser = await User.findOne(query);
       if (existingUser) {
         return res.status(302).json({ message: "User already exists!" });
       }
-      const result = await User.create(user);
+      const userRole = await Role.findOne({ name: role });
+      if (!userRole) {
+        return res.status(400).json({ message: "Role does not exist!" });
+      }
+
+      const newUser = new User({
+        email,
+        name,
+        photoURL,
+        roles: [userRole._id],
+      });
+      const result = await newUser.save();
+
+      res.status(200).json(result);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  }
+
+  static async createUserAdmin(req, res) {
+    const { email, name, photoURL, roles } = req.body;
+    const query = { email };
+
+    try {
+      const existingUser = await User.findOne(query);
+      if (existingUser) {
+        return res.status(302).json({ message: "User already exists!" });
+      }
+
+      const userRole = await Role.findOne({ _id: roles });
+      if (!userRole) {
+        return res.status(400).json({ message: "Role does not exist!" });
+      }
+
+      const newUser = new User({
+        email,
+        name,
+        photoURL,
+        roles: [userRole._id],
+      });
+      const result = await newUser.save();
       res.status(200).json(result);
     } catch (error) {
       res.status(500).json({ message: error.message });
@@ -46,21 +88,42 @@ module.exports = class usersAPI {
   }
   static async updateUser(req, res) {
     const userId = req.params.id;
-    const { name, photoURL } = req.body;
-
+    let new_image = "";
     try {
+      const existingUser = await User.findById(userId);
+
+      if (!existingUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      if (req.file) {
+        new_image = req.file.filename;
+        if (existingUser.photoURL) {
+          try {
+            fs.unlinkSync("./uploads/" + existingUser.photoURL);
+          } catch (err) {
+            console.log(err);
+          }
+        }
+        new_image = req.file.filename;
+      } else {
+        new_image = existingUser.photoURL;
+      }
+
       const updatedUser = await User.findByIdAndUpdate(
         userId,
-        { name, photoURL },
+        { ...req.body, photoURL: new_image },
         { new: true, runValidators: true }
       );
 
       if (!updatedUser) {
         return res.status(404).json({ message: "User not found" });
       }
+
       res.status(200).json(updatedUser);
     } catch (error) {
-      res.status(500).json({ message: error.message });
+      console.error("Error updating user:", error);
+      res.status(500).json({ message: "Internal server error" });
     }
   }
 
@@ -79,74 +142,55 @@ module.exports = class usersAPI {
     }
   }
 
-  // get admin
-  static async getAdmin(req, res) {
+  static async getPermissions(req, res) {
     const email = req.params.email;
-    const query = { email: email };
     try {
-      const user = await User.findOne(query);
-      // console.log(user)
-      if (email !== req.decoded.email) {
-        return res.status(403).send({ message: "Forbidden access" });
-      }
-      let admin = false;
-      if (user) {
-        admin = user?.role === "admin";
-      }
-      res.status(200).json({ admin });
-    } catch (error) {
-      res.status(500).json({ message: error.message });
-    }
-  }
-  static async getStaff(req, res) {
-    const email = req.params.email;
-    const query = { email: email };
-    try {
-      const user = await User.findOne(query);
-      if (email !== req.decoded.email) {
-        return res.status(403).send({ message: "Forbidden access" });
-      }
-      let staff = false;
-      if (user) {
-        staff = user?.role === "staff";
-      }
-      res.status(200).json({ staff });
-    } catch (error) {
-      res.status(500).json({ message: error.message });
-    }
-  }
-  // make admin of a user
-  static async makeAdmin(req, res) {
-    const userId = req.params.id;
-    try {
-      const updatedUser = await User.findByIdAndUpdate(
-        userId,
-        { role: "admin" },
-        { new: true, runValidators: true }
-      );
-
-      if (!updatedUser) {
+      const user = await User.findOne({ email: email }).populate("roles");
+      if (!user) {
         return res.status(404).json({ message: "User not found" });
       }
-      res.status(200).json(updatedUser);
+      const permissions = await Promise.all(
+        user.roles.map(async (roleId) => {
+          const role = await Role.findById(roleId);
+          return role ? role.permissions : [];
+        })
+      );
+      const flatPermissions = [].concat(...permissions);
+      res.status(200).json({ permissions: flatPermissions });
     } catch (error) {
       res.status(500).json({ message: error.message });
     }
   }
+
+  static async getAllRoles(req, res) {
+    try {
+      const roles = await Role.find({});
+      res.status(200).json(roles);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  }
+
   static async updateUserRole(req, res) {
     const userId = req.params.id;
-    const { role } = req.body;
+    const { roleId } = req.body;
 
     try {
-      const updatedUser = await User.findByIdAndUpdate(
-        userId,
-        { role },
-        { new: true, runValidators: true }
-      );
-      if (!updatedUser) {
+      const user = await User.findById(userId);
+      if (!user) {
         return res.status(404).json({ message: "User not found" });
       }
-      res.status(200).json(updatedUser);
+
+      const role = await Role.findById(roleId);
+      if (!role) {
+        return res.status(404).json({ message: "Role not found" });
+      }
+
+      // Update the user's roles
+      user.roles = [{ _id: role._id, name: role.name }];
+      await user.save();
+
+      res.status(200).json(user);
     } catch (error) {
       res.status(500).json({ message: error.message });
     }

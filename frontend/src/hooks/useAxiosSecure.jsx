@@ -13,18 +13,15 @@ const useAxiosSecure = () => {
   axiosSecure.interceptors.request.use(
     async function (config) {
       try {
-        // Do something before request is sent
         const token = localStorage.getItem("access-token");
         config.headers.authorization = `Bearer ${token}`;
         return config;
       } catch (error) {
-        // Handle any errors during request preparation
         console.error("Error preparing request:", error);
         throw error;
       }
     },
     function (error) {
-      // Do something with request error
       return Promise.reject(error);
     }
   );

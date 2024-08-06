@@ -1,10 +1,16 @@
 import axios from "axios";
 const url = "http://localhost:3000/order";
 const urlStatus = "http://localhost:3000";
+const token = localStorage.getItem("access-token");
+
 export default class orderAPI {
   static async postProductToOrder(orderItem) {
     try {
-      const res = await axios.post(url, orderItem);
+      const res = await axios.post(url, orderItem, {
+        headers: {
+          authorization: `Bearer ${token}`,
+        },
+      });
       return res.data;
     } catch (error) {
       console.error(error);
@@ -14,7 +20,12 @@ export default class orderAPI {
   static async getUserOrders(userId) {
     try {
       const res = await axios.get(
-        `http://localhost:3000/order/order-user/${userId}`
+        `http://localhost:3000/order/order-user/${userId}`,
+        {
+          headers: {
+            authorization: `Bearer ${token}`,
+          },
+        }
       );
       return res.data;
     } catch (error) {
@@ -24,7 +35,11 @@ export default class orderAPI {
   }
   static async getAllStatuses() {
     try {
-      const response = await axios.get(`${urlStatus}/statuses`);
+      const response = await axios.get(`${urlStatus}/statuses`, {
+        headers: {
+          authorization: `Bearer ${token}`,
+        },
+      });
       return response.data;
     } catch (error) {
       console.error("Failed to fetch statuses:", error);
@@ -37,12 +52,24 @@ export default class orderAPI {
     return res.data;
   }
   static async getAllOrder() {
-    const res = await axios.get(`http://localhost:3000/order/allOrder`);
+    const res = await axios.get(`http://localhost:3000/order/allOrder`, {
+      headers: {
+        authorization: `Bearer ${token}`,
+      },
+    });
     return res.data;
   }
   static async updateOrderStatus(orderId, statusId) {
     try {
-      const res = await axios.patch(`${url}/${orderId}`, { statusId });
+      const res = await axios.patch(
+        `${url}/${orderId}`,
+        { statusId },
+        {
+          headers: {
+            authorization: `Bearer ${token}`,
+          },
+        }
+      );
       return res.data;
     } catch (error) {
       console.error(error);

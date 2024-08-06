@@ -1,11 +1,16 @@
 import axios from "axios";
 const url = "http://localhost:3000/address";
+const token = localStorage.getItem("access-token");
 
 export default class addressAPI {
   //
   static async postAddressToDB(address) {
     try {
-      const res = await axios.post(url, address);
+      const res = await axios.post(url, address, {
+        headers: {
+          authorization: `Bearer ${token}`,
+        },
+      });
       return res.data;
     } catch (error) {
       console.error(error);
@@ -14,7 +19,11 @@ export default class addressAPI {
   }
   static async updateAddressInDB(addressToEdit, updateData) {
     try {
-      const res = await axios.patch(`${url}/${addressToEdit}`, updateData);
+      const res = await axios.patch(`${url}/${addressToEdit}`, updateData, {
+        headers: {
+          authorization: `Bearer ${token}`,
+        },
+      });
       return res.data;
     } catch (error) {
       console.error("Error updating product:", error);
@@ -25,7 +34,12 @@ export default class addressAPI {
     try {
       const res = await axios.patch(
         `${url}/isDefault/${addressId}`,
-        addressData
+        addressData,
+        {
+          headers: {
+            authorization: `Bearer ${token}`,
+          },
+        }
       );
       return res.data;
     } catch (error) {
@@ -35,7 +49,11 @@ export default class addressAPI {
   }
   static async setDefaultAddress(addressId) {
     try {
-      const res = await axios.patch(`${url}/${addressId}/setDefault`);
+      const res = await axios.patch(`${url}/${addressId}/setDefault`, {
+        headers: {
+          authorization: `Bearer ${token}`,
+        },
+      });
       return res.data;
     } catch (error) {
       console.error("error");
@@ -44,7 +62,11 @@ export default class addressAPI {
   }
 
   static async deleteAddress(id) {
-    const res = await axios.delete(`${url}/${id}`);
+    const res = await axios.delete(`${url}/${id}`, {
+      headers: {
+        authorization: `Bearer ${token}`,
+      },
+    });
     return res.data;
   }
 }

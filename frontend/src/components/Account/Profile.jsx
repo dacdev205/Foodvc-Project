@@ -8,17 +8,18 @@ import Divider from "@mui/material/Divider";
 import IconButton from "@mui/material/IconButton";
 import Tooltip from "@mui/material/Tooltip";
 import Logout from "@mui/icons-material/Logout";
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import { AuthContext } from "../../context/AuthProvider";
 import { Link, useNavigate } from "react-router-dom";
 import { FaCartShopping } from "react-icons/fa6";
 import { MdOutlineAdminPanelSettings } from "react-icons/md";
-import useAdmin from "../../hooks/useAdmin";
-import useStaff from "../../hooks/useStaff";
+import usePermission from "../../hooks/usePermission";
+import useUserCurrent from "../../hooks/useUserCurrent";
 const Profile = ({ user }) => {
   const { logOut } = useContext(AuthContext);
   const navigate = useNavigate();
-
+  const [adminPermission, isPermissionLoading] = usePermission("admin_pages");
+  const userData = useUserCurrent();
   const handleLogout = () => {
     logOut()
       .then(() => {
@@ -29,8 +30,6 @@ const Profile = ({ user }) => {
       });
   };
 
-  const [isAdmin] = useAdmin();
-  const [isStaff] = useStaff();
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
   const handleClick = (event) => {
@@ -116,7 +115,7 @@ const Profile = ({ user }) => {
             Đơn mua
           </MenuItem>
         </Link>
-        {isAdmin || isStaff ? (
+        {adminPermission && (
           <Link to="/admin">
             <MenuItem onClick={handleClose}>
               <ListItemIcon>
@@ -125,9 +124,8 @@ const Profile = ({ user }) => {
               Trang quản lý
             </MenuItem>
           </Link>
-        ) : (
-          ""
         )}
+
         <MenuItem onClick={handleLogout}>
           <ListItemIcon>
             <Logout fontSize="small" />

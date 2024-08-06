@@ -10,7 +10,7 @@ import MenuItem from "@mui/material/MenuItem";
 import Select from "@mui/material/Select";
 
 const UserOrders = () => {
-  const [orders, refetch, isLoading] = useOrders();
+  const [orders] = useOrders();
   const [value, setValue] = useState(0);
   const [searchTerm, setSearchTerm] = useState("");
   const [productDetails, setProductDetails] = useState([]);
@@ -32,7 +32,6 @@ const UserOrders = () => {
   };
 
   const handleCancel = () => {
-    // Xử lý logic hủy đơn hàng với lý do cancelReason và đơn hàng selectedOrder
     console.log("Hủy đơn hàng:", selectedOrder, "Lý do:", cancelReason);
     setIsModalOpen(false);
     setCancelReason("");
@@ -53,13 +52,13 @@ const UserOrders = () => {
   const filteredOrders = orders.filter((order) => {
     const statusFilter = {
       0: true, // All orders
-      1: order.status === "Pending",
-      2: order.status === "Waiting4Pickup",
-      3: order.status === "InTransit",
-      4: order.status === "Delivery",
-      5: order.status === "Completed",
-      6: order.status === "Cancelled",
-      7: order.status === "ReturnedRefunded",
+      1: order.statusId.name === "Pending",
+      2: order.statusId.name === "Waiting4Pickup",
+      3: order.statusId.name === "InTransit",
+      4: order.statusId.name === "Delivery",
+      5: order.statusId.name === "Completed",
+      6: order.statusId.name === "Cancelled",
+      7: order.statusId.name === "ReturnedRefunded",
     };
     return (
       statusFilter[value] &&
@@ -67,18 +66,17 @@ const UserOrders = () => {
     );
   });
 
-  const displayStatus = (status) => {
+  const displayStatus = (statusId) => {
     const statusMap = {
-      Confirmed: "Đã xác nhận",
-      Pending: "Chờ xác nhận",
-      Waiting4Pickup: "Chờ lấy hàng",
-      InTransit: "Đang giao hàng",
-      Delivery: "Chờ giao hàng",
-      Completed: "Hoàn thành",
-      Cancelled: "Đã hủy",
-      ReturnedRefunded: "Trả hàng/Hoàn tiền",
+      "66ade850ecf7c04da3efc24b": "Đã xác nhận",
+      "66ade850ecf7c04da3efc24c": "Chờ xác nhận",
+      "66ade850ecf7c04da3efc24d": "Chờ lấy hàng",
+      "66ade850ecf7c04da3efc24f": "Chờ giao hàng",
+      "66ade850ecf7c04da3efc250": "Hoàn thành",
+      "66ade850ecf7c04da3efc251": "Đã hủy",
+      "66ade850ecf7c04da3efc252": "Trả hàng/Hoàn tiền",
     };
-    return statusMap[status] || status;
+    return statusMap[statusId] || statusId;
   };
 
   return (
@@ -136,10 +134,10 @@ const UserOrders = () => {
                   <p className="text-sm text-gray-600">
                     Trạng thái:{" "}
                     <span className="font-medium text-red-500">
-                      {displayStatus(order.status)}
+                      {displayStatus(order.statusId.description)}
                     </span>
                   </p>
-                  {order.status === "Pending" && (
+                  {order.statusId.name === "Pending" && (
                     <Button
                       variant="outlined"
                       color="error"
@@ -157,19 +155,19 @@ const UserOrders = () => {
                     >
                       <div className="flex items-center">
                         <img
-                          src={`http://localhost:3000/${product.image}`}
-                          alt={product.name}
+                          src={`http://localhost:3000/${product.productId.image}`}
+                          alt={product.productId.name}
                           className="w-20 h-20 object-cover rounded-lg mr-4"
                         />
                         <div>
                           <p className="font-semibold text-lg text-black">
-                            {product.name}
+                            {product.productId.name}
                           </p>
                           <p className="text-black">x{product.quantity}</p>
                         </div>
                       </div>
                       <div className="text-right">
-                        <FormattedPrice price={product.price} />
+                        <FormattedPrice price={product.productId.price} />
                       </div>
                     </div>
                   ))}

@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
 import { useEffect, useState } from "react";
-import singleAPI from "../../api/userAPI";
+import userAPI from "../../api/userAPI";
 
 export default function Conversation({ conversation, currentUser }) {
   const [user, setUser] = useState(null);
@@ -9,7 +9,7 @@ export default function Conversation({ conversation, currentUser }) {
     const fetchData = async () => {
       const friendId = conversation.members.find((m) => m !== currentUser._id);
       try {
-        const res = await singleAPI.getSingleUserById(friendId);
+        const res = await userAPI.getSingleUserById(friendId);
         setUser(res);
       } catch (error) {
         console.log(error);

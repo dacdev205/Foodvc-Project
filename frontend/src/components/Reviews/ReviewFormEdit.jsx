@@ -4,7 +4,7 @@ import reviewAPI from "../../api/reviewAPI";
 import { FaStar } from "react-icons/fa";
 import { AuthContext } from "../../context/AuthProvider";
 import styles from "../../CssModule/ReviewForm.module.css";
-import { Bounce, ToastContainer, toast } from "react-toastify";
+import { Bounce, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 const ReviewFormEdit = ({
   reviewId,
@@ -117,7 +117,7 @@ const ReviewFormEdit = ({
               <div className="form-control mt-6">
                 <button
                   type="submit"
-                  className="btn bg-green hover:bg-green hover:opacity-80"
+                  className="btn bg-green hover:bg-green hover:opacity-80 border-none"
                 >
                   <span className="text-white">Gửi đánh giá</span>
                 </button>

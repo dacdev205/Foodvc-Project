@@ -5,6 +5,7 @@ import axios from "axios";
 import inventoryAPI from "../../../api/inventoryAPI";
 import FormattedPrice from "../../../ultis/FormatedPriece";
 import { FaCheck } from "react-icons/fa6";
+import { Bounce, toast } from "react-toastify";
 const AddVoucher = () => {
   const [menu, , refetch] = useMenu();
   const PF = "http://localhost:3000";
@@ -74,9 +75,29 @@ const AddVoucher = () => {
         applyVoucher: true,
       });
       if (response.data.success) {
-        alert("Voucher added succesfully");
+        toast.success("Thêm voucher thành công!", {
+          position: "bottom-right",
+          autoClose: 2000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "colored",
+          transition: Bounce,
+        });
       } else {
-        console.error("Error applying voucher:", response.data.error);
+        toast.error("Thêm voucher thất bại!", {
+          position: "bottom-right",
+          autoClose: 2000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "colored",
+          transition: Bounce,
+        });
       }
     } catch (error) {
       console.error("Error applying voucher:", error);

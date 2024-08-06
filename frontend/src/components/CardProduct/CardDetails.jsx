@@ -1,5 +1,11 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import styles from "../../CssModule/CardDetails.module.css";
 import menuAPI from "../../api/menuAPI";
@@ -18,12 +24,12 @@ import Modal from "../Account/Modal";
 import LoadingSpinner from "../../ultis/LoadingSpinner";
 import { AuthContext } from "../../context/AuthProvider";
 import "react-toastify/dist/ReactToastify.css";
-import { Bounce, ToastContainer, toast } from "react-toastify";
-
-import { confirmAlert } from "react-confirm-alert";
+import { Bounce, toast } from "react-toastify";
+import ConfirmDeleteModal from "../Modal/ConfirmDeleteModal";
 import "react-confirm-alert/src/react-confirm-alert.css";
 import useUserCurrent from "../../hooks/useUserCurrent";
 import axios from "axios";
+const token = localStorage.getItem("access-token");
 
 const CardDetails = () => {
   const { id } = useParams();
@@ -36,6 +42,8 @@ const CardDetails = () => {
   const [quantityDefault, setQuantity] = useState(1);
   const [isExpanded, setExpanded] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [reviewToDelete, setReviewToDelete] = useState(null);
   const [priceOrginals, setPrices] = useState([]);
   const [cart, refetchCart] = useCart();
   const [commented, setCommented] = useState(false);
@@ -91,6 +99,11 @@ const CardDetails = () => {
 
     fetchProductDetail();
   }, [id]);
+  const openDeleteModal = useCallback((review) => {
+    setReviewToDelete(review);
+    setIsDeleteModalOpen(true);
+  }, []);
+
   useEffect(() => {
     const commentedByUser = localStorage.getItem(`${id}-${userData?._id}`);
     if (commentedByUser) {
@@ -135,7 +148,11 @@ const CardDetails = () => {
       };
 
       try {
-        await axios.post("http://localhost:3000/cart", cartItem);
+        await axios.post("http://localhost:3000/cart", cartItem, {
+          headers: {
+            authorization: `Bearer ${token}`,
+          },
+        });
         refetchCart();
         toast.success("Thêm vào giỏ hàng thành công!", {
           position: "bottom-right",
@@ -282,64 +299,30 @@ const CardDetails = () => {
   );
   const currentReviews = sortedReviews.slice(indexOfFirstItem, indexOfLastItem);
 
-  const handleDeleteComment = (reviewId) => {
-    confirmAlert({
-      customUI: ({ onClose }) => (
-        <div className="p-6 rounded-lg shadow-lg max-w-md mx-auto">
-          <h2 className="text-lg font-bold mb-4 text-gray-700">
-            Xóa đánh giá!
-          </h2>
-          <p className="text-gray-600 mb-6">
-            Bạn có chắc là bạn muốn xoá bình luận này không?
-          </p>
-          <div className="flex justify-end space-x-4">
-            <button
-              className="px-6 py-1 bg-green text-white rounded hover:bg-green hover:opacity-80"
-              onClick={async () => {
-                try {
-                  await reviewAPI.deleteCommentByReviewId(reviewId);
-                  const updatedReviews = await reviewAPI.getProductById(id);
-                  setReviews(updatedReviews);
-                  toast.success("Đánh giá được xóa thành công!", {
-                    position: "bottom-right",
-                    autoClose: 5000,
-                    hideProgressBar: false,
-                    closeOnClick: true,
-                    pauseOnHover: true,
-                    draggable: true,
-                    progress: undefined,
-                    theme: "colored",
-                    transition: Bounce,
-                  });
-                } catch (error) {
-                  toast.error("Lỗi khi xóa đánh giá!", {
-                    position: "bottom-right",
-                    autoClose: 5000,
-                    hideProgressBar: false,
-                    closeOnClick: true,
-                    pauseOnHover: true,
-                    draggable: true,
-                    progress: undefined,
-                    theme: "colored",
-                    transition: Bounce,
-                  });
-                } finally {
-                  onClose();
-                }
-              }}
-            >
-              Đồng ý
-            </button>
-            <button
-              className="px-6 py-1 bg-white text-green border-solid border-2 border-green rounded hover:opacity-80"
-              onClick={onClose}
-            >
-              Đóng
-            </button>
-          </div>
-        </div>
-      ),
-    });
+  const handleConfirmDelete = async (reviewId) => {
+    try {
+      await reviewAPI.deleteReview(reviewId);
+      updateReviews();
+      toast.success("Xóa đánh giá thành công!", {
+        position: "bottom-right",
+        autoClose: 5000,
+        theme: "colored",
+        transition: Bounce,
+      });
+    } catch (error) {
+      console.error("Error deleting review:", error);
+      toast.error("Lỗi khi xóa đánh giá.", {
+        position: "bottom-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+        transition: Bounce,
+      });
+    }
   };
 
   const handleEditComment = (reviewId) => {
@@ -358,7 +341,7 @@ const CardDetails = () => {
       }
       await paymentAPI.postProductToPayment({
         userId: userData?._id,
-        totalAmount: product.price,
+        totalAmount: product.price * quantityDefault,
         products: {
           productId: product._id,
           quantity: quantityDefault,
@@ -603,7 +586,7 @@ const CardDetails = () => {
                     {showActions && (
                       <div>
                         <button
-                          onClick={() => handleDeleteComment(review._id)}
+                          onClick={() => openDeleteModal(review)}
                           className="text-red no-underline cursor-pointer text-sm"
                         >
                           Xóa
@@ -619,6 +602,12 @@ const CardDetails = () => {
                   </div>
                 </div>
               )}
+              <ConfirmDeleteModal
+                isOpen={isDeleteModalOpen}
+                onClose={() => setIsDeleteModalOpen(false)}
+                onConfirm={handleConfirmDelete}
+                review={reviewToDelete}
+              />
               {editReviewId === review._id && (
                 <ReviewFormEdit
                   reviewId={review._id}

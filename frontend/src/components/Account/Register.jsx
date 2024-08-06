@@ -5,7 +5,7 @@ import { FaGoogle, FaFacebook, FaEye, FaEyeSlash } from "react-icons/fa";
 import { AuthContext } from "../../context/AuthProvider";
 import useAxiosPublic from "../../hooks/useAxiosPublic";
 import * as Yup from "yup";
-import { Bounce, toast, ToastContainer } from "react-toastify";
+import { Bounce, toast } from "react-toastify";
 
 const Register = () => {
   const {
@@ -75,10 +75,22 @@ const Register = () => {
               const userInfor = {
                 name: data.name,
                 email: data.email,
+                photoURL: data.photoURL || null,
+                address: null,
               };
               axiosPublic.post("/users", userInfor).then((response) => {
                 if (userInfor.name) {
-                  alert("Đăng kí thành công!");
+                  toast.success("Chào mừng bạn đến với FOODVC", {
+                    position: "bottom-right",
+                    autoClose: 2000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "colored",
+                    transition: Bounce,
+                  });
                   navigate(from, { replace: true });
                 } else {
                   console.error(
@@ -108,7 +120,6 @@ const Register = () => {
         email: result?.user?.email,
       };
       axiosPublic.post("/users", userInfor).then((response) => {
-        alert("Đăng nhập thành công!");
         navigate("/");
         toast.success("Chào mừng bạn đến với với FOODVC", {
           position: "bottom-right",
@@ -251,8 +262,6 @@ const Register = () => {
           </button>
         </div>
       </div>
-      <ToastContainer />
-
       <Link
         to="/"
         className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2 text-black"

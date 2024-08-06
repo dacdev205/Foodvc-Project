@@ -6,8 +6,8 @@ import { FaGoogle, FaFacebook, FaEyeSlash, FaEye } from "react-icons/fa";
 import { AuthContext } from "../../context/AuthProvider";
 import useAxiosPublic from "../../hooks/useAxiosPublic";
 import * as Yup from "yup";
-import { Bounce, ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css"; // Import CSS
+import { Bounce, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const Modal = () => {
   const {
@@ -70,7 +70,7 @@ const Modal = () => {
           };
           axiosPublic.post("/users", userInfor);
           reset();
-          toast.success("Chào mừng bạn trở lại", {
+          toast.success("Chào mừng bạn trở lại!", {
             position: "bottom-right",
             autoClose: 2000,
             hideProgressBar: false,
@@ -225,7 +225,6 @@ const Modal = () => {
           </div>
         </div>
       </dialog>
-      <ToastContainer />
     </div>
   );
 };

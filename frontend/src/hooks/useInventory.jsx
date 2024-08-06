@@ -1,18 +1,21 @@
-import React from "react";
 import useAxiosPublic from "./useAxiosPublic";
 import { useQuery } from "@tanstack/react-query";
 
 const useInventory = () => {
   const axiosPublic = useAxiosPublic();
-
+  const token = localStorage.getItem("access-token");
   const {
     data: inventory = [],
     isPending: loading,
     refetch,
   } = useQuery({
-    queryKey: ["menu"],
+    queryKey: ["inventory"],
     queryFn: async () => {
-      const res = await axiosPublic.get("/inventory");
+      const res = await axiosPublic.get("/inventory", {
+        headers: {
+          authorization: `Bearer ${token}`,
+        },
+      });
       return res.data;
     },
   });

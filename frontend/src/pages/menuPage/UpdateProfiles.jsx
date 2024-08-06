@@ -1,37 +1,45 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { useForm } from "react-hook-form";
 import { AuthContext } from "../../context/AuthProvider";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Bounce, ToastContainer, toast } from "react-toastify";
-import axios from "axios";
+import { Bounce, toast } from "react-toastify";
 import useUserCurrent from "../../hooks/useUserCurrent";
+import userAPI from "../../api/userAPI";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+
 const UpdateProfile = () => {
   const { updateUserProfile, user } = useContext(AuthContext);
   const userData = useUserCurrent();
+  const [photo, setPhoto] = useState(null);
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm();
-
   const location = useLocation();
   const navigate = useNavigate();
   const from = location.state?.from?.pathname || "/";
 
   const onSubmit = async (data) => {
-    const { name: formDataName, photoURL } = data;
+    const { name: formDataName } = data;
     const name = formDataName.trim() === "" ? user.displayName : formDataName;
-    const updatedPhotoURL = photoURL || user.photoURL;
 
     try {
+      let updatedPhotoURL = user.photoURL;
+
+      if (photo) {
+        const storage = getStorage();
+        const storageRef = ref(storage, `avatars/${user.uid}`);
+        await uploadBytes(storageRef, photo);
+        updatedPhotoURL = await getDownloadURL(storageRef);
+      }
+
       await updateUserProfile(name, updatedPhotoURL);
-      const response = await axios.put(
-        `http://localhost:3000/users/${userData._id}`,
-        {
-          name,
-          photoURL: updatedPhotoURL,
-        }
-      );
+      await userAPI.updateUserProfile(userData?._id, {
+        name,
+        photoURL: updatedPhotoURL,
+      });
+
       toast.success("Cập nhật thông tin thành công", {
         position: "bottom-right",
         autoClose: 5000,
@@ -57,6 +65,10 @@ const UpdateProfile = () => {
         transition: Bounce,
       });
     }
+  };
+
+  const handlePhotoChange = (event) => {
+    setPhoto(event.target.files[0]);
   };
 
   return (
@@ -106,17 +118,22 @@ const UpdateProfile = () => {
           <div className="flex flex-col">
             <div className="flex justify-center">
               <img
-                src={user?.photoURL || "https://via.placeholder.com/150"}
+                src={
+                  photo
+                    ? URL.createObjectURL(photo)
+                    : user?.photoURL || "https://via.placeholder.com/150"
+                }
                 alt="User Avatar"
                 className="w-32 h-32 rounded-full mb-4"
               />
             </div>
             <input
-              type="text"
+              type="file"
               {...register("photoURL")}
               className="input input-bordered text-black input-sm w-full mb-4"
-              placeholder="Write photo URL"
+              onChange={handlePhotoChange}
             />
+
             <div className="flex justify-end">
               <button
                 type="submit"

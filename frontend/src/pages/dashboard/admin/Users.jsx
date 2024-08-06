@@ -1,24 +1,39 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { FaTrash, FaSearch } from "react-icons/fa";
 import useAxiosSecure from "../../../hooks/useAxiosSecure";
-import useAuth from "../../../hooks/useAuth";
 import Pagination from "../../../ultis/Pagination";
 import AddUserModal from "./AddUserModal";
 import ConfirmDeleteModal from "../../../ultis/ConfirmDeleteModal";
+import { Bounce, toast } from "react-toastify";
+
 const Users = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterType, setFilterType] = useState("name");
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(5); // Number of items to show per page
+  const [itemsPerPage] = useState(5); // Số lượng mục trên mỗi trang
   const axiosSecure = useAxiosSecure();
   const [addUserModalOpen, setAddUserModalOpen] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [userToDelete, setUserToDelete] = useState(null);
+  const token = localStorage.getItem("access-token");
+
   const { refetch, data: users = [] } = useQuery({
     queryKey: ["users"],
     queryFn: async () => {
       const res = await axiosSecure.get("/users");
+      return res.data;
+    },
+  });
+
+  const { data: roles = [] } = useQuery({
+    queryKey: ["roles"],
+    queryFn: async () => {
+      const res = await axiosSecure.get("/users/roles/getAll", {
+        headers: {
+          authorization: `Bearer ${token}`,
+        },
+      });
       return res.data;
     },
   });
@@ -29,32 +44,64 @@ const Users = () => {
     if (filterType === "name") {
       return user.name && user.name.toLowerCase().includes(lowerSearchTerm);
     } else if (filterType === "role") {
-      return user.role && user.role.toLowerCase().includes(lowerSearchTerm);
+      return (
+        user.roles[0].name &&
+        user.roles[0].name.toLowerCase().includes(lowerSearchTerm)
+      );
     }
     return true;
   });
-  // Pagination logic
+
+  // Logic phân trang
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentUsers = filteredUsers.slice(indexOfFirstItem, indexOfLastItem);
 
-  const handleRoleChange = async (user, role) => {
+  const handleRoleChange = async (user, roleId) => {
     try {
-      const response = await axiosSecure.patch(
-        `/users/users/${user._id}/role`,
-        {
-          role,
-        }
-      );
+      const response = await axiosSecure.patch(`/users/${user._id}/role`, {
+        roleId,
+      });
       if (response.status === 200) {
-        //
-        alert(`${user.name} bây giờ là ${role}`);
+        alert(`${user.name} bây giờ là ${roleId}`);
         refetch();
       }
     } catch (error) {
       console.error("Lỗi khi cập nhật quyền:", error);
     }
   };
+
+  const handleAddUser = async (userData) => {
+    try {
+      await axiosSecure.post("/users/admin/create-user", userData);
+      toast.success("Thêm người dùng thành công!", {
+        position: "bottom-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+        transition: Bounce,
+      });
+      refetch();
+    } catch (error) {
+      toast.error("Thêm người dùng thất bại!", {
+        position: "bottom-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+        transition: Bounce,
+      });
+      console.error("Lỗi khi thêm người dùng:", error);
+    }
+  };
+
   const handleDelete = async (user) => {
     axiosSecure.delete(`/users/${user._id}`).then((res) => {
       setShowConfirmModal(false);
@@ -62,21 +109,26 @@ const Users = () => {
       refetch();
     });
   };
-  const handleDeleteClick = (id) => {
-    setUserToDelete(id);
+
+  const handleDeleteClick = (user) => {
+    setUserToDelete(user);
     setShowConfirmModal(true);
   };
+
   const confirmDeleteUser = () => {
     if (userToDelete) {
       handleDelete(userToDelete);
     }
   };
+
   const paginate = (pageNumber) => {
     setCurrentPage(pageNumber);
   };
+
   const refetchData = () => {
     refetch();
   };
+
   return (
     <div>
       <h2 className="text-2xl font-semibold my-4 text-black">
@@ -100,12 +152,12 @@ const Users = () => {
             </p>
             <input
               type="text"
-              placeholder={`Search by ${
-                filterType === "name" ? "name" : "role"
+              placeholder={`Tìm kiếm theo ${
+                filterType === "name" ? "tên" : "chức vụ"
               }`}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="input input-sm ml-1 "
+              className="input input-sm ml-1"
             />
           </div>
         </div>
@@ -120,11 +172,12 @@ const Users = () => {
             addUserModalOpen={addUserModalOpen}
             setAddUserModalOpen={setAddUserModalOpen}
             refetchData={refetchData}
+            onAddUser={handleAddUser}
           />
         </div>
       </div>
 
-      <div className="overflow-x-auto ">
+      <div className="overflow-x-auto">
         <table className="table md:w-[870px]">
           <thead className="bg-green text-white rounded-lg">
             <tr className="border-style">
@@ -142,15 +195,20 @@ const Users = () => {
                 <td>{user.name}</td>
                 <td>{user.email}</td>
                 <td>
-                  {user.role === "admin" ? (
+                  {user.roles[0].name === "admin" ? (
                     "Admin"
                   ) : (
                     <select
-                      value={user.role}
+                      value={user.roles[0]._id}
                       onChange={(e) => handleRoleChange(user, e.target.value)}
                     >
-                      <option value="staff">Nhân viên</option>
-                      <option value="user">Người dùng</option>
+                      {roles
+                        .filter((role) => role.name.toLowerCase() !== "admin")
+                        .map((role) => (
+                          <option key={role._id} value={role._id}>
+                            {role.name}
+                          </option>
+                        ))}
                     </select>
                   )}
                 </td>

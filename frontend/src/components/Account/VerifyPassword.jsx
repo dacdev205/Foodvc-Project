@@ -5,6 +5,7 @@ import { FaArrowLeft } from "react-icons/fa";
 import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
 import useAuth from "../../hooks/useAuth";
 import { useActiveLink } from "../../context/ActiveLinkProvider";
+import { Bounce, toast } from "react-toastify";
 
 const VerifyPassword = () => {
   const [currentPassword, setCurrentPassword] = useState("");

@@ -6,19 +6,32 @@ import useAxiosPublic from "../../../hooks/useAxiosPublic";
 import * as Yup from "yup";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import axios from "axios";
+import { useQuery } from "@tanstack/react-query";
+import useAxiosSecure from "../../../hooks/useAxiosSecure";
 
 const AddUserModal = ({
   addUserModalOpen,
   setAddUserModalOpen,
   refetchData,
+  onAddUser,
 }) => {
   const [errorMessage, setErrorMessage] = useState({});
   const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [role, setRole] = useState("user"); // State để lưu trữ quyền được chọn
+  const [role, setRole] = useState("");
   const { createUserWithoutLogin } = useContext(AuthContext);
+  const token = localStorage.getItem("access-token");
 
-  const axiosPublic = useAxiosPublic();
+  const { data: roles = [] } = useQuery({
+    queryKey: ["roles"],
+    queryFn: async () => {
+      const res = await useAxiosSecure.get("/users/roles/getAll", {
+        headers: {
+          authorization: `Bearer ${token}`,
+        },
+      });
+      return res.data;
+    },
+  });
 
   const {
     register,
@@ -58,9 +71,7 @@ const AddUserModal = ({
   };
 
   const togglePasswordVisibility = (fieldName) => {
-    fieldName === "password"
-      ? setShowPassword(!showPassword)
-      : setShowConfirmPassword(!showConfirmPassword);
+    setShowPassword(fieldName === "password" ? !showPassword : showPassword);
   };
 
   const handleChange = (e) => {
@@ -106,23 +117,18 @@ const AddUserModal = ({
         const password = data.password;
 
         createUserWithoutLogin(email, password)
-          .then(() => {
+          .then(async () => {
             const userInfor = {
               name: data.name,
               email: data.email,
-              role: role,
+              roles: role,
+              photoURL: data.photoURL || null,
+              address: null,
             };
-            axiosPublic.post("/users", userInfor).then(() => {
-              if (userInfor.name) {
-                alert("Thêm thành công thành công!");
-                setAddUserModalOpen(false);
-                sendEmailToNewUser(data.email, password);
-                refetchData();
-              } else {
-                console.error(
-                  "Lỗi: userInfor.name không được xác định hoặc là giá trị sai"
-                );
-              }
+            await onAddUser(userInfor).then(() => {
+              setAddUserModalOpen(false);
+              sendEmailToNewUser(data.email, password);
+              refetchData();
             });
           })
           .catch((error) => {
@@ -158,6 +164,7 @@ const AddUserModal = ({
                   placeholder="Tên người dùng"
                   className=" input input-sm input-bordered text-black"
                   {...register("name")}
+                  onChange={handleChange}
                 />
               </div>
               <div className="form-control">
@@ -171,7 +178,7 @@ const AddUserModal = ({
                   placeholder="Email"
                   className="input input-sm input-bordered text-black"
                   {...register("email")}
-                  onChange={(e) => handleChange(e)}
+                  onChange={handleChange}
                 />
                 {errorMessage.email && (
                   <p className="text-red text-xs italic">
@@ -191,7 +198,7 @@ const AddUserModal = ({
                     placeholder="Mật khẩu"
                     className="input input-sm input-bordered w-full text-black"
                     {...register("password")}
-                    onChange={(e) => handleChange(e)}
+                    onChange={handleChange}
                   />
                   <button
                     type="button"
@@ -208,18 +215,23 @@ const AddUserModal = ({
                 )}
               </div>
 
-              {/* Thêm select box để chọn quyền */}
+              {/* Select box to choose role */}
               <div className="form-control">
                 <label className="label">
-                  <span className="label-text text-black">Vài trò:</span>
+                  <span className="label-text text-black">Vai trò:</span>
                 </label>
                 <select
-                  className="input input-sm input-bordered"
-                  value={role}
-                  onChange={(e) => setRole(e.target.value)}
+                  value={role} // Set the value of the select to the role state
+                  onChange={(e) => setRole(e.target.value)} // Update the role state on change
+                  className="input input-sm input-bordered text-black"
                 >
-                  <option value="user">Người dùng</option>
-                  <option value="staff">Nhân viên</option>
+                  {roles
+                    .filter((role) => role.name.toLowerCase() !== "admin")
+                    .map((role) => (
+                      <option key={role._id} value={role._id}>
+                        {role.name}
+                      </option>
+                    ))}
                 </select>
               </div>
 
@@ -233,10 +245,10 @@ const AddUserModal = ({
             </form>
           </div>
           <button
-            className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
+            className="btn btn-sm bg-transparent border-none hover:bg-transparent absolute right-2 top-2 text-xl text-black"
             onClick={() => setAddUserModalOpen(false)}
           >
-            ✕
+            ×
           </button>
         </div>
       </dialog>

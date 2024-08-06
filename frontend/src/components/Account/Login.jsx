@@ -5,7 +5,7 @@ import { FaGoogle, FaFacebook, FaEyeSlash, FaEye } from "react-icons/fa";
 import { AuthContext } from "../../context/AuthProvider";
 import useAxiosPublic from "../../hooks/useAxiosPublic";
 import * as Yup from "yup";
-import { Bounce, ToastContainer, toast } from "react-toastify";
+import { Bounce, toast } from "react-toastify";
 
 const Login = () => {
   const {
@@ -64,7 +64,7 @@ const Login = () => {
           try {
             axiosPublic.post("/users", userInfor);
             reset();
-            toast.success("Chào mừng bạn trở lại", {
+            toast.success("Chào mừng bạn trở lại!", {
               position: "bottom-right",
               autoClose: 2000,
               hideProgressBar: false,
@@ -77,11 +77,31 @@ const Login = () => {
             });
             navigate(from, { replace: true });
           } catch (error) {
-            console.log("");
+            toast.error("Đăng nhập thất bại", {
+              position: "bottom-right",
+              autoClose: 2000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+              theme: "colored",
+              transition: Bounce,
+            });
           }
         })
         .catch(() => {
-          setErrorMessageSubmit("Email hoặc mật khẩu không chính xác!");
+          toast.error("Đăng nhập thất bại", {
+            position: "bottom-right",
+            autoClose: 2000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "colored",
+            transition: Bounce,
+          });
         });
     } catch (error) {
       const newErrors = {};

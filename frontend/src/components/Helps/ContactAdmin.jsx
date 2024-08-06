@@ -14,12 +14,19 @@ const ContactAdmin = () => {
   const [messages, setMessages] = useState([]);
   const [onlineUsers, setOnlineUsers] = useState([]);
   const [arrivalMessage, setArrivalMessage] = useState(null);
+  const token = localStorage.getItem("access-token");
+
   useEffect(() => {
     const getConversations = async () => {
       try {
         if (userData) {
           const res = await axios.get(
-            "http://localhost:3000/api/conversations/" + userData._id
+            "http://localhost:3000/api/conversations/" + userData._id,
+            {
+              headers: {
+                authorization: `Bearer ${token}`,
+              },
+            }
           );
           setConversations(res.data);
         }
@@ -28,14 +35,19 @@ const ContactAdmin = () => {
       }
     };
     getConversations();
-  }, [userData]);
+  }, [userData, token]);
 
   useEffect(() => {
     const getMessages = async () => {
       try {
         if (currentChat) {
           const res = await axios.get(
-            "http://localhost:3000/api/messages/" + currentChat._id
+            "http://localhost:3000/api/messages/" + currentChat._id,
+            {
+              headers: {
+                authorization: `Bearer ${token}`,
+              },
+            }
           );
           setMessages(res.data);
         }
@@ -44,7 +56,7 @@ const ContactAdmin = () => {
       }
     };
     getMessages();
-  }, [currentChat]);
+  }, [currentChat, token]);
 
   useEffect(() => {
     const socket = io("http://localhost:8800");
@@ -103,7 +115,12 @@ const ContactAdmin = () => {
     try {
       await axios.post(
         "http://localhost:3000/api/messages/send-message",
-        message
+        message,
+        {
+          headers: {
+            authorization: `Bearer ${token}`,
+          },
+        }
       );
       setMessages([
         ...messages,

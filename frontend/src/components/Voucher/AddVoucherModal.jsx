@@ -1,6 +1,7 @@
 /* eslint-disable react/prop-types */
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { Bounce, toast } from "react-toastify";
 
 const AddVoucherModal = ({ isModalOpen, setIsModalOpen }) => {
   const [voucherName, setVoucherName] = useState("");
@@ -8,6 +9,7 @@ const AddVoucherModal = ({ isModalOpen, setIsModalOpen }) => {
   const [voucherDiscountPercent, setVoucherDiscountPercent] = useState("");
   const [voucherStatus, setVoucherStatus] = useState("");
   const [voucherExpiredDate, setVoucherExpiredDate] = useState("");
+  const token = localStorage.getItem("access-token");
 
   useEffect(() => {
     if (isModalOpen) {
@@ -27,8 +29,22 @@ const AddVoucherModal = ({ isModalOpen, setIsModalOpen }) => {
         voucher_status: voucherStatus,
         voucher_experied_date: voucherExpiredDate,
       };
-      console.log(newVoucher);
-      await axios.post("http://localhost:3000/vouchers", newVoucher);
+      await axios.post("http://localhost:3000/vouchers", newVoucher, {
+        headers: {
+          authorization: `Bearer ${token}`,
+        },
+      });
+      toast.success("Cập nhật thành công!", {
+        position: "bottom-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+        transition: Bounce,
+      });
       setIsModalOpen(false);
     } catch (error) {
       console.error("Error creating voucher:", error);
@@ -59,8 +75,8 @@ const AddVoucherModal = ({ isModalOpen, setIsModalOpen }) => {
                     type="text"
                     value={voucherName}
                     onChange={(e) => setVoucherName(e.target.value)}
-                    placeholder="Type here"
-                    className="input input-bordered input-success w-full max-w-xs input-sm"
+                    placeholder="Nhập tên voucher"
+                    className="input input-bordered w-full max-w-xs input-sm"
                     required
                   />
                 </div>
@@ -72,8 +88,8 @@ const AddVoucherModal = ({ isModalOpen, setIsModalOpen }) => {
                     type="text"
                     value={voucherDescribe}
                     onChange={(e) => setVoucherDescribe(e.target.value)}
-                    placeholder="Type here"
-                    className="input input-bordered input-success w-full max-w-xs input-sm"
+                    placeholder="Mô tả voucher"
+                    className="input input-bordered -full max-w-xs input-sm"
                     required
                   />
                 </div>
@@ -87,7 +103,7 @@ const AddVoucherModal = ({ isModalOpen, setIsModalOpen }) => {
                     type="number"
                     value={voucherDiscountPercent}
                     onChange={(e) => setVoucherDiscountPercent(e.target.value)}
-                    placeholder="Type here"
+                    placeholder="VD: 10 (%)"
                     className="input input-bordered input-success w-full max-w-xs input-sm"
                     required
                   />
@@ -111,7 +127,6 @@ const AddVoucherModal = ({ isModalOpen, setIsModalOpen }) => {
                     type="date"
                     value={voucherExpiredDate}
                     onChange={(e) => setVoucherExpiredDate(e.target.value)}
-                    placeholder="Type here"
                     className="input input-bordered input-success w-full bg-white"
                     required
                   />

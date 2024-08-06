@@ -15,20 +15,17 @@ import FormattedPrice from "../../../ultis/FormatedPriece";
 import ConfirmDeleteModal from "../../../ultis/ConfirmDeleteModal";
 import TransferToMenuModal from "../../../components/Modal/TransferToMenuModal";
 import UpdateQuantityModal from "../../../components/Modal/UpdateQuantityModal";
-import "react-toastify/dist/ReactToastify.css";
-import { Bounce, ToastContainer, toast } from "react-toastify";
+import { Bounce, toast } from "react-toastify";
 const ManageInventory = () => {
   const PF = "http://localhost:3000";
   const [inventory, , refetch] = useInventory();
   const axiosSecure = useAxiosSecure();
 
-  const [transferQuantity, setTransferQuantity] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const [sortType, setSortType] = useState("createdAt");
   const [sortOrder, setSortOrder] = useState("desc");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(5);
-  const [newQuantity, setNewQuantity] = useState(1);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [productToDelete, setProductToDelete] = useState(null);
   const [showRemoveConfirmModal, setShowRemoveConfirmModal] = useState(false);
@@ -36,6 +33,7 @@ const ManageInventory = () => {
 
   const [openModal, setOpenModal] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
+  const token = localStorage.getItem("access-token");
 
   const [openUpdateQuantityModal, setOpenUpdateQuantityModal] = useState(false);
 
@@ -378,7 +376,6 @@ const ManageInventory = () => {
           />
         </div>
       </div>
-      <ToastContainer />
     </div>
   );
 };

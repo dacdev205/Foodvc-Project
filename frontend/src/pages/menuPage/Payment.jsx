@@ -3,34 +3,44 @@ import LoadingSpinner from "../../ultis/LoadingSpinner";
 import usePayment from "../../hooks/usePayment";
 import FormattedPrice from "../../ultis/FormatedPriece";
 import { CiDiscount1, CiLocationOn } from "react-icons/ci";
-import useAuth from "../../hooks/useAuth";
+import { AiOutlineClose } from "react-icons/ai";
 import useCart from "../../hooks/useCart";
 import orderAPI from "../../api/orderAPI";
 import useAddress from "../../hooks/useAddress";
 import useUserCurrent from "../../hooks/useUserCurrent";
+import VoucherModal from "../../components/Voucher/VoucherModal";
 import AddressForm from "../../components/Address/AddressForm";
 import SelectAddress from "../../components/Address/SelectAddress";
 import ghnAPI from "../../api/ghnAPI";
 import axios from "axios";
+import voucherAPI from "../../api/voucherAPI";
+import useAuth from "../../hooks/useAuth";
+import { AuthContext } from "../../context/AuthProvider";
+import cartAPI from "../../api/cartAPI";
 const Payment = () => {
   const [payment, refetch, isLoading] = usePayment();
   const userData = useUserCurrent();
   const [orderTotal, setOrderTotal] = useState(0);
   const [subOrderTotal, setSubOrderTotal] = useState(0);
-  const [, refetchCart] = useCart();
+  const [cart, refetchCart] = useCart();
   const [address] = useAddress();
+  const [isVoucherModalOpen, setIsVoucherModalOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [addressModalOpen, setAddressModalOpen] = useState(false);
+  const { user } = useAuth(AuthContext);
   const PF = "http://localhost:3000";
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [shopData, setShopData] = useState();
   const [note, setNote] = useState("");
   const [shippingFee, setShippingFee] = useState(0);
-  const [productData, setProductData] = useState([]);
-  const [voucher, setVoucher] = useState(""); // State for voucher code
-  const [initialOrderTotal, setInitialOrderTotal] = useState(0); // State for initial order total
-  const [discountedOrderTotal, setDiscountedOrderTotal] = useState(0); // State for discounted order total
+  const [vouchers, setVouchers] = useState([]);
+  const [selectedVoucher, setSelectedVoucher] = useState(null);
+  const [isVoucherApplied, setIsVoucherApplied] = useState(false);
+  const [discountedAmount, setDiscountedAmount] = useState(0);
+  const GHN_TOKEN = import.meta.env.VITE_GHN_TOKEN;
+  const token = localStorage.getItem("access-token");
 
+  const [amount, setAmount] = useState(0);
   const [addressUser, setAddress] = useState({
     fullName: "",
     phone: "",
@@ -39,16 +49,27 @@ const Payment = () => {
     district: { districtId: null, districtName: "" },
     ward: { wardCode: "", wardName: "" },
   });
+
   useEffect(() => {
     const fetchShopData = async () => {
       try {
         const res = await ghnAPI.getAddressFOODVC();
+        console.log(res);
+
         setShopData(res.data.shops[0]);
       } catch (error) {
         console.error(error);
       }
     };
     fetchShopData();
+  }, []);
+
+  useEffect(() => {
+    const fetchVoucherData = async () => {
+      const res = await voucherAPI.getAllVoucher();
+      setVouchers(res);
+    };
+    fetchVoucherData();
   }, []);
   useEffect(() => {
     let total = 0;
@@ -59,35 +80,51 @@ const Payment = () => {
       });
     });
     setSubOrderTotal(total);
-    setInitialOrderTotal(total);
-    setDiscountedOrderTotal(total);
   }, [payment]);
 
   useEffect(() => {
     let total = 0;
-    payment.forEach((item) => {
-      item.products.forEach((product) => {
-        const totalPrice = product.productId.price * product.quantity;
-        total += totalPrice;
+    if (isVoucherApplied) {
+      const newAmount = discountedAmount + shippingFee;
+      setAmount(newAmount);
+      setOrderTotal(newAmount);
+    } else {
+      payment.forEach((item) => {
+        item.products.forEach((product) => {
+          const totalPrice = product.productId.price * product.quantity;
+          total += totalPrice;
+        });
       });
-    });
-    total += shippingFee;
-    setDiscountedOrderTotal(total);
-    setOrderTotal(total);
-  }, [payment, shippingFee]);
-  const applyVoucher = (voucherCode) => {
-    // Assume voucher gives a 10% discount
-    const discountPercentage = 10;
-    const discountAmount = (discountPercentage / 100) * initialOrderTotal;
-    const newTotal = initialOrderTotal - discountAmount;
-    setDiscountedOrderTotal(newTotal);
-    setOrderTotal(newTotal + shippingFee);
-  };
+      total += shippingFee;
+      setAmount(total);
+      setOrderTotal(total);
+    }
+  }, [payment, shippingFee, discountedAmount, vouchers, isVoucherApplied]);
+
   const calculatePrice = (item) => {
     const totalPrice = item.productId.price * item.quantity;
     return parseFloat(totalPrice.toFixed(2));
   };
-
+  const applyVoucher = (voucherCode) => {
+    setSelectedVoucher(voucherCode);
+    payment.forEach(async (item) => {
+      const res = await axios.post(
+        "http://localhost:3000/vouchers/apply",
+        {
+          voucherCode: voucherCode.code,
+          paymentId: item._id,
+        },
+        {
+          headers: {
+            authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setDiscountedAmount(res.data.discountedAmount);
+    });
+    setIsVoucherApplied(true);
+    setIsVoucherModalOpen(!isVoucherModalOpen);
+  };
   function generateRandomString(length) {
     let result = "";
     const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
@@ -159,85 +196,85 @@ const Payment = () => {
   };
   const handleBuyItem = async () => {
     const randomId = generateRandomString(20);
-    // const productData = extractProductData(payment);
-    // setIsSubmitting(true);
-    // const payload = {
-    //   payment_type_id: 2,
-    //   note: note,
-    //   required_note: "CHOXEMHANGKHONGTHU",
-    //   return_phone: `${shopData.phone}`,
-    //   return_address: `${shopData.address}`,
-    //   return_district_id: `${shopData.district_id}`,
-    //   return_ward_code: "",
-    //   client_order_code: randomId,
-    //   from_name: `${shopData.name}`,
-    //   from_phone: `${shopData.phone}`,
-    //   from_address: `${shopData.address}`,
-    //   from_ward_name: "Xuân Khánh",
-    //   from_district_name: "Ninh Kiều",
-    //   from_province_name: "Cần Thơ",
-    //   to_name: addressUser.fullName,
-    //   to_phone: addressUser.phone,
-    //   to_address: `${addressUser?.street}, ${addressUser?.ward.wardName}, ${addressUser?.district.districtName}, ${addressUser?.city.cityName}`,
-    //   to_ward_name: addressUser?.ward.wardName,
-    //   to_district_name: addressUser?.district.districtName,
-    //   to_province_name: addressUser?.city.cityName,
-    //   cod_amount: orderTotal,
-    //   content: note,
-    //   weight: productData.totalWeight,
-    //   length: productData.totalLength,
-    //   width: productData.totalWidth,
-    //   height: productData.totalHeight,
-    //   cod_failed_amount: 2000,
-    //   pick_station_id: 1444,
-    //   deliver_station_id: null,
-    //   insurance_value: Math.min(orderTotal, 5000000),
-    //   service_id: 0,
-    //   service_type_id: 2,
-    //   coupon: null,
-    //   pickup_time: Math.floor(Date.now() / 1000),
-    //   pick_shift: getPickShifts(),
-    //   items: payment.flatMap((item) =>
-    //     item.products.map((product) => ({
-    //       name: product.name,
-    //       quantity: product.quantity,
-    //       price: parseInt(product.price),
-    //     }))
-    //   ),
-    // };
-    // const createOrderGhn = await ghnAPI.createOrder(payload);
-    // if (!createOrderGhn.status === 200) {
-    //   console.error("Lỗi tạo đơn hàng GHN:", createOrderGhn.message);
-    //   return;
-    // } else {
-    try {
-      payment.forEach(async (item) => {
-        await orderAPI.postProductToOrder({
-          userId: userData._id,
-          products: item.products,
-          totalAmount: discountedOrderTotal,
-          note: note,
-          orderCode: randomId,
-          addressId: addressUser._id,
+    const productData = extractProductData(payment);
+    setIsSubmitting(true);
+    const payload = {
+      payment_type_id: 2,
+      note: note,
+      required_note: "CHOXEMHANGKHONGTHU",
+      return_phone: `${shopData.phone}`,
+      return_address: `${shopData.address}`,
+      return_district_id: `${shopData.district_id}`,
+      return_ward_code: "",
+      client_order_code: randomId,
+      from_name: `${shopData.name}`,
+      from_phone: `${shopData.phone}`,
+      from_address: `${shopData.address}`,
+      from_ward_name: "Xuân Khánh",
+      from_district_name: "Ninh Kiều",
+      from_province_name: "Cần Thơ",
+      to_name: addressUser.fullName,
+      to_phone: addressUser.phone,
+      to_address: `${addressUser?.street}, ${addressUser?.ward.wardName}, ${addressUser?.district.districtName}, ${addressUser?.city.cityName}`,
+      to_ward_name: addressUser?.ward.wardName,
+      to_district_name: addressUser?.district.districtName,
+      to_province_name: addressUser?.city.cityName,
+      cod_amount: orderTotal,
+      content: note,
+      weight: productData.totalWeight,
+      length: productData.totalLength,
+      width: productData.totalWidth,
+      height: productData.totalHeight,
+      cod_failed_amount: 2000,
+      pick_station_id: 1444,
+      deliver_station_id: null,
+      insurance_value: Math.min(orderTotal, 5000000),
+      service_id: 0,
+      service_type_id: 2,
+      coupon: null,
+      pickup_time: Math.floor(Date.now() / 1000),
+      pick_shift: getPickShifts(),
+      items: payment.flatMap((item) =>
+        item.products.map((product) => ({
+          name: product.productId.name,
+          quantity: product.quantity,
+          price: parseInt(product.productId.price),
+        }))
+      ),
+    };
+    const createOrderGhn = await ghnAPI.createOrder(payload);
+    if (!createOrderGhn.status === 200) {
+      console.error("Lỗi tạo đơn hàng GHN:", createOrderGhn.message);
+      return;
+    } else {
+      try {
+        payment.forEach(async (item) => {
+          await orderAPI.postProductToOrder({
+            userId: userData._id,
+            products: item.products,
+            totalAmount: amount,
+            note: note,
+            orderCode: randomId,
+            addressId: addressUser._id,
+          });
+          await Promise.all(
+            item.products.map(async (product) => {
+              await cartAPI.deleteProduct(cart._id, product.productId._id);
+            })
+          );
+
+          refetchCart();
         });
-        refetchCart();
-      });
-      // await sendEmailToUser(user.email, randomId);
-      // window.location.href = "/order-success";
-    } catch (error) {
-      console.error("Lỗi khi xử lý mua hàng:", error);
-    } finally {
-      setIsSubmitting(false);
+        await sendEmailToUser(user.email, randomId);
+        window.location.href = "/order-success";
+      } catch (error) {
+        console.error("Lỗi khi xử lý mua hàng:", error);
+      } finally {
+        setIsSubmitting(false);
+      }
     }
-    // }
   };
-  useEffect(() => {
-    payment.forEach((item) => {
-      item.products.forEach((product) => {
-        setProductData(product);
-      });
-    });
-  }, [payment]);
+
   useEffect(() => {
     const productData = extractProductData(payment);
     const calculateShippingFee = async () => {
@@ -248,7 +285,7 @@ const Payment = () => {
       ) {
         const items = payment.forEach((item) =>
           item.products.map((product) => ({
-            name: product.name,
+            name: product.productId.name,
             quantity: product.quantity,
             height: product.productId.height,
             length: product.productId.length,
@@ -272,8 +309,8 @@ const Payment = () => {
             },
             {
               headers: {
-                Token: "6ea4d8bb-4c99-11ef-8e53-0a00184fe694",
-                ShopId: "193151",
+                Token: GHN_TOKEN,
+                ShopId: shopData?._id,
                 "Content-Type": "application/json",
               },
             }
@@ -286,8 +323,13 @@ const Payment = () => {
     };
 
     calculateShippingFee();
-  }, [addressUser, shopData, payment]);
+  }, [addressUser, shopData, payment, GHN_TOKEN]);
 
+  const handleRemoveVoucher = () => {
+    setSelectedVoucher(null);
+    setIsVoucherApplied(false);
+    setDiscountedAmount(0);
+  };
   useEffect(() => {
     address.forEach((addressDefault) => {
       if (addressDefault.isDefault) {
@@ -455,9 +497,31 @@ const Payment = () => {
               <div className="md:w-2/3 space-y-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center">
-                    <CiDiscount1></CiDiscount1>Voucher của Shop
+                    <CiDiscount1></CiDiscount1>Voucher của Shop:
                   </div>
-                  <button className="text-sky-500">Chọn Voucher</button>
+                  {selectedVoucher && (
+                    <div className="flex items-center mt-2 p-2 border text-white rounded bg-green">
+                      <p className="mr-2">{selectedVoucher.code}</p>
+                      <button
+                        onClick={handleRemoveVoucher}
+                        className="text-white"
+                      >
+                        <AiOutlineClose />
+                      </button>
+                    </div>
+                  )}
+                  <button
+                    className="text-sky-500"
+                    onClick={() => setIsVoucherModalOpen(true)}
+                  >
+                    Chọn Voucher
+                  </button>
+                  <VoucherModal
+                    isOpen={isVoucherModalOpen}
+                    onClose={() => setIsVoucherModalOpen(false)}
+                    vouchers={vouchers}
+                    applyVoucher={applyVoucher}
+                  />
                 </div>
                 <hr />
 
@@ -470,6 +534,16 @@ const Payment = () => {
                     price={subOrderTotal.toFixed(2)}
                   />
                 </div>
+                {selectedVoucher && (
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <span>Sau khi áp mã: </span>
+                    </div>
+
+                    <FormattedPrice price={discountedAmount.toFixed(2)} />
+                  </div>
+                )}
+
                 <div className="">
                   <div className="flex justify-between">
                     <span>Phí vận chuyển: </span>

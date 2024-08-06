@@ -2,7 +2,7 @@ import React, { useState, useContext } from "react";
 import { updatePassword } from "firebase/auth";
 import { AuthContext } from "../../context/AuthProvider";
 import { useNavigate } from "react-router-dom";
-import { Bounce, ToastContainer, toast } from "react-toastify";
+import { Bounce, toast } from "react-toastify";
 import * as Yup from "yup";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 
@@ -161,7 +161,6 @@ const ChangePassword = () => {
           </div>
         </form>
       </div>
-      <ToastContainer />
     </div>
   );
 };

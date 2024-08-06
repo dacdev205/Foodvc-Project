@@ -11,7 +11,7 @@ import FormattedPrice from "../../ultis/FormatedPriece";
 import { FaCheck } from "react-icons/fa6";
 import paymentAPI from "../../api/paymentAPI";
 import "react-toastify/dist/ReactToastify.css";
-import { Bounce, ToastContainer, toast } from "react-toastify";
+import { Bounce, toast } from "react-toastify";
 import useUserCurrent from "../../hooks/useUserCurrent";
 const CartPage = () => {
   const [cart, refetchCart, isLoading] = useCart();
@@ -223,7 +223,7 @@ const CartPage = () => {
     });
   };
   const cartSubTotal = selectedItems.reduce((totalPrice, itemId) => {
-    const selectedItem = cart.products.find(
+    const selectedItem = cart?.products?.find(
       (item) => item.productId._id === itemId
     );
     return totalPrice + calculatePrice(selectedItem);
@@ -237,6 +237,7 @@ const CartPage = () => {
         products: cart.products.filter((item) =>
           selectedItems.includes(item.productId._id)
         ),
+        totalAmount: orderTotal,
       });
     } catch (error) {
       console.error("Error during check-out:", error);
@@ -251,22 +252,8 @@ const CartPage = () => {
       </div>
     );
   } else {
-    // Render cart page with database load succesfully
     return (
       <div className="section-container">
-        <ToastContainer
-          position="top-right"
-          autoClose={5000}
-          hideProgressBar={false}
-          newestOnTop={false}
-          closeOnClick
-          rtl={false}
-          pauseOnFocusLoss
-          draggable
-          pauseOnHover
-          theme="colored"
-          transition:Bounce
-        />
         <div className="max-w-screen-2xl container mx-auto xl:px-24 px-4 bg-gradient-to-r from-0% from-[#FAFAFA] to-[#FCFCFC] to-100%">
           <div className="py-24 flex flex-col items-center justify-center">
             <div className="text-center px-4 space-y-7">

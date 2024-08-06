@@ -8,10 +8,11 @@ import wishListAPI from "../../api/wishListAPI";
 import reviewAPI from "../../api/reviewAPI";
 import useCart from "../../hooks/useCart";
 import useWishList from "../../hooks/useWishList";
-import { toast } from "react-toastify";
+import { Bounce, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import useUserCurrent from "../../hooks/useUserCurrent";
 import axios from "axios";
+const token = localStorage.getItem("access-token");
 
 const Cards = ({ item }) => {
   const { user } = useContext(AuthContext);
@@ -52,7 +53,11 @@ const Cards = ({ item }) => {
     };
 
     try {
-      await axios.post("http://localhost:3000/cart", cartItem);
+      await axios.post("http://localhost:3000/cart", cartItem, {
+        headers: {
+          authorization: `Bearer ${token}`,
+        },
+      });
       toast.success("Thêm vào giỏ hàng thành công!", {
         position: "bottom-right",
         autoClose: 3000,
@@ -66,7 +71,17 @@ const Cards = ({ item }) => {
       refetchCart();
     } catch (error) {
       console.error("Error adding to cart:", error);
-      toast.error("Lỗi khi thêm vào giỏ hàng.");
+      toast.error("Lỗi khi thêm vào giỏ hàng.", {
+        position: "bottom-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+        transition: Bounce,
+      });
     }
   };
 
@@ -113,7 +128,17 @@ const Cards = ({ item }) => {
         }
       } catch (error) {
         console.log(error);
-        toast.error("Lỗi khi quản lý sản phẩm yêu thích.");
+        toast.error("Lỗi khi thêm vào yêu thích.", {
+          position: "bottom-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "colored",
+          transition: Bounce,
+        });
       }
     }
     refetchWishList(); // Refetch danh sách yêu thích

@@ -5,8 +5,6 @@ import Navbar from "../components/LayoutDisplay/Navbar";
 import Footer from "../components/LayoutDisplay/Footer";
 import "../App.css";
 import LoadingSpinner from "../ultis/LoadingSpinner";
-import { ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 
 const Main = () => {
   const { loading } = useContext(AuthContext);
@@ -16,7 +14,6 @@ const Main = () => {
         <LoadingSpinner />
       ) : (
         <div>
-          <ToastContainer />
           <div>
             <div className="relative mb-16">
               <Navbar></Navbar>

@@ -17,11 +17,12 @@ const WishListPage = () => {
   const handleDelete = async (item) => {
     try {
       await wishListAPI.deleteProduct(item._id);
-
-      setHeartFilledIds((prevIds) => prevIds.filter((id) => id !== item._id));
+      setHeartFilledIds((prevIds) =>
+        prevIds.filter((id) => id !== item.product._id)
+      );
 
       const updatedHeartFilledIds = heartFilledIds.filter(
-        (id) => id !== item._id
+        (id) => id !== item.product._id
       );
       localStorage.setItem(
         "heartFilledIds",
@@ -33,12 +34,6 @@ const WishListPage = () => {
     }
   };
 
-  useEffect(() => {
-    if (!isLoading) {
-      console.log();
-    }
-  }, [isLoading, wishList]);
-
   if (isLoading) {
     return (
       <div>
@@ -46,7 +41,6 @@ const WishListPage = () => {
       </div>
     );
   } else {
-    // Render cart page with database load succesfully
     return (
       <div className="section-container">
         <div className="max-w-screen-2xl container mx-auto xl:px-24 px-4 bg-gradient-to-r from-0% from-[#FAFAFA] to-[#FCFCFC] to-100%">

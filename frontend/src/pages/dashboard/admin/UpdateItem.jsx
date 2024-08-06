@@ -6,14 +6,12 @@ import menuAPI from "../../../api/menuAPI";
 import React, { useEffect, useState } from "react";
 import QuillEditor from "../../../ultis/QuillEditor";
 import productsAPI from "../../../api/productsAPI";
-import SuccessAlert from "../../../ultis/SuccessAlert";
+import { Bounce, toast } from "react-toastify";
 const UpdateItem = () => {
   const { register, handleSubmit, setValue } = useForm({ mode: "onChange" });
   const [product, setProduct] = useState(null);
   const { id } = useParams();
   const { reset } = useForm();
-  const [showSuccessAlert, setShowSuccessAlert] = useState(false);
-  const successMessage = "Chỉnh sửa thành công!";
   useEffect(() => {
     const fetchProductDetail = async () => {
       try {
@@ -42,9 +40,18 @@ const UpdateItem = () => {
       formData.append("length", data.length);
       formData.append("width", data.width);
       formData.append("height", data.height);
-
       await productsAPI.updateProduct(product._id, formData);
-      setShowSuccessAlert(true);
+      toast.success("Cập nhật thành công!", {
+        position: "bottom-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+        transition: Bounce,
+      });
       const updatedProduct = await productsAPI.getProductById(product._id);
       const menuUpdateData = {
         name: updatedProduct.name,
@@ -81,7 +88,6 @@ const UpdateItem = () => {
       <h2 className="text-2xl font-semibold my-4 text-black">
         Chỉnh sửa chi tiết <span className="text-green">sản phẩm</span>
       </h2>
-      <SuccessAlert show={showSuccessAlert} message={successMessage} />
 
       {product && (
         <div>

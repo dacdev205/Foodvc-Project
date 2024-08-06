@@ -6,15 +6,12 @@ import inventoryAPI from "../../../api/inventoryAPI";
 import QuillEditor from "../../../ultis/QuillEditor";
 import Button from "@mui/material/Button";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
-import SuccessAlert from "../../../ultis/SuccessAlert";
+import { Bounce, toast } from "react-toastify";
 const AddInventory = () => {
   const { register, handleSubmit, setValue, reset } = useForm({
     mode: "onChange",
   });
-  const [showSuccessAlert, setShowSuccessAlert] = useState(false);
-  const [showErrorAlert, setShowErrorAlert] = useState(false);
-
-  const successMessage = "Thêm thành công!";
+  const [photo, setPhoto] = useState(null);
 
   const VisuallyHiddenInput = styled("input")({
     clip: "rect(0 0 0 0)",
@@ -40,24 +37,48 @@ const AddInventory = () => {
       formData.append("weight", data.weight);
       formData.append("length", data.length);
       formData.append("width", data.width);
-      formData.append("image", data.image[0]);
       formData.append("brand", data.brand);
       formData.append("productionLocation", data.productionLocation);
       formData.append("instructions", data.instructions);
+      if (photo) {
+        formData.append("image", photo);
+      }
       await inventoryAPI.addProduct(formData);
       reset();
-      setShowSuccessAlert(true);
+      setPhoto(null);
+      toast.success("Nhập kho thành công!", {
+        position: "bottom-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+        transition: Bounce,
+      });
     } catch (error) {
-      setShowErrorAlert(true);
+      toast.error("Nhập kho thành công!", {
+        position: "bottom-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+        transition: Bounce,
+      });
     }
   };
-
+  const handlePhotoChange = (event) => {
+    setPhoto(event.target.files[0]);
+  };
   return (
     <div className="w-full md:w-[870px] px-4 mx-auto">
       <h2 className="text-2xl font-semibold my-4 text-black">
         Thêm sản phẩm mới vào <span className="text-green">kho</span>
       </h2>
-      <SuccessAlert show={showSuccessAlert} message={successMessage} />
       <div>
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="form-control">
@@ -229,19 +250,28 @@ const AddInventory = () => {
                 Hình ảnh sản phẩm(<span className="text-red">*</span>):
               </span>
             </label>
+            {photo && <img src={URL.createObjectURL(photo)} alt="" />}
             <Button
               component="label"
               variant="contained"
               startIcon={<CloudUploadIcon />}
               sx={{
-                backgroundColor: "green",
-                "&:hover": { backgroundColor: "darkgreen" },
+                backgroundColor: "#4caf50",
+                color: "white",
+                "&:hover": {
+                  backgroundColor: "#388e3c",
+                },
+                borderRadius: "5px",
+                padding: "10px 20px",
+                marginRight: "10px",
+                textTransform: "none",
               }}
             >
-              Upload file
+              Upload File
               <VisuallyHiddenInput
-                {...register("image", { required: true })}
                 type="file"
+                {...register("image")}
+                onChange={handlePhotoChange}
               />
             </Button>
           </div>

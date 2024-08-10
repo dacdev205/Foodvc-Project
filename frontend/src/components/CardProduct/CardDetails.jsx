@@ -84,7 +84,7 @@ const CardDetails = () => {
     const fetchProductDetail = async () => {
       try {
         const response = await menuAPI.getProductById(id);
-        setProduct(response.productId);
+        setProduct(response);
         const reviewsData = await reviewAPI.getProductById(id);
         setReviews(reviewsData);
         const priceOriginalData = await inventoryAPI.getProductById(id);
@@ -142,17 +142,13 @@ const CardDetails = () => {
   const handleAddToCart = async (product) => {
     if (user && user?.email) {
       const cartItem = {
-        userId: userData._id,
-        productId: product._id,
+        userId: userData?._id,
+        productId: product?.productId?._id,
         quantity: quantityDefault,
       };
 
       try {
-        await axios.post("http://localhost:3000/cart", cartItem, {
-          headers: {
-            authorization: `Bearer ${token}`,
-          },
-        });
+        await cartAPI.postToCart(cartItem);
         refetchCart();
         toast.success("Thêm vào giỏ hàng thành công!", {
           position: "bottom-right",
@@ -186,17 +182,46 @@ const CardDetails = () => {
   };
 
   const handleReviewSubmit = async (reviewData) => {
-    const userOrders = await orderAPI.getUserOrders(userData._id);
-    let productFound = false;
-    userOrders.forEach((userOrder) => {
-      userOrder.products.forEach((productOrder) => {
-        if (productOrder.productId.toString() === product._id.toString()) {
-          productFound = true;
-        }
+    try {
+      const userOrdersResponse = await orderAPI.getUserOrders(userData._id);
+
+      // Ensure userOrdersResponse is an object with an orders array
+      const userOrders = userOrdersResponse.orders;
+
+      if (!Array.isArray(userOrders)) {
+        throw new Error("Expected userOrders to be an array.");
+      }
+
+      let productFound = false;
+      userOrders.forEach((userOrder) => {
+        userOrder.products.forEach((productOrder) => {
+          if (
+            productOrder.productId._id.toString() ===
+            product.productId._id.toString()
+          ) {
+            productFound = true;
+          }
+        });
       });
-    });
-    if (!productFound) {
-      return;
+
+      if (!productFound) {
+        toast.error("Vui lòng mua sản phẩm trước khi đánh giá", {
+          position: "bottom-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "colored",
+          transition: Bounce,
+        });
+        return;
+      } else {
+        console.log("good");
+      }
+    } catch (error) {
+      console.error("Error handling review submission:", error);
     }
 
     toast.success("Cảm ơn bạn đã gửi đánh giá!", {
@@ -299,32 +324,6 @@ const CardDetails = () => {
   );
   const currentReviews = sortedReviews.slice(indexOfFirstItem, indexOfLastItem);
 
-  const handleConfirmDelete = async (reviewId) => {
-    try {
-      await reviewAPI.deleteReview(reviewId);
-      updateReviews();
-      toast.success("Xóa đánh giá thành công!", {
-        position: "bottom-right",
-        autoClose: 5000,
-        theme: "colored",
-        transition: Bounce,
-      });
-    } catch (error) {
-      console.error("Error deleting review:", error);
-      toast.error("Lỗi khi xóa đánh giá.", {
-        position: "bottom-right",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "colored",
-        transition: Bounce,
-      });
-    }
-  };
-
   const handleEditComment = (reviewId) => {
     setEditReviewId(reviewId);
     setIsModalOpen(true);
@@ -343,7 +342,7 @@ const CardDetails = () => {
         userId: userData?._id,
         totalAmount: product.price * quantityDefault,
         products: {
-          productId: product._id,
+          productId: product.productId._id,
           quantity: quantityDefault,
         },
       });
@@ -381,8 +380,12 @@ const CardDetails = () => {
           <div className="mt-6 sm:mt-10">
             <div className="grid grid-cols-1 md:grid-cols-2 sm:grid:cols-2 gap-6 h-max">
               <div className="relative">
-                <img src={PF + "/" + product.image} alt="" className="w-full" />
-                {product.quantity === 0 && (
+                <img
+                  src={PF + "/" + product.productId.image}
+                  alt=""
+                  className="w-full"
+                />
+                {product.productId.quantity === 0 && (
                   <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                     <span className="text-white text-lg font-bold bg-black bg-opacity-50 py-10 px-4 rounded-full no-hover-fade">
                       <p className="text-opacity-100">Hết hàng</p>
@@ -393,7 +396,9 @@ const CardDetails = () => {
 
               {/* product detail */}
               <div>
-                <h1 className="title">{product.name.slice(0, 30)}...</h1>
+                <h1 className="title">
+                  {product.productId.name.slice(0, 30)}...
+                </h1>
                 <div className="flex mb-3">
                   {/* rating */}
                   <span className="mr-2 underline">
@@ -410,7 +415,7 @@ const CardDetails = () => {
                 </div>
                 {/* price */}
                 <p className="text-lg font-bold ">
-                  {formattedPrice(product.price)}
+                  {formattedPrice(product.productId.price)}
                   <span>₫</span>
                 </p>
                 {priceOrginals.applyVoucher ? (
@@ -481,42 +486,46 @@ const CardDetails = () => {
             <tbody>
               <tr>
                 <td className="border p-2">Thương hiệu:</td>
-                <td className="border p-2 text-gray-500">{product.brand}</td>
+                <td className="border p-2 text-gray-500">
+                  {product.productId.brand}
+                </td>
               </tr>
               <tr>
                 <td className="border p-2">Loại sản phẩm:</td>
                 <td className="border p-2 text-gray-500">
-                  {product.category === "popular"
+                  {product.productId.category === "popular"
                     ? "Nổi bật"
-                    : product.category === "soup"
+                    : product.productId.category === "soup"
                     ? "Mì, miến, cháo phở"
-                    : product.category === "milk"
+                    : product.productId.category === "milk"
                     ? "Sữa các loại"
-                    : product.category === "vegetable"
+                    : product.productId.category === "vegetable"
                     ? "Rau, củ, nấm, trái cây"
-                    : product.category === "protein"
+                    : product.productId.category === "protein"
                     ? "Thịt, cá, trứng, hải sản"
-                    : product.category === "drinks"
+                    : product.productId.category === "drinks"
                     ? "Bia, nước giải khát"
-                    : product.category}
+                    : product.productId.category}
                 </td>
               </tr>
               <tr>
                 <td className="border p-2">Ngày sản xuất:</td>
                 <td className="border p-2 text-gray-500">
-                  {formatDateTimeProductCreate(product.createdAt)}
+                  {formatDateTimeProductCreate(product.productId.createdAt)}
                 </td>
               </tr>
               <tr>
                 <td className="border p-2">Hướng dẫn sử dụng:</td>
                 <td className="border p-2 text-gray-500">
-                  {product.instructions}
+                  {product.productId.instructions}
                 </td>
               </tr>
               <tr>
                 <td className="border p-2">Hạn sử dụng:</td>
                 <td className="border p-2 text-gray-500">
-                  {formatDateTimeProductCreate(product.expirationDate)}
+                  {formatDateTimeProductCreate(
+                    product.productId.expirationDate
+                  )}
                 </td>
               </tr>
             </tbody>
@@ -526,11 +535,11 @@ const CardDetails = () => {
             <div
               dangerouslySetInnerHTML={{
                 __html: isExpanded
-                  ? product.recipe
-                  : `${product.recipe.slice(0, 300)}...`,
+                  ? product.productId.recipe
+                  : `${product.productId.recipe.slice(0, 300)}...`,
               }}
             />
-            {product.recipe.length > 300 && (
+            {product.productId.recipe.length > 300 && (
               <div className="flex justify-center">
                 <div>
                   <button
@@ -586,12 +595,6 @@ const CardDetails = () => {
                     {showActions && (
                       <div>
                         <button
-                          onClick={() => openDeleteModal(review)}
-                          className="text-red no-underline cursor-pointer text-sm"
-                        >
-                          Xóa
-                        </button>
-                        <button
                           onClick={() => handleEditComment(review._id)}
                           className="no-underline cursor-pointer ml-2 text-sm"
                         >
@@ -602,12 +605,6 @@ const CardDetails = () => {
                   </div>
                 </div>
               )}
-              <ConfirmDeleteModal
-                isOpen={isDeleteModalOpen}
-                onClose={() => setIsDeleteModalOpen(false)}
-                onConfirm={handleConfirmDelete}
-                review={reviewToDelete}
-              />
               {editReviewId === review._id && (
                 <ReviewFormEdit
                   reviewId={review._id}

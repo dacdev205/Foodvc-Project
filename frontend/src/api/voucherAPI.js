@@ -19,4 +19,12 @@ export default class voucherAPI {
     });
     return res.data;
   }
+  static async createVoucher(data) {
+    const res = await axios.post(url, data, {
+      headers: {
+        authorization: `Bearer ${token}`,
+      },
+    });
+    return res.data;
+  }
 }

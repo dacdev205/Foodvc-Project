@@ -16,7 +16,19 @@ export default class cartAPI {
       throw error;
     }
   }
-
+  static async postToCart(cartItem) {
+    try {
+      const res = await axios.post(url, cartItem, {
+        headers: {
+          authorization: `Bearer ${token}`,
+        },
+      });
+      return res.data;
+    } catch (error) {
+      console.error("Error adding product to cart:", error);
+      throw error;
+    }
+  }
   static async getProductToCart(cartItem) {
     try {
       const productId = cartItem.productId;

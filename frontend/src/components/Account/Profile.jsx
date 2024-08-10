@@ -19,7 +19,6 @@ const Profile = ({ user }) => {
   const { logOut } = useContext(AuthContext);
   const navigate = useNavigate();
   const [adminPermission, isPermissionLoading] = usePermission("admin_pages");
-  const userData = useUserCurrent();
   const handleLogout = () => {
     logOut()
       .then(() => {

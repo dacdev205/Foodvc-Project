@@ -1,11 +1,11 @@
 import { styled } from "@mui/material/styles";
+import Button from "@mui/material/Button";
+import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import React, { useState } from "react";
 import { FaUtensils } from "react-icons/fa";
 import { useForm } from "react-hook-form";
 import inventoryAPI from "../../../api/inventoryAPI";
 import QuillEditor from "../../../ultis/QuillEditor";
-import Button from "@mui/material/Button";
-import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import { Bounce, toast } from "react-toastify";
 const AddInventory = () => {
   const { register, handleSubmit, setValue, reset } = useForm({
@@ -267,7 +267,7 @@ const AddInventory = () => {
                 textTransform: "none",
               }}
             >
-              Upload File
+              Chọn ảnh
               <VisuallyHiddenInput
                 type="file"
                 {...register("image")}

@@ -9,6 +9,9 @@ const RegisterLazyLoading = lazy(() =>
   import("../components/Account/Register")
 );
 const LoginLazyLoading = lazy(() => import("../components/Account/Login"));
+const ManagementazyLoading = lazy(() =>
+  import("../components/Account/Management")
+);
 
 const UpdateProfilesLazyLoading = lazy(() =>
   import("../pages/menuPage/UpdateProfiles")
@@ -69,7 +72,9 @@ const ChangePasswordLazyLoading = lazy(() =>
 const ForgetPasswordLazyLoading = lazy(() =>
   import("../components/Account/ForgetPassword")
 );
-
+const OrderRequestLazyLoading = lazy(() =>
+  import("../pages/dashboard/adminNstaff/OrderRequest")
+);
 const MenuLazyLoading = lazy(() => import("../pages/menuPage/Menu"));
 const BlogLazyLoading = lazy(() => import("../pages/Blog/Blog"));
 const AboutLazyLoading = lazy(() => import("../pages/About/About"));
@@ -263,6 +268,14 @@ const router = createBrowserRouter([
     ),
   },
   {
+    path: "/management",
+    element: (
+      <Suspense fallback={<LoadingSpinner />}>
+        <ManagementazyLoading />
+      </Suspense>
+    ),
+  },
+  {
     path: "/admin",
     element: (
       <Suspense fallback={<LoadingSpinner />}>
@@ -373,6 +386,14 @@ const router = createBrowserRouter([
         element: (
           <Suspense>
             <ReviewsManagementLazyLoading />
+          </Suspense>
+        ),
+      },
+      {
+        path: "order-requests",
+        element: (
+          <Suspense>
+            <OrderRequestLazyLoading />
           </Suspense>
         ),
       },

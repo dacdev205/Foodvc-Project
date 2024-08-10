@@ -14,7 +14,7 @@ const AddressFormEdit = ({
   addressToEdit,
 }) => {
   const { user } = useAuth();
-  const [address, refetchAddress] = useAddress();
+  const [address, totalPages, refetchAddress, isLoading] = useAddress();
   const [formData, setFormData] = useState({
     fullName: "",
     phone: "",

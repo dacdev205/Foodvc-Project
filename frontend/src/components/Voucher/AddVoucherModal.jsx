@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Bounce, toast } from "react-toastify";
+import voucherAPI from "../../api/voucherAPI";
 
 const AddVoucherModal = ({ isModalOpen, setIsModalOpen }) => {
   const [voucherName, setVoucherName] = useState("");
@@ -29,11 +30,7 @@ const AddVoucherModal = ({ isModalOpen, setIsModalOpen }) => {
         voucher_status: voucherStatus,
         voucher_experied_date: voucherExpiredDate,
       };
-      await axios.post("http://localhost:3000/vouchers", newVoucher, {
-        headers: {
-          authorization: `Bearer ${token}`,
-        },
-      });
+      await voucherAPI.createVoucher(newVoucher);
       toast.success("Cập nhật thành công!", {
         position: "bottom-right",
         autoClose: 2000,

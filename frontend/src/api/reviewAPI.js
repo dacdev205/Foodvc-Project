@@ -25,14 +25,7 @@ export default class reviewAPI {
       throw error;
     }
   }
-  static async deleteCommentByReviewId(reviewId) {
-    const res = await axios.delete(`${url}/${reviewId}`, {
-      headers: {
-        authorization: `Bearer ${token}`,
-      },
-    });
-    return res.data;
-  }
+
   static async updateReviewByReviewId(reviewId, updateData) {
     try {
       const res = await axios.patch(`${url}/${reviewId}`, updateData, {

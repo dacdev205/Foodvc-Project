@@ -17,7 +17,12 @@ let storage = multer.diskStorage({
 let upload = multer({
   storage: storage,
 }).single("image");
-
+router.get(
+  "/search",
+  verifyToken,
+  checkPermission("manage_users"),
+  usersAPI.getUsers
+);
 router.get(
   "/",
   verifyToken,
@@ -29,6 +34,13 @@ router.post(
   verifyToken,
   checkPermission("create_user"),
   usersAPI.createUserAdmin
+);
+
+router.get(
+  "/roles/role-detail/:id",
+  verifyToken,
+  checkPermission("manage_users"),
+  usersAPI.getRoleById
 );
 
 router.post("/", usersAPI.createUser);

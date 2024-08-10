@@ -10,7 +10,8 @@ import axios from "axios";
 
 const AddressForm = ({ setAddress, userId }) => {
   const { user } = useAuth();
-  const [address, refetchAddress] = useAddress();
+  const [address, totalPages, refetchAddress, isLoading] = useAddress();
+
   const [districts, setDistricts] = useState([]);
   const [cities, setCities] = useState([]);
   const [districtsID, setDistrictsID] = useState([]);

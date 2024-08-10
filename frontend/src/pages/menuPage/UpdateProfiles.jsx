@@ -6,9 +6,13 @@ import { Bounce, toast } from "react-toastify";
 import useUserCurrent from "../../hooks/useUserCurrent";
 import userAPI from "../../api/userAPI";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
-
+import { styled } from "@mui/material/styles";
+import Button from "@mui/material/Button";
+import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+import LoadingSpinner from "../../ultis/LoadingSpinner";
 const UpdateProfile = () => {
-  const { updateUserProfile, user } = useContext(AuthContext);
+  const { updateUserProfile, user, updateUser } = useContext(AuthContext);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const userData = useUserCurrent();
   const [photo, setPhoto] = useState(null);
   const {
@@ -19,11 +23,22 @@ const UpdateProfile = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const from = location.state?.from?.pathname || "/";
+  const VisuallyHiddenInput = styled("input")({
+    clip: "rect(0 0 0 0)",
+    clipPath: "inset(50%)",
+    height: 1,
+    overflow: "hidden",
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    whiteSpace: "nowrap",
+    width: 1,
+  });
 
   const onSubmit = async (data) => {
     const { name: formDataName } = data;
     const name = formDataName.trim() === "" ? user.displayName : formDataName;
-
+    setIsSubmitting(true);
     try {
       let updatedPhotoURL = user.photoURL;
 
@@ -39,7 +54,7 @@ const UpdateProfile = () => {
         name,
         photoURL: updatedPhotoURL,
       });
-
+      updateUser({ displayName: name, photoURL: updatedPhotoURL });
       toast.success("Cập nhật thông tin thành công", {
         position: "bottom-right",
         autoClose: 5000,
@@ -64,6 +79,8 @@ const UpdateProfile = () => {
         theme: "colored",
         transition: Bounce,
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -73,6 +90,11 @@ const UpdateProfile = () => {
 
   return (
     <div className="min-h-full lg:w-[890px] md:w-full sm:w-full shadow-md rounded-sm bg-white">
+      {isSubmitting && (
+        <div className="fixed inset-0 flex items-center justify-center bg-gray-600 bg-opacity-50 z-50">
+          <LoadingSpinner />
+        </div>
+      )}
       <div className="px-8 py-4">
         <h1 className="text-black font-sans text-2xl">Hồ sơ của tôi</h1>
         <p className="text-black font-sans text-sm">
@@ -127,12 +149,32 @@ const UpdateProfile = () => {
                 className="w-32 h-32 rounded-full mb-4"
               />
             </div>
-            <input
-              type="file"
-              {...register("photoURL")}
-              className="input input-bordered text-black input-sm w-full mb-4"
-              onChange={handlePhotoChange}
-            />
+            <span className="flex justify-center">
+              <Button
+                component="label"
+                variant="contained"
+                startIcon={<CloudUploadIcon />}
+                sx={{
+                  backgroundColor: "#4caf50",
+                  color: "white",
+                  "&:hover": {
+                    backgroundColor: "#388e3c",
+                  },
+                  borderRadius: "5px",
+                  padding: "5px 10px",
+                  marginRight: "10px",
+                  textTransform: "none",
+                  width: "120px",
+                }}
+              >
+                Chọn ảnh
+                <VisuallyHiddenInput
+                  type="file"
+                  {...register("photoURL")}
+                  onChange={handlePhotoChange}
+                />
+              </Button>
+            </span>
 
             <div className="flex justify-end">
               <button

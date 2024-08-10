@@ -33,6 +33,14 @@ export default class userAPI {
     });
     return res.data;
   }
+  static async getRoleById(roleId) {
+    const res = await axios.get(`${url}/roles/role-detail/${roleId}`, {
+      headers: {
+        authorization: `Bearer ${token}`,
+      },
+    });
+    return res.data;
+  }
   static async getUserByEmail(email) {
     const res = await axios.get(`${url}/getUserByEmail/${email}`, {
       headers: {

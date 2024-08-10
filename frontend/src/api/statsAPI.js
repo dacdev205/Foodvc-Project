@@ -11,18 +11,37 @@ export default class statsAPI {
     });
     return res.data;
   }
+  static async fetchSoldProducts(startDate, endDate) {
+    try {
+      const response = await axios.post(
+        `${url}/products/sold`,
+        {},
+        {
+          headers: {
+            authorization: `Bearer ${token}`,
+          },
+          params: { startDate: startDate, endDate: endDate },
+        }
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      throw error;
+    }
+  }
+
   static async fetchDataByYear(selectedYear) {
     try {
       const res = await axios.get(
         `${url}/${selectedYear}`,
         {
-          params: {
-            year: selectedYear,
+          headers: {
+            authorization: `Bearer ${token}`,
           },
         },
         {
-          headers: {
-            authorization: `Bearer ${token}`,
+          params: {
+            year: selectedYear,
           },
         }
       );
@@ -37,14 +56,14 @@ export default class statsAPI {
       const res = await axios.get(
         `${url}/${selectedYear}/${selectedMonth}`,
         {
-          params: {
-            year: selectedYear,
-            month: selectedMonth,
+          headers: {
+            authorization: `Bearer ${token}`,
           },
         },
         {
-          headers: {
-            authorization: `Bearer ${token}`,
+          params: {
+            year: selectedYear,
+            month: selectedMonth,
           },
         }
       );

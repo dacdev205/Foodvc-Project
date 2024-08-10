@@ -2,11 +2,35 @@ const Menu = require("../models/menu");
 const fs = require("fs");
 const Product = require("../models/product");
 module.exports = class menuAPI {
-  //fetch all menu
-  static async fetchAllMenu(req, res) {
+  static async fetchMenus(req, res) {
     try {
-      const menus = await Menu.find().populate("productId");
-      res.status(200).json(menus);
+      const {
+        searchTerm = "",
+        filterType = "name",
+        category = "all",
+        page = 1,
+        limit = 8,
+      } = req.query;
+
+      let menus = await Menu.find().populate("productId").exec();
+
+      if (searchTerm) {
+        if (filterType === "name") {
+          menus = menus.filter((menu) =>
+            menu.productId.name.toLowerCase().includes(searchTerm.toLowerCase())
+          );
+        }
+      }
+
+      if (category !== "all") {
+        menus = menus.filter((menu) => menu.productId.category === category);
+      }
+
+      const totalMenus = menus.length;
+      const totalPages = Math.ceil(totalMenus / limit);
+      const paginatedMenus = menus.slice((page - 1) * limit, page * limit);
+
+      res.json({ menus: paginatedMenus, totalPages });
     } catch (err) {
       res.status(500).json({ message: err.message });
     }
@@ -16,7 +40,9 @@ module.exports = class menuAPI {
   static async fetchProductByID(req, res) {
     const id = req.params.id;
     try {
-      const product = await Menu.findOne({ id }).populate("productId");
+      const product = await Menu.findOne({ productId: id }).populate(
+        "productId"
+      );
       res.status(200).json(product);
     } catch (err) {
       res.status(500).json({ message: err.message });

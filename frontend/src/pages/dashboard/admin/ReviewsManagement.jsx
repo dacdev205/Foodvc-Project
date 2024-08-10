@@ -4,8 +4,9 @@ import { Pie } from "react-chartjs-2";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import reviewAPI from "../../../api/reviewAPI";
 import { FaTrash } from "react-icons/fa";
-import Pagination from "../../../ultis/Pagination";
 import ConfirmDeleteModal from "../../../ultis/ConfirmDeleteModal";
+import userAPI from "../../../api/userAPI";
+import { Pagination } from "@mui/material";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -15,6 +16,9 @@ const ReviewsManagement = () => {
   const [filterSentiment, setFilterSentiment] = useState("");
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [reviewToDelete, setReviewToDelete] = useState(null);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+
   const [stats, setStats] = useState({
     total_reviews: 0,
     positive_reviews: 0,
@@ -23,13 +27,21 @@ const ReviewsManagement = () => {
     negative_percentage: 0,
   });
 
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(5);
-
-  const fetchReviewsAndStats = async () => {
+  const fetchReviewsAndStats = async (page = 1) => {
     try {
-      const reviewsResponse = await axios.get("http://localhost:5000/data");
-      setReviews(reviewsResponse.data);
+      const reviewsResponse = await axios.get("http://localhost:5000/data", {
+        params: { page, limit: 5 },
+      });
+      const { reviews, totalPages } = reviewsResponse.data;
+      const reviewsWithUserDetails = await Promise.all(
+        reviews.map(async (review) => {
+          const userResponse = await userAPI.getSingleUserById(review.userId);
+          return { ...review, userName: userResponse.name };
+        })
+      );
+
+      setReviews(reviewsWithUserDetails);
+      setTotalPages(totalPages);
 
       const statsResponse = await axios.get(
         "http://localhost:5000/sentiment-stats"
@@ -41,26 +53,8 @@ const ReviewsManagement = () => {
   };
 
   useEffect(() => {
-    fetchReviewsAndStats();
-  }, []);
-
-  const filteredReviews = reviews.filter((review) => {
-    const matchesSearch = review.comment
-      .toLowerCase()
-      .includes(searchTerm.toLowerCase());
-    const matchesSentiment = filterSentiment
-      ? review.sentiment === filterSentiment
-      : true;
-    return matchesSearch && matchesSentiment;
-  });
-
-  // Pagination logic
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentReviews = filteredReviews.slice(
-    indexOfFirstItem,
-    indexOfLastItem
-  );
+    fetchReviewsAndStats(page);
+  }, [page]);
 
   const chartData = {
     labels: ["Đánh giá tích cực", "Đánh giá tiêu cực"],
@@ -103,12 +97,16 @@ const ReviewsManagement = () => {
     },
   };
 
+  const handlePageChange = (event, value) => {
+    setPage(value);
+  };
+
   const handleDelete = async (id) => {
     try {
       await reviewAPI.deleteCommentByReviewId(id);
       setShowConfirmModal(false);
       setReviewToDelete(null);
-      await fetchReviewsAndStats();
+      await fetchReviewsAndStats(page);
     } catch (error) {
       console.error("Failed to delete review:", error);
     }
@@ -123,10 +121,6 @@ const ReviewsManagement = () => {
     if (reviewToDelete) {
       handleDelete(reviewToDelete);
     }
-  };
-
-  const paginate = (pageNumber) => {
-    setCurrentPage(pageNumber);
   };
 
   return (
@@ -169,12 +163,12 @@ const ReviewsManagement = () => {
           </tr>
         </thead>
         <tbody>
-          {currentReviews.map((review, index) => (
+          {reviews.map((review, index) => (
             <tr
               key={review._id}
               className="border-gray-300 text-black text-center"
             >
-              <td>{index + 1 + indexOfFirstItem}</td>
+              <td>{index + 1}</td>
               <td>{review.userName}</td>
               <td>{review.rating}</td>
               <td className="tooltip tooltip-bottom" data-tip={review.comment}>
@@ -209,12 +203,14 @@ const ReviewsManagement = () => {
       />
 
       {/* Pagination */}
-      <Pagination
-        itemsPerPage={itemsPerPage}
-        totalItems={filteredReviews.length}
-        currentPage={currentPage}
-        paginate={paginate}
-      />
+      <div className="flex justify-center mt-4">
+        <Pagination
+          count={totalPages}
+          page={page}
+          onChange={handlePageChange}
+          color="success"
+        />
+      </div>
     </div>
   );
 };

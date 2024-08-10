@@ -15,7 +15,7 @@ const PrivateRouter = ({ children }) => {
     return children;
   }
   return (
-    <Navigate to="/login" state={location} replace>
+    <Navigate to="/management" state={location} replace>
       {" "}
     </Navigate>
   );

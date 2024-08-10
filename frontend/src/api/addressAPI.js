@@ -48,15 +48,21 @@ export default class addressAPI {
     }
   }
   static async setDefaultAddress(addressId) {
+    const token = localStorage.getItem("access-token");
+
     try {
-      const res = await axios.patch(`${url}/${addressId}/setDefault`, {
-        headers: {
-          authorization: `Bearer ${token}`,
-        },
-      });
+      const res = await axios.patch(
+        `${url}/${addressId}/setDefault`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
       return res.data;
     } catch (error) {
-      console.error("error");
+      console.error("Failed to set default address:", error);
       throw error;
     }
   }

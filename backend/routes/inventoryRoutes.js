@@ -28,7 +28,7 @@ router.get(
   "/",
   verifyToken,
   checkPermission("dashboard_actions"),
-  inventoryAPI.fetchAllInventory
+  inventoryAPI.fetchInventorys
 );
 router.post("/transfer-to-menu", inventoryAPI.postProductToMenu);
 router.post("/remove-from-menu", inventoryAPI.removeProductFromMenu);

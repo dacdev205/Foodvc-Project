@@ -51,10 +51,16 @@ export default class orderAPI {
     const res = await axios.get(`${url}/${id}`);
     return res.data;
   }
-  static async getAllOrder() {
-    const res = await axios.get(`http://localhost:3000/order/allOrder`, {
+  static async getAllOrder(searchTerm, searchStatus, page, limit) {
+    const res = await axios.get(`${url}/allOrder`, {
       headers: {
         authorization: `Bearer ${token}`,
+      },
+      params: {
+        searchTerm,
+        searchStatus,
+        page,
+        limit,
       },
     });
     return res.data;

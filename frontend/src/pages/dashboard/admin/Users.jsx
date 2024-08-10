@@ -2,30 +2,37 @@ import React, { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { FaTrash, FaSearch } from "react-icons/fa";
 import useAxiosSecure from "../../../hooks/useAxiosSecure";
-import Pagination from "../../../ultis/Pagination";
 import AddUserModal from "./AddUserModal";
 import ConfirmDeleteModal from "../../../ultis/ConfirmDeleteModal";
 import { Bounce, toast } from "react-toastify";
+import { Pagination } from "@mui/material";
+import userAPI from "../../../api/userAPI";
 
 const Users = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterType, setFilterType] = useState("name");
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(5); // Số lượng mục trên mỗi trang
   const axiosSecure = useAxiosSecure();
   const [addUserModalOpen, setAddUserModalOpen] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [userToDelete, setUserToDelete] = useState(null);
   const token = localStorage.getItem("access-token");
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
   const { refetch, data: users = [] } = useQuery({
-    queryKey: ["users"],
+    queryKey: ["users", page, searchTerm, filterType],
     queryFn: async () => {
-      const res = await axiosSecure.get("/users");
-      return res.data;
+      const res = await axiosSecure.get(`/users/search`, {
+        params: { page, limit: 5, searchTerm, filterType },
+      });
+      setTotalPages(res.data.totalPages);
+      return res.data.users;
     },
+    keepPreviousData: true,
   });
-
+  useEffect(() => {
+    refetch();
+  }, [page, refetch]);
   const { data: roles = [] } = useQuery({
     queryKey: ["roles"],
     queryFn: async () => {
@@ -38,37 +45,47 @@ const Users = () => {
     },
   });
 
-  const filteredUsers = users.filter((user) => {
-    if (!user) return false;
-    const lowerSearchTerm = searchTerm.toLowerCase();
-    if (filterType === "name") {
-      return user.name && user.name.toLowerCase().includes(lowerSearchTerm);
-    } else if (filterType === "role") {
-      return (
-        user.roles[0].name &&
-        user.roles[0].name.toLowerCase().includes(lowerSearchTerm)
-      );
-    }
-    return true;
-  });
-
-  // Logic phân trang
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentUsers = filteredUsers.slice(indexOfFirstItem, indexOfLastItem);
+  const handlePageChange = (event, value) => {
+    setPage(value);
+    refetch();
+  };
 
   const handleRoleChange = async (user, roleId) => {
     try {
       const response = await axiosSecure.patch(`/users/${user._id}/role`, {
         roleId,
       });
+
       if (response.status === 200) {
-        alert(`${user.name} bây giờ là ${roleId}`);
+        const role = await userAPI.getRoleById(roleId);
+        toast.info(`${user.name} bây giờ là ${role.name}`, {
+          position: "bottom-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "colored",
+          transition: Bounce,
+        });
         refetch();
       }
     } catch (error) {
       console.error("Lỗi khi cập nhật quyền:", error);
     }
+  };
+
+  const handleSearch = (e) => {
+    setSearchTerm(e.target.value);
+    setPage(1);
+    refetch();
+  };
+
+  const handleFilterTypeChange = (e) => {
+    setFilterType(e.target.value);
+    setPage(1);
+    refetch();
   };
 
   const handleAddUser = async (userData) => {
@@ -103,11 +120,14 @@ const Users = () => {
   };
 
   const handleDelete = async (user) => {
-    axiosSecure.delete(`/users/${user._id}`).then((res) => {
+    try {
+      await axiosSecure.delete(`/users/${user._id}`);
       setShowConfirmModal(false);
       setUserToDelete(null);
       refetch();
-    });
+    } catch (error) {
+      console.error("Lỗi khi xóa người dùng:", error);
+    }
   };
 
   const handleDeleteClick = (user) => {
@@ -121,14 +141,6 @@ const Users = () => {
     }
   };
 
-  const paginate = (pageNumber) => {
-    setCurrentPage(pageNumber);
-  };
-
-  const refetchData = () => {
-    refetch();
-  };
-
   return (
     <div>
       <h2 className="text-2xl font-semibold my-4 text-black">
@@ -140,11 +152,11 @@ const Users = () => {
           <select
             id="filterType"
             value={filterType}
-            onChange={(e) => setFilterType(e.target.value)}
+            onChange={handleFilterTypeChange}
             className="select select-sm"
           >
             <option value="name">Tên người dùng</option>
-            <option value="role">Chức vụ</option>
+            <option value="roles">Chức vụ</option>
           </select>
           <div className="flex items-center justify-center">
             <p className="ml-3 text-black">
@@ -156,7 +168,7 @@ const Users = () => {
                 filterType === "name" ? "tên" : "chức vụ"
               }`}
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={handleSearch}
               className="input input-sm ml-1"
             />
           </div>
@@ -171,7 +183,7 @@ const Users = () => {
           <AddUserModal
             addUserModalOpen={addUserModalOpen}
             setAddUserModalOpen={setAddUserModalOpen}
-            refetchData={refetchData}
+            refetchData={refetch}
             onAddUser={handleAddUser}
           />
         </div>
@@ -189,9 +201,9 @@ const Users = () => {
             </tr>
           </thead>
           <tbody className="text-black">
-            {currentUsers.map((user, index) => (
-              <tr key={index} className="border-gray-300">
-                <th>{index + 1 + indexOfFirstItem}</th>
+            {users.map((user, index) => (
+              <tr key={user._id} className="border-gray-300">
+                <th>{index + 1}</th>
                 <td>{user.name}</td>
                 <td>{user.email}</td>
                 <td>
@@ -224,21 +236,21 @@ const Users = () => {
             ))}
           </tbody>
         </table>
-        <ConfirmDeleteModal
-          showModal={showConfirmModal}
-          onClose={() => setShowConfirmModal(false)}
-          onConfirm={confirmDeleteUser}
-          title="Xác nhận xóa người dùng"
-          message="Bạn có chắc chắn muốn xóa người dùng này?"
-        />
-        {/* Pagination */}
+      </div>
+      <div className="flex justify-center mt-4">
         <Pagination
-          itemsPerPage={itemsPerPage}
-          totalItems={filteredUsers.length}
-          currentPage={currentPage}
-          paginate={paginate}
+          count={totalPages}
+          page={page}
+          onChange={handlePageChange}
+          color="success"
         />
       </div>
+      <ConfirmDeleteModal
+        isOpen={showConfirmModal}
+        onClose={() => setShowConfirmModal(false)}
+        onConfirm={confirmDeleteUser}
+        message="Bạn có chắc chắn muốn xóa người dùng này?"
+      />
     </div>
   );
 };

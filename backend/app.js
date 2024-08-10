@@ -46,6 +46,7 @@ app.use("/products", require("./routes/productsRoutes"));
 app.use("/email", require("./routes/sendEmailRoutes"));
 app.use("/vouchers", require("./routes/voucherRoutes"));
 app.use("/statuses", require("./routes/statusRoutes"));
+app.use("/order-request", require("./routes/orderRequestRoutes"));
 
 app.post("/jwt", async (req, res) => {
   const user = req.body;

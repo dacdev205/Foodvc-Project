@@ -20,7 +20,7 @@ router.patch(
 router.delete(
   "/:id",
   verifyToken,
-  checkPermission("detele_address"),
+  checkPermission("delete_address"),
   addressAPI.deleteAddressByID
 );
 

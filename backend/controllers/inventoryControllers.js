@@ -5,14 +5,61 @@ const axios = require("axios");
 const Menu = require("../models/menu");
 
 module.exports = class inventoryAPI {
-  static async fetchAllInventory(req, res) {
+  static async fetchInventorys(req, res) {
     try {
-      const inventorys = await Product.find();
-      res.status(200).json(inventorys);
+      const {
+        searchTerm = "",
+        filterType = "name",
+        page = 1,
+        limit = 5,
+        sortBy = "",
+        sortOrder = "asc",
+      } = req.query;
+
+      const query = {};
+      const sortOptions = {};
+
+      if (searchTerm) {
+        switch (filterType) {
+          case "name":
+            query.name = { $regex: searchTerm, $options: "i" };
+            break;
+          case "category":
+            query.category = { $regex: searchTerm, $options: "i" };
+            break;
+          case "brand":
+            query.brand = { $regex: searchTerm, $options: "i" };
+            break;
+          case "productionLocation":
+            query.productionLocation = { $regex: searchTerm, $options: "i" };
+            break;
+          case "instructions":
+            query.instructions = { $regex: searchTerm, $options: "i" };
+            break;
+          default:
+            query.name = { $regex: searchTerm, $options: "i" };
+            break;
+        }
+      }
+
+      if (sortBy) {
+        sortOptions[sortBy] = sortOrder === "asc" ? -1 : 1;
+      }
+
+      const inventory = await Product.find(query)
+        .sort(sortOptions)
+        .skip((page - 1) * limit)
+        .limit(Number(limit));
+
+      const totalProduct = await Product.countDocuments(query);
+      const totalPages = Math.ceil(totalProduct / limit);
+
+      res.json({ inventory, totalPages });
     } catch (err) {
       res.status(500).json({ message: err.message });
     }
   }
+
   // fetch product by id
   static async fetchProductByID(req, res) {
     const id = req.params.id;

@@ -11,6 +11,44 @@ module.exports = class usersAPI {
       res.status(500).json({ message: error.message });
     }
   }
+  static async getUsers(req, res) {
+    try {
+      const {
+        searchTerm = "",
+        filterType = "name",
+        page = 1,
+        limit = 5,
+      } = req.query;
+
+      const query = {};
+      if (searchTerm) {
+        if (filterType === "name") {
+          query.name = { $regex: searchTerm, $options: "i" };
+        } else if (filterType === "roles") {
+          const role = await Role.findOne({
+            name: { $regex: searchTerm, $options: "i" },
+          });
+          if (role) {
+            query.roles = role._id;
+          } else {
+            query.roles = null;
+          }
+        }
+      }
+
+      const users = await User.find(query)
+        .skip((page - 1) * limit)
+        .limit(Number(limit))
+        .populate("roles");
+
+      const totalUsers = await User.countDocuments(query);
+      const totalPages = Math.ceil(totalUsers / limit);
+
+      res.json({ users, totalPages });
+    } catch (error) {
+      res.status(500).json({ message: "Internal Server Error" });
+    }
+  }
 
   static async getSigleUser(req, res) {
     const id = req.params.id;
@@ -170,7 +208,15 @@ module.exports = class usersAPI {
       res.status(500).json({ message: error.message });
     }
   }
-
+  static async getRoleById(req, res) {
+    const id = req.params.id;
+    try {
+      const role = await Role.findById(id);
+      res.status(200).json(role);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  }
   static async updateUserRole(req, res) {
     const userId = req.params.id;
     const { roleId } = req.body;

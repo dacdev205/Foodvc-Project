@@ -25,12 +25,7 @@ router.post(
   menuAPI.createProduct
 );
 router.post("/add-to-menu", upload, menuAPI.createProduct);
-router.get(
-  "/",
-  verifyToken,
-  checkPermission("dashboard_actions"),
-  menuAPI.fetchAllMenu
-);
+router.get("/", menuAPI.fetchMenus);
 router.get("/:id", menuAPI.fetchProductByID);
 router.patch(
   "/quantity/:id",
@@ -50,7 +45,7 @@ router.patch(
 router.post(
   "/apply-voucher",
   verifyToken,
-  checkPermission("dashboard_actions"),
+  checkPermission("read"),
   menuAPI.applyVoucher
 );
 

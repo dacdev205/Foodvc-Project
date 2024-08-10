@@ -13,7 +13,8 @@ const AddressFormEditv2 = ({
   addressToEdit,
 }) => {
   const { user } = useAuth();
-  const [address, refetchAddress] = useAddress();
+  const [address, totalPages, refetchAddress, isLoading] = useAddress();
+
   const [formData, setFormData] = useState({
     fullName: "",
     phone: "",
@@ -31,7 +32,6 @@ const AddressFormEditv2 = ({
   const [isDefaultAddress, setIsDefaultAddress] = useState(false);
   const GHN_TOKEN = import.meta.env.VITE_GHN_TOKEN;
   const [wardsId, setWardsId] = useState([]);
-
   useEffect(() => {
     if (addressToEdit) {
       setFormData({

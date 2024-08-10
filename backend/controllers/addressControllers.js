@@ -53,9 +53,19 @@ module.exports = class AddressAPI {
   static async fetchAllAddressWithEmail(req, res) {
     try {
       const email = req.query.email;
-      const addresses = await Address.find({ email: email });
-      if (addresses) {
-        res.status(200).json(addresses);
+      const { page = 1, limit = 5 } = req.query;
+
+      const addresses = await Address.find({ email: email })
+        .skip((page - 1) * limit)
+        .limit(limit);
+
+      const totalAddresses = await Address.countDocuments({ email: email });
+
+      if (addresses.length > 0) {
+        res.status(200).json({
+          addresses,
+          totalPages: Math.ceil(totalAddresses / limit),
+        });
       } else {
         res.status(404).json({ message: "Address not found" });
       }
@@ -63,6 +73,7 @@ module.exports = class AddressAPI {
       res.status(500).json({ message: err.message });
     }
   }
+
   static async updateAddress(req, res) {
     const id = req.params.id;
     const updatedAddress = req.body;

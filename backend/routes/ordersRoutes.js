@@ -10,12 +10,7 @@ router.post(
   checkPermission("create_order"),
   orderAPI.createOrder
 );
-router.get(
-  "/",
-  verifyToken,
-  checkPermission("read"),
-  orderAPI.fetchAllOrderWithEmail
-);
+
 router.get(
   "/allOrder",
   verifyToken,
@@ -32,7 +27,7 @@ router.get(
 router.patch(
   "/:id",
   verifyToken,
-  checkPermission("update_order"),
+  checkPermission("manage_orders"),
   orderAPI.updateOrderStatus
 );
 router.get(

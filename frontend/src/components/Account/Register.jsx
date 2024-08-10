@@ -91,7 +91,7 @@ const Register = () => {
                     theme: "colored",
                     transition: Bounce,
                   });
-                  navigate(from, { replace: true });
+                  navigate("/", { replace: true });
                 } else {
                   console.error(
                     "Lỗi: userInfor.name không được xác định hoặc là giá trị sai"

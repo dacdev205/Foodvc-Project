@@ -54,8 +54,6 @@ const Payment = () => {
     const fetchShopData = async () => {
       try {
         const res = await ghnAPI.getAddressFOODVC();
-        console.log(res);
-
         setShopData(res.data.shops[0]);
       } catch (error) {
         console.error(error);

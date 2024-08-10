@@ -21,7 +21,7 @@ export default defineConfig({
       },
     },
   },
-  // server: {
-  //   port: 3001,
-  // },
+  daisyui: {
+    themes: ["light", "dark", "cupcake"],
+  },
 });

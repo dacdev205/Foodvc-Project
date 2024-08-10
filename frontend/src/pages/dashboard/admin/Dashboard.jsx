@@ -126,19 +126,14 @@ const Dashboard = () => {
     });
   };
 
-  const handleResultClick = () => {
-    axios
-      .post(
-        `http://localhost:3000/adminStats/products/sold?startDate=${startDate}&endDate=${endDate}`
-      )
-      .then((response) => {
-        const data = response.data;
-        setResult(data);
-        exportToExcel(data, startDate, endDate);
-      })
-      .catch((error) => {
-        console.error("Error fetching data:", error);
-      });
+  const handleResultClick = async () => {
+    try {
+      const data = await statsAPI.fetchSoldProducts(startDate, endDate);
+      setResult(data);
+      exportToExcel(data, startDate, endDate);
+    } catch (error) {
+      console.error("Error handling result click:", error);
+    }
   };
 
   return (

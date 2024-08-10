@@ -53,11 +53,7 @@ const Cards = ({ item }) => {
     };
 
     try {
-      await axios.post("http://localhost:3000/cart", cartItem, {
-        headers: {
-          authorization: `Bearer ${token}`,
-        },
-      });
+      await cartAPI.postToCart(cartItem);
       toast.success("Thêm vào giỏ hàng thành công!", {
         position: "bottom-right",
         autoClose: 3000,

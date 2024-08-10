@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Link, Outlet } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Link, Outlet, useLocation } from "react-router-dom";
 import {
   MdDashboard,
   MdDashboardCustomize,
@@ -7,16 +7,14 @@ import {
   MdOutlineRateReview,
 } from "react-icons/md";
 import { VscLayoutMenubar } from "react-icons/vsc";
-import { CiDiscount1 } from "react-icons/ci";
 import { FcStatistics } from "react-icons/fc";
-import { BiSolidDiscount } from "react-icons/bi";
 import {
   FaWarehouse,
   FaUser,
-  FaShoppingBag,
   FaQuestionCircle,
   FaUsers,
   FaPercentage,
+  FaShoppingBag,
 } from "react-icons/fa";
 import { RiMoneyCnyCircleLine } from "react-icons/ri";
 import { IoIosAddCircle, IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
@@ -24,42 +22,44 @@ import { AiOutlineMenu } from "react-icons/ai";
 import Login from "../components/Account/Login";
 import useAuth from "../hooks/useAuth";
 import usePermission from "../hooks/usePermission";
-const shareLinks = (
-  <>
-    <li>
-      <Link to="/admin/help-users">
-        <FaQuestionCircle />
-        Hỗ trợ khách hàng
-      </Link>
-    </li>
-  </>
-);
-const isAdminDashboard = location.pathname === "/admin";
+import orderRequestAPI from "../api/orderRequest";
+
 const DashBoardLayout = () => {
   const { loading } = useAuth();
   const [rolePermission, isPermissionLoading] = usePermission("admin_pages");
-
   const [promotionsOpen, setPromotionsOpen] = useState(false);
   const [inventoryOpen, setInventoryOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [usersOpen, setUsersOpen] = useState(false);
+  const [supportOpen, setSupportOpen] = useState(false);
+  const [orderRequests, setOrderRequests] = useState(0);
+  const location = useLocation();
 
-  const togglePromotions = () => {
-    setPromotionsOpen(!promotionsOpen);
+  const togglePromotions = () => setPromotionsOpen(!promotionsOpen);
+  const toggleInventory = () => setInventoryOpen(!inventoryOpen);
+  const toggleMenu = () => setMenuOpen(!menuOpen);
+  const toggleSupport = () => setSupportOpen(!supportOpen);
+  const toggleUsers = () => setUsersOpen(!usersOpen);
+
+  useEffect(() => {
+    const fetchOrderReq = async () => {
+      try {
+        const res = await orderRequestAPI.getAllCancelReq();
+        const pendingOrders = res.requests.filter(
+          (order) => order.status === "Pending"
+        );
+        setOrderRequests(pendingOrders.length);
+      } catch (error) {
+        console.error("Error fetching order requests:", error);
+      }
+    };
+
+    fetchOrderReq();
+  }, []);
+
+  const handleOrderRequestsClick = () => {
+    setOrderRequests(0);
   };
-
-  const toggleInventory = () => {
-    setInventoryOpen(!inventoryOpen);
-  };
-
-  const toggleMenu = () => {
-    setMenuOpen(!menuOpen);
-  };
-
-  const toggleUsers = () => {
-    setUsersOpen(!usersOpen);
-  };
-
   return (
     <div>
       {rolePermission ? (
@@ -102,7 +102,7 @@ const DashBoardLayout = () => {
               <li>
                 <Link
                   className={`active-link-2 ${
-                    isAdminDashboard ? "text-green" : ""
+                    location.pathname === "/admin" ? "text-green" : ""
                   }`}
                   to="/admin"
                 >
@@ -285,7 +285,8 @@ const DashBoardLayout = () => {
                         }`}
                         to="/admin/add-voucher"
                       >
-                        <CiDiscount1 /> Giảm Giá Sản Phẩm
+                        <IoIosAddCircle />
+                        Giảm Giá Sản Phẩm
                       </Link>
                     </li>
                     <li>
@@ -297,7 +298,8 @@ const DashBoardLayout = () => {
                         }`}
                         to="/admin/create-voucher"
                       >
-                        <BiSolidDiscount /> Mã Giảm Giá
+                        <MdOutlineRateReview />
+                        Quản lý khuyến mãi
                       </Link>
                     </li>
                   </ul>
@@ -329,20 +331,96 @@ const DashBoardLayout = () => {
                   Quản lý đánh giá
                 </Link>
               </li>
-
-              <hr />
-              {shareLinks}
+              <li>
+                <div
+                  onClick={() => {
+                    toggleSupport();
+                  }}
+                  className="cursor-pointer flex items-center active-link"
+                >
+                  <FaQuestionCircle />
+                  <span>Hỗ trợ khách hàng</span>
+                  {supportOpen ? (
+                    <IoIosArrowUp className="ml-auto" />
+                  ) : (
+                    <IoIosArrowDown className="ml-auto" />
+                  )}
+                  {orderRequests > 0 && (
+                    <span className="badge badge-error text-white ml-2">
+                      {orderRequests}
+                    </span>
+                  )}
+                </div>
+                {supportOpen && (
+                  <ul className="ml-4">
+                    <li>
+                      <Link
+                        onClick={() => {
+                          handleOrderRequestsClick();
+                        }}
+                        className={`active-link-2 ${
+                          location.pathname.startsWith("/admin/order-requests")
+                            ? "text-green"
+                            : ""
+                        }`}
+                        to="/admin/order-requests"
+                      >
+                        <FaQuestionCircle />
+                        Yêu cầu đơn hàng
+                        {orderRequests > 0 && (
+                          <span className="badge badge-error text-white ml-2">
+                            {orderRequests}
+                          </span>
+                        )}
+                      </Link>
+                    </li>
+                    <li>
+                      <Link
+                        className={`active-link-2 ${
+                          location.pathname.startsWith("/admin/feedbacks")
+                            ? "text-green"
+                            : ""
+                        }`}
+                        to="/admin/feedbacks"
+                      >
+                        <FaQuestionCircle />
+                        Phản hồi
+                      </Link>
+                    </li>
+                    <li>
+                      <Link
+                        className={`active-link-2 ${
+                          location.pathname.startsWith("/admin/help-users")
+                            ? "text-green"
+                            : ""
+                        }`}
+                        to="/admin/help-users"
+                      >
+                        <FaQuestionCircle />
+                        Hỗ trợ người dùng
+                      </Link>
+                    </li>
+                  </ul>
+                )}
+              </li>
+              <li>
+                <Link
+                  className={`active-link-2 ${
+                    location.pathname.startsWith("/admin/settings")
+                      ? "text-green"
+                      : ""
+                  }`}
+                  to="/admin/settings"
+                >
+                  <RiMoneyCnyCircleLine />
+                  Cài đặt
+                </Link>
+              </li>
             </ul>
           </div>
         </div>
-      ) : loading ? (
-        <Login />
       ) : (
-        <div className="h-screen flex justify-center items-center">
-          <Link to="/">
-            <button className="btn bg-green text-white">Back to Home</button>
-          </Link>
-        </div>
+        <Login />
       )}
     </div>
   );

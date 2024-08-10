@@ -34,35 +34,65 @@ module.exports = class orderAPI {
 
   static async getUserOrders(req, res) {
     const userId = req.params.userId;
+    const {
+      searchTerm = "",
+      filterType = "orderCode",
+      page = 1,
+      limit = 5,
+    } = req.query;
+
+    const query = { userId };
     try {
-      const orders = await Order.find({ userId }).populate("statusId");
-      res.status(200).json(orders);
+      if (searchTerm) {
+        if (filterType === "orderCode") {
+          query.orderCode = { $regex: searchTerm, $options: "i" };
+        }
+      }
+      const orders = await Order.find(query)
+        .skip((page - 1) * limit)
+        .limit(limit)
+        .populate("statusId")
+        .populate("products.productId");
+
+      const totalOrders = await Order.countDocuments(query);
+      const totalPages = Math.ceil(totalOrders / limit);
+
+      res.status(200).json({
+        orders,
+        totalPages,
+      });
     } catch (error) {
       console.error("Error fetching user orders:", error);
       res.status(500).json({ message: error.message });
     }
   }
 
-  static async fetchAllOrderWithEmail(req, res) {
-    try {
-      const email = req.query.email;
-      const orders = await Order.find({ email })
-        .populate("statusId")
-        .populate("products.productId");
-      if (orders.length > 0) {
-        res.status(200).json(orders);
-      } else {
-        res.status(404).json({ message: "Order not found" });
-      }
-    } catch (err) {
-      res.status(500).json({ message: err.message });
-    }
-  }
-
   static async fetchAllOrder(req, res) {
     try {
-      const orders = await Order.find().populate("statusId");
-      res.status(200).json(orders);
+      const {
+        searchTerm = "",
+        searchStatus = "",
+        page = 1,
+        limit = 5,
+      } = req.query;
+
+      const filter = {};
+
+      if (searchTerm) {
+        filter.orderCode = { $regex: searchTerm, $options: "i" };
+      }
+      if (searchStatus) {
+        filter.statusId = searchStatus;
+      }
+
+      const orders = await Order.find(filter)
+        .skip((page - 1) * limit)
+        .limit(limit)
+        .populate("statusId")
+        .populate("products.productId");
+      const totalOrders = await Order.countDocuments(filter);
+      const totalPages = Math.ceil(totalOrders / limit);
+      res.status(200).json({ orders, totalPages });
     } catch (err) {
       res.status(500).json({ message: err.message });
     }

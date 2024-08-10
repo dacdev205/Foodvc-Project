@@ -13,12 +13,12 @@ module.exports = class reviewAPI {
     try {
       const { productId, userId, rating, comment } = req.body;
 
-      const menu = await Menu.findOne({ productId });
+      const menu = await Menu.findOne({ _id: productId });
       if (!menu) {
         return res.status(404).json({ message: "Menu item not found" });
       }
       const newReview = await Review.create({
-        productId: menu.productId._id,
+        productId: menu.productId,
         userId,
         rating,
         comment,

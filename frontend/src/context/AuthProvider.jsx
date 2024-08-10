@@ -119,7 +119,12 @@ const AuthProvider = ({ children }) => {
       return unsubscribe();
     };
   }, []);
-
+  const updateUser = (newUserData) => {
+    setUser((prevUser) => ({
+      ...prevUser,
+      ...newUserData,
+    }));
+  };
   const authInfo = {
     user,
     createUser,
@@ -127,6 +132,7 @@ const AuthProvider = ({ children }) => {
     signUpWithGmail,
     login,
     logOut,
+    updateUser,
     updateUserProfile,
     loading,
     changePassword,

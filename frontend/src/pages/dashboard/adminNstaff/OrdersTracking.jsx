@@ -1,31 +1,39 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import orderAPI from "../../../api/orderAPI";
-import Pagination from "../../../ultis/Pagination";
 import { FaEye } from "react-icons/fa";
 import FormattedPrice from "../../../ultis/FormatedPriece";
+import { Bounce, toast } from "react-toastify";
+import { Pagination } from "@mui/material";
 
 const OrdersTracking = () => {
   const [allOrders, setAllOrders] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [searchStatus, setSearchStatus] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(5);
   const [statuses, setStatuses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
   useEffect(() => {
     const fetchAllOrders = async () => {
       try {
-        const response = await orderAPI.getAllOrder();
-        setAllOrders(response);
+        const response = await orderAPI.getAllOrder(
+          searchTerm,
+          searchStatus,
+          page,
+          5
+        );
+        setTotalPages(response.totalPages);
+        setAllOrders(response.orders);
       } catch (error) {
         console.error("Failed to fetch orders:", error);
       }
     };
 
     fetchAllOrders();
-  }, []);
+  }, [searchTerm, searchStatus, page]);
+
   useEffect(() => {
     const fetchStatuses = async () => {
       try {
@@ -40,27 +48,28 @@ const OrdersTracking = () => {
 
     fetchStatuses();
   }, []);
-  const paginate = (pageNumber) => {
-    setCurrentPage(pageNumber);
-  };
 
   const handleStatusChange = async (orderId, newStatusId) => {
     try {
       await orderAPI.updateOrderStatus(orderId, newStatusId);
-      const updatedOrders = await orderAPI.getAllOrder();
-      setAllOrders(updatedOrders);
+      const updatedOrders = await orderAPI.getAllOrder(
+        searchTerm,
+        searchStatus
+      );
+      setAllOrders(updatedOrders.orders);
+      toast.success("Trạng thái đã được cập nhật", {
+        position: "bottom-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+        transition: Bounce,
+      });
     } catch (error) {
       console.error("Failed to update order status:", error);
-    }
-  };
-
-  const handleCancelOrder = async (orderId) => {
-    try {
-      await orderAPI.updateOrderStatus(orderId, "Cancelled");
-      const updatedOrders = await orderAPI.getAllOrder();
-      setAllOrders(updatedOrders);
-    } catch (error) {
-      console.error("Failed to cancel order:", error);
     }
   };
 
@@ -71,19 +80,9 @@ const OrdersTracking = () => {
   const handleStatusChangeSearch = (e) => {
     setSearchStatus(e.target.value);
   };
-
-  const filteredOrders = allOrders.filter((order) => {
-    return (
-      order.orderCode.toLowerCase().includes(searchTerm.toLowerCase()) &&
-      (searchStatus === "" || order.status.name === searchStatus)
-    );
-  });
-
-  const currentOrders = filteredOrders.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
-
+  const handlePageChange = (event, value) => {
+    setPage(value);
+  };
   return (
     <div className="w-full md:w-[870px] px-4 mx-auto">
       <div>
@@ -106,13 +105,11 @@ const OrdersTracking = () => {
           className="select select-sm"
         >
           <option value="">Tất cả trạng thái</option>
-          <option value="Pending">Chờ xác nhận</option>
-          <option value="Waiting4Pickup">Chờ lấy hàng</option>
-          <option value="InTransit">Vận chuyển</option>
-          <option value="Delivery">Chờ giao hàng</option>
-          <option value="Completed">Hoàn thành</option>
-          <option value="Cancelled">Đã hủy</option>
-          <option value="ReturnedRefunded">Trả hàng/Hoàn tiền</option>
+          {statuses.map((status) => (
+            <option key={status._id} value={status._id}>
+              {status.description}
+            </option>
+          ))}
         </select>
       </div>
       {allOrders.length ? (
@@ -130,7 +127,7 @@ const OrdersTracking = () => {
                 </tr>
               </thead>
               <tbody>
-                {currentOrders.map((order, index) => (
+                {allOrders.map((order, index) => (
                   <tr key={index} className="text-black border-gray-300">
                     <td>{index + 1}</td>
                     <td>{order.orderCode}</td>
@@ -161,26 +158,20 @@ const OrdersTracking = () => {
                           <FaEye />
                         </Link>
                       </button>
-                      {order.statusId.name === "Pending" && (
-                        <button
-                          onClick={() => handleCancelOrder(order._id)}
-                          className="ml-2 text-red-500"
-                        >
-                          Hủy đơn
-                        </button>
-                      )}
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
-          <Pagination
-            itemsPerPage={itemsPerPage}
-            totalItems={filteredOrders.length}
-            currentPage={currentPage}
-            paginate={paginate}
-          />
+          <div className="flex justify-center mt-4">
+            <Pagination
+              count={totalPages}
+              page={page}
+              onChange={handlePageChange}
+              color="success"
+            />
+          </div>
         </div>
       ) : (
         <p className="text-center text-black">Không có đơn hàng nào.</p>

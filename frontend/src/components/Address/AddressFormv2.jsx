@@ -10,7 +10,8 @@ import axios from "axios";
 // eslint-disable-next-line react/prop-types
 const AddressFormv2 = ({ userId }) => {
   const { user } = useAuth();
-  const [address, refetchAddress] = useAddress();
+  const [address, totalPages, refetchAddress, isLoading] = useAddress();
+
   const [districts, setDistricts] = useState([]);
   const [cities, setCities] = useState([]);
   const [districtsID, setDistrictsID] = useState([]);

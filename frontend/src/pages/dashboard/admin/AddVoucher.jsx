@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import useMenu from "../../../hooks/useMenu";
-import Pagination from "../../../ultis/Pagination";
 import axios from "axios";
 import inventoryAPI from "../../../api/inventoryAPI";
 import FormattedPrice from "../../../ultis/FormatedPriece";
@@ -12,52 +11,18 @@ const AddVoucher = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [sortType, setSortType] = useState("name");
   const [sortOrder, setSortOrder] = useState("asc");
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(5);
   const [selectedCategory, setSelectedCategory] = useState("");
   const [discountPercentage, setDiscountPercentage] = useState("");
-  const categories = [...new Set(menu.map((item) => item.category))];
+  const categories = [...new Set(menu.map((item) => item.productId.category))];
   const [selectedProducts, setSelectedProducts] = useState([]);
 
-  const paginate = (pageNumber) => {
-    setCurrentPage(pageNumber);
-  };
-
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   useEffect(() => {
     refetch();
   }, [sortType, sortOrder, refetch]);
 
   const handleSearch = (e) => {
     setSearchTerm(e.target.value);
-    setCurrentPage(1);
   };
-
-  const handleSort = (type) => {
-    if (type === sortType) {
-      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
-    } else {
-      setSortType(type);
-      setSortOrder("asc");
-    }
-  };
-  const filteredMenu = menu.filter((item) => {
-    const nameMatches = item.name
-      .toLowerCase()
-      .includes(searchTerm.toLowerCase());
-    const categoryMatches =
-      selectedCategory === "" || item.category === selectedCategory;
-    return nameMatches && categoryMatches;
-  });
-
-  const sortedMenu = filteredMenu.sort((a, b) => {
-    const dateA = new Date(a.createdAt);
-    const dateB = new Date(b.createdAt);
-
-    return sortOrder === "desc" ? dateA - dateB : dateB - dateA;
-  });
-  const currentMenu = sortedMenu.slice(indexOfFirstItem, indexOfLastItem);
 
   const handleApplyVoucher = async () => {
     try {
@@ -203,39 +168,34 @@ const AddVoucher = () => {
                 <th>#</th>
                 <th>Stt</th>
                 <th>Hình ảnh</th>
-                <th onClick={() => handleSort("name")} className="curser">
-                  Tên sản phẩm
-                </th>
-                <th onClick={() => handleSort("price")}>Giá</th>
-                <th
-                  onClick={() => handleSort("quantity")}
-                  className="text-center"
-                >
-                  Số lượng
-                </th>
+                <th className="curser">Tên sản phẩm</th>
+                <th>Giá</th>
+                <th className="text-center">Số lượng</th>
               </tr>
             </thead>
             <tbody>
-              {currentMenu.map((item, index) => (
+              {menu.map((item, index) => (
                 <tr key={index} className="text-black border-gray-300">
                   <td>
                     <label
-                      htmlFor={`checkbox-${item._id}`}
+                      htmlFor={`checkbox-${item.productId._id}`}
                       className="cursor-pointer relative"
                     >
                       <input
                         type="checkbox"
-                        id={`checkbox-${item._id}`}
-                        checked={selectedProducts.includes(item._id)}
-                        onChange={(e) => handleCheckboxChange(e, item._id)}
+                        id={`checkbox-${item.productId._id}`}
+                        checked={selectedProducts.includes(item.productId._id)}
+                        onChange={(e) =>
+                          handleCheckboxChange(e, item.productId._id)
+                        }
                         className="appearance-none w-4 h-4 rounded-sm bg-white border-2 border-[#39d84A] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
                       />
                       <FaCheck
                         className={`absolute top-0 left-[1px] text-green ${
-                          selectedProducts.includes(item._id)
+                          selectedProducts.includes(item.productId._id)
                             ? "text-opacity-100"
                             : "text-opacity-0"
-                        } check-${item._id} transition`}
+                        } check-${item.productId._id} transition`}
                       />
                     </label>
                   </td>
@@ -244,26 +204,19 @@ const AddVoucher = () => {
                   <td>
                     <div className="avatar">
                       <div className="mask mask-squircle w-12 h-12">
-                        <img src={PF + "/" + item.image} alt="" />
+                        <img src={PF + "/" + item.productId.image} alt="" />
                       </div>
                     </div>
                   </td>
-                  <td>{item.name.slice(0, 20)}...</td>
+                  <td>{item.productId.name.slice(0, 20)}...</td>
                   <td>
-                    <FormattedPrice price={item.price} />
+                    <FormattedPrice price={item.productId.price} />
                   </td>
-                  <td className="text-center">{item.quantity}</td>
+                  <td className="text-center">{item.productId.quantity}</td>
                 </tr>
               ))}
             </tbody>
           </table>
-
-          <Pagination
-            itemsPerPage={itemsPerPage}
-            totalItems={filteredMenu.length}
-            currentPage={currentPage}
-            paginate={paginate}
-          />
         </div>
       </div>
     </div>

@@ -10,7 +10,8 @@ import useAxiosSecure from "../../../hooks/useAxiosSecure";
 import inventoryAPI from "../../../api/inventoryAPI";
 import menuAPI from "../../../api/menuAPI";
 import useInventory from "../../../hooks/useInventory";
-import Pagination from "../../../ultis/Pagination";
+import { Pagination } from "@mui/material";
+
 import FormattedPrice from "../../../ultis/FormatedPriece";
 import ConfirmDeleteModal from "../../../ultis/ConfirmDeleteModal";
 import TransferToMenuModal from "../../../components/Modal/TransferToMenuModal";
@@ -18,45 +19,55 @@ import UpdateQuantityModal from "../../../components/Modal/UpdateQuantityModal";
 import { Bounce, toast } from "react-toastify";
 const ManageInventory = () => {
   const PF = "http://localhost:3000";
-  const [inventory, , refetch] = useInventory();
-  const axiosSecure = useAxiosSecure();
 
+  const axiosSecure = useAxiosSecure();
   const [searchTerm, setSearchTerm] = useState("");
-  const [sortType, setSortType] = useState("createdAt");
-  const [sortOrder, setSortOrder] = useState("desc");
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(5);
+  const [page, setPage] = useState(1);
+  const [filterType, setFilterType] = useState("name");
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [productToDelete, setProductToDelete] = useState(null);
   const [showRemoveConfirmModal, setShowRemoveConfirmModal] = useState(false);
   const [productToRemove, setProductToRemove] = useState(null);
+  const [sortBy, setSortBy] = useState("");
+  const [sortOrder, setSortOrder] = useState("asc");
 
   const [openModal, setOpenModal] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
-  const token = localStorage.getItem("access-token");
-
   const [openUpdateQuantityModal, setOpenUpdateQuantityModal] = useState(false);
-
-  const paginate = (pageNumber) => {
-    setCurrentPage(pageNumber);
-  };
-
+  const [inventory, totalPages, refetch] = useInventory(
+    searchTerm,
+    filterType,
+    page,
+    5,
+    sortBy,
+    sortOrder
+  );
+  useEffect(() => {
+    refetch();
+  }, [page, searchTerm, filterType, refetch]);
   const handleSearch = (e) => {
     setSearchTerm(e.target.value);
-    setCurrentPage(1);
+    setPage(1);
+    refetch();
   };
-
-  const handleSort = (e) => {
-    const value = e.target.value;
-    setSortType(value);
-    setCurrentPage(1);
+  const handlePageChange = (event, value) => {
+    setPage(value);
+    refetch();
   };
-
-  const handleOrderChange = (e) => {
-    setSortOrder(e.target.value);
-    setCurrentPage(1);
+  const handleFilterChange = (e) => {
+    setFilterType(e.target.value);
+    setPage(1);
+    refetch();
   };
+  const handleSortChange = (e) => {
+    const [field, order] = e.target.value.split(":");
+    console.log(field, order);
 
+    setSortBy(field);
+    setSortOrder(order);
+    setPage(1);
+    refetch();
+  };
   const handleTransferToMenu = (item) => {
     setSelectedProduct(item);
     setOpenModal(true);
@@ -175,26 +186,6 @@ const ManageInventory = () => {
     }
   };
 
-  const filteredInventory = inventory.filter(
-    (item) =>
-      item.name && item.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  const sortedInventory = filteredInventory.sort((a, b) => {
-    if (sortOrder === "asc") {
-      return a[sortType] > b[sortType] ? 1 : -1;
-    } else {
-      return a[sortType] < b[sortType] ? 1 : -1;
-    }
-  });
-
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentInventory = sortedInventory.slice(
-    indexOfFirstItem,
-    indexOfLastItem
-  );
-
   const handleDeleteItem = async (item) => {
     const res = await inventoryAPI.deleteProductById(item._id);
     setShowConfirmModal(false);
@@ -221,46 +212,37 @@ const ManageInventory = () => {
         Quản lý tất cả <span className="text-green">sản phẩm trong kho</span>
       </h2>
       <div className="flex items-center my-2">
-        <label htmlFor="search" className="mr-2 text-black">
-          Tìm kiếm theo tên:
-        </label>
         <input
           type="text"
-          id="search"
           placeholder="Nhập tên sản phẩm"
           value={searchTerm}
           onChange={handleSearch}
           className="input input-sm text-black"
         />
-        <label htmlFor="sort" className="ml-2 mr-2 text-black">
-          Sắp xếp theo:
-        </label>
         <select
-          id="sort"
-          value={sortType}
-          onChange={handleSort}
-          className="select select-sm text-black"
+          value={filterType}
+          onChange={handleFilterChange}
+          className="select select-sm ml-2"
         >
           <option value="name">Tên sản phẩm</option>
-          <option value="price">Giá</option>
-          <option value="quantity">Số lượng</option>
-          <option value="status">Trạng thái</option>
+          <option value="brand">Thương hiệu</option>
+          <option value="category">Danh mục</option>
+          <option value="location">Nơi sản xuất</option>
         </select>
-        <label htmlFor="order" className="ml-2 mr-2 text-black">
-          Thứ tự:
-        </label>
         <select
-          id="order"
-          value={sortOrder}
-          onChange={handleOrderChange}
-          className="select select-sm"
+          value={`${sortBy}:${sortOrder}`}
+          onChange={handleSortChange}
+          className="select select-sm ml-2"
         >
-          <option value="asc">Tăng dần</option>
-          <option value="desc">Giảm dần</option>
+          <option value="">Sắp xếp theo</option>
+          <option value="price:asc">Giá tăng dần</option>
+          <option value="price:desc">Giá giảm dần</option>
+          <option value="quantity:asc">Số lượng tăng dần</option>
+          <option value="quantity:desc">Số lượng giảm dần</option>
         </select>
       </div>
       <div>
-        <div className="overflow-x-auto">
+        <div className="">
           <table className="table">
             <thead>
               <tr className="text-black border-style">
@@ -275,7 +257,7 @@ const ManageInventory = () => {
               </tr>
             </thead>
             <tbody>
-              {currentInventory.map((item, index) => (
+              {inventory.map((item, index) => (
                 <tr key={index} className="boder border-gray-300">
                   <th className="text-black">{index + 1}</th>
                   <td>
@@ -368,13 +350,15 @@ const ManageInventory = () => {
             title="Xác nhận gỡ sản phẩm khỏi menu"
             message="Bạn có chắc chắn muốn gỡ sản phẩm này khỏi menu?"
           />
-          <Pagination
-            itemsPerPage={itemsPerPage}
-            totalItems={filteredInventory.length}
-            currentPage={currentPage}
-            paginate={paginate}
-          />
         </div>
+      </div>
+      <div className="flex justify-center mt-4">
+        <Pagination
+          count={totalPages}
+          page={page}
+          onChange={handlePageChange}
+          color="success"
+        />
       </div>
     </div>
   );

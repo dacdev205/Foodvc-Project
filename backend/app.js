@@ -47,7 +47,7 @@ app.use("/email", require("./routes/sendEmailRoutes"));
 app.use("/vouchers", require("./routes/voucherRoutes"));
 app.use("/statuses", require("./routes/statusRoutes"));
 app.use("/order-request", require("./routes/orderRequestRoutes"));
-
+app.use("/method-deli", require("./routes/methodDeliRoutes"));
 app.post("/jwt", async (req, res) => {
   const user = req.body;
   const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {

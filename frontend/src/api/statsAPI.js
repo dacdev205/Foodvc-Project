@@ -6,7 +6,7 @@ export default class statsAPI {
   static async getAllStats() {
     const res = await axios.get(url, {
       headers: {
-        authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${token}`,
       },
     });
     return res.data;
@@ -18,7 +18,7 @@ export default class statsAPI {
         {},
         {
           headers: {
-            authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${token}`,
           },
           params: { startDate: startDate, endDate: endDate },
         }
@@ -36,7 +36,7 @@ export default class statsAPI {
         `${url}/${selectedYear}`,
         {
           headers: {
-            authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${token}`,
           },
         },
         {
@@ -57,7 +57,7 @@ export default class statsAPI {
         `${url}/${selectedYear}/${selectedMonth}`,
         {
           headers: {
-            authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${token}`,
           },
         },
         {

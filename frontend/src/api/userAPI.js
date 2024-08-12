@@ -6,7 +6,7 @@ export default class userAPI {
   static async getSingleUserById(id) {
     const res = await axios.get(`${url}/${id}`, {
       headers: {
-        authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${token}`,
       },
     });
     return res.data;
@@ -16,7 +16,7 @@ export default class userAPI {
       const res = await axios.patch(`${url}/${userId}`, updateData, {
         headers: {
           "Content-Type": "multipart/form-data",
-          authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
       });
       return res.data;
@@ -28,7 +28,7 @@ export default class userAPI {
   static async getAllRoles() {
     const res = await axios.get(`${url}/roles/getAll`, {
       headers: {
-        authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${token}`,
       },
     });
     return res.data;
@@ -36,7 +36,7 @@ export default class userAPI {
   static async getRoleById(roleId) {
     const res = await axios.get(`${url}/roles/role-detail/${roleId}`, {
       headers: {
-        authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${token}`,
       },
     });
     return res.data;
@@ -44,7 +44,7 @@ export default class userAPI {
   static async getUserByEmail(email) {
     const res = await axios.get(`${url}/getUserByEmail/${email}`, {
       headers: {
-        authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${token}`,
       },
     });
     return res.data;

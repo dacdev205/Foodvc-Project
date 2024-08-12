@@ -19,7 +19,7 @@ const usePayment = () => {
       }
       const res = await fetch(`http://localhost:3000/check-out/${id}`, {
         headers: {
-          authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
       });
       if (!res.ok) {

@@ -8,7 +8,7 @@ export default class orderAPI {
     try {
       const res = await axios.post(url, orderItem, {
         headers: {
-          authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
       });
       return res.data;
@@ -23,7 +23,7 @@ export default class orderAPI {
         `http://localhost:3000/order/order-user/${userId}`,
         {
           headers: {
-            authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${token}`,
           },
         }
       );
@@ -37,7 +37,7 @@ export default class orderAPI {
     try {
       const response = await axios.get(`${urlStatus}/statuses`, {
         headers: {
-          authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
       });
       return response.data;
@@ -48,13 +48,17 @@ export default class orderAPI {
   }
 
   static async getOrderById(id) {
-    const res = await axios.get(`${url}/${id}`);
+    const res = await axios.get(`${url}/${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
     return res.data;
   }
   static async getAllOrder(searchTerm, searchStatus, page, limit) {
     const res = await axios.get(`${url}/allOrder`, {
       headers: {
-        authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${token}`,
       },
       params: {
         searchTerm,
@@ -72,7 +76,7 @@ export default class orderAPI {
         { statusId },
         {
           headers: {
-            authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${token}`,
           },
         }
       );

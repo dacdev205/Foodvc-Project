@@ -38,7 +38,7 @@ const Users = () => {
     queryFn: async () => {
       const res = await axiosSecure.get("/users/roles/getAll", {
         headers: {
-          authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
       });
       return res.data;

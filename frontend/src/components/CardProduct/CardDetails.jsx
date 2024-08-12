@@ -340,7 +340,7 @@ const CardDetails = () => {
       }
       await paymentAPI.postProductToPayment({
         userId: userData?._id,
-        totalAmount: product.price * quantityDefault,
+        totalAmount: product.productId.price * quantityDefault,
         products: {
           productId: product.productId._id,
           quantity: quantityDefault,
@@ -385,7 +385,7 @@ const CardDetails = () => {
                   alt=""
                   className="w-full"
                 />
-                {product.productId.quantity === 0 && (
+                {product.quantity === 0 && (
                   <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                     <span className="text-white text-lg font-bold bg-black bg-opacity-50 py-10 px-4 rounded-full no-hover-fade">
                       <p className="text-opacity-100">Hết hàng</p>
@@ -585,12 +585,16 @@ const CardDetails = () => {
               <p className="text-gray-700">{review.comment}</p>
               {userData?._id === review?.userId?._id && (
                 <div>
-                  <button
-                    onClick={handleToggleActions}
-                    className="text-grey no-underline cursor-pointer"
-                  >
-                    <span className="text-sm">Thay đổi</span>
-                  </button>
+                  {review.isEdited === false ? (
+                    <button
+                      onClick={handleToggleActions}
+                      className="text-grey no-underline cursor-pointer"
+                    >
+                      <span className="text-sm">Thay đổi</span>
+                    </button>
+                  ) : (
+                    ""
+                  )}
                   <div className="flex justify-end">
                     {showActions && (
                       <div>

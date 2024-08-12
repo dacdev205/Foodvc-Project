@@ -1,4 +1,5 @@
 const orderAPI = require("../controllers/orderControllers");
+const checkCancelCount = require("../middleware/checkCancelCount");
 const checkPermission = require("../middleware/checkPermission");
 const verifyToken = require("../middleware/verifyToken");
 const router = require("express").Router();
@@ -7,8 +8,17 @@ const router = require("express").Router();
 router.post(
   "/",
   verifyToken,
+  checkCancelCount,
   checkPermission("create_order"),
   orderAPI.createOrder
+);
+
+router.patch(
+  "/cancel-order",
+  verifyToken,
+  checkCancelCount,
+  checkPermission("create_order"),
+  orderAPI.cancelOrder
 );
 
 router.get(

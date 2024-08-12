@@ -7,7 +7,7 @@ export default class paymentAPI {
     try {
       const res = await axios.get(`${url}?email=${email}`, {
         headers: {
-          authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
       });
       return res.data;
@@ -21,7 +21,7 @@ export default class paymentAPI {
       const productId = orderItem._id;
       const res = await axios.get(`${url}/${productId}`, {
         headers: {
-          authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
       });
       return res.data;
@@ -34,7 +34,7 @@ export default class paymentAPI {
     try {
       const res = await axios.post(url, ItemBuyNow, {
         headers: {
-          authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
       });
       return res.data;
@@ -47,7 +47,7 @@ export default class paymentAPI {
     try {
       const res = await axios.patch(`${url}/${productId}`, updateData, {
         headers: {
-          authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
       });
       return res.data;
@@ -59,7 +59,7 @@ export default class paymentAPI {
   static async deleteProduct(id) {
     const res = await axios.delete(`${url}/${id}`, {
       headers: {
-        authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${token}`,
       },
     });
     return res.data;

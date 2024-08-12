@@ -1,25 +1,49 @@
 const Menu = require("../models/menu");
 const Order = require("../models/order");
 const statusesAPI = require("../controllers/statusesControllers");
-
+const OrderStatus = require("../models/orderStatus");
+const User = require("../models/user");
+const OrderRequest = require("../models/orderRequest");
+const methodDeliAPI = require("./methodDeliControllers");
 module.exports = class orderAPI {
   static async createOrder(req, res) {
-    const { userId, orderCode, products, totalAmount, addressId, note } =
-      req.body;
+    const {
+      userId,
+      orderCode,
+      products,
+      totalAmount,
+      addressId,
+      note,
+      methodId,
+    } = req.body;
     const pendingStatusId = await statusesAPI.getStatusIdByName("Pending");
+    const waiting4PickupStatusId = await statusesAPI.getStatusIdByName(
+      "Waiting4Pickup"
+    );
+    const methodDoc = await methodDeliAPI.getMethodIdByMethodId(methodId);
+    let statusId;
+
+    if (methodDoc.methodId === 2) {
+      statusId = waiting4PickupStatusId;
+    } else {
+      statusId = pendingStatusId;
+    }
     try {
       const order = await Order.create({
         userId,
         orderCode,
         products,
         totalAmount,
-        statusId: pendingStatusId,
+        statusId,
         addressId,
         note,
+        methodId,
       });
 
       for (const product of products) {
-        const foundProduct = await Menu.findOne({ _id: product.productId });
+        const foundProduct = await Menu.findOne({
+          productId: product.productId,
+        });
         if (foundProduct) {
           foundProduct.quantity -= product.quantity;
           await foundProduct.save();
@@ -31,6 +55,53 @@ module.exports = class orderAPI {
       res.status(500).json({ message: error.message });
     }
   }
+  static async cancelOrder(req, res) {
+    try {
+      const { orderId, reason } = req.body;
+      const email = req.decoded.email;
+      const user = await User.findOne({ email: email });
+      const userId = user._id;
+
+      const order = await Order.findOne({ _id: orderId, userId });
+      if (!order) {
+        return res.status(404).json({ message: "Order not found" });
+      }
+
+      const cancelledStatus = await OrderStatus.findOne({ name: "Cancelled" });
+      if (!cancelledStatus) {
+        return res.status(500).json({
+          message:
+            "Không tìm thấy trạng thái 'Cancelled'. Vui lòng liên hệ hỗ trợ.",
+        });
+      }
+
+      order.statusId = cancelledStatus._id;
+      order.updatedAt = new Date();
+
+      await order.save();
+
+      const newRequest = new OrderRequest({
+        orderId: orderId,
+        userId: userId,
+        requestType: "Cancel",
+        reason: reason,
+        status: "Approved",
+      });
+
+      await newRequest.save();
+
+      return res.status(200).json({
+        message: "Đơn hàng đã được hủy thành công.",
+        order,
+        request: newRequest,
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        message: "Lỗi khi hủy đơn hàng. Vui lòng thử lại sau.",
+      });
+    }
+  }
 
   static async getUserOrders(req, res) {
     const userId = req.params.userId;
@@ -38,7 +109,7 @@ module.exports = class orderAPI {
       searchTerm = "",
       filterType = "orderCode",
       page = 1,
-      limit = 5,
+      limit = 2,
     } = req.query;
 
     const query = { userId };
@@ -50,7 +121,7 @@ module.exports = class orderAPI {
       }
       const orders = await Order.find(query)
         .skip((page - 1) * limit)
-        .limit(limit)
+        .limit(Number(limit))
         .populate("statusId")
         .populate("products.productId");
 
@@ -101,7 +172,11 @@ module.exports = class orderAPI {
   static async getOrderById(req, res) {
     const id = req.params.id;
     try {
-      const order = await Order.findById(id).populate("statusId");
+      const order = await Order.findById(id)
+        .populate("userId")
+        .populate("statusId")
+        .populate("products.productId")
+        .populate("addressId");
       if (order) {
         res.status(200).json(order);
       } else {

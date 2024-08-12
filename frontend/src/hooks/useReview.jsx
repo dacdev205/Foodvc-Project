@@ -15,7 +15,7 @@ const useReview = () => {
     queryFn: async () => {
       const res = await axiosPublic.get("/reviews", {
         headers: {
-          authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
       });
       return res.data;

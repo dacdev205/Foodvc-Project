@@ -9,7 +9,7 @@ const SelectAddress = ({
   setAddressModalOpen,
   handleSetAddress,
 }) => {
-  const [addresses, refetchAddress] = useAddress();
+  const [addresses, totalPages, refetchAddress, isLoading] = useAddress();
   const [showAddressEditForm, setShowAddressEditForm] = useState(false);
   const [selectedAddress, setSelectedAddress] = useState(null);
   useEffect(() => {

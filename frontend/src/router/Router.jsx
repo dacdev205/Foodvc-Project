@@ -40,6 +40,7 @@ const ManageInventoryLazyLoading = lazy(() =>
 const UpdateItemLazyLoading = lazy(() =>
   import("../pages/dashboard/admin/UpdateItem")
 );
+const VNPayReturnLazyLoading = lazy(() => import("../components/VNPayReturn"));
 const AddVoucherLazyLoading = lazy(() =>
   import("../pages/dashboard/admin/AddVoucher")
 );
@@ -251,6 +252,15 @@ const router = createBrowserRouter([
       </Suspense>
     ),
   },
+  {
+    path: "/order/vnpay_return",
+    element: (
+      <Suspense fallback={<LoadingSpinner />}>
+        <VNPayReturnLazyLoading />
+      </Suspense>
+    ),
+  },
+
   {
     path: "/register",
     element: (

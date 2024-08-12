@@ -22,6 +22,7 @@
     "exceljs": "^4.4.0",
     "file-saver": "^2.0.5",
     "firebase": "^10.7.1",
+    "moment": "^2.30.1",
     "react": "^18.2.0",
     "react-barcode": "^1.4.6",
     "react-chartjs-2": "^5.2.0",

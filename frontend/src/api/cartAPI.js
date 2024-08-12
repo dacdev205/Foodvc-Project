@@ -7,7 +7,7 @@ export default class cartAPI {
     try {
       const res = await axios.get(`${url}?email=${email}`, {
         headers: {
-          authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
       });
       return res.data;
@@ -20,7 +20,7 @@ export default class cartAPI {
     try {
       const res = await axios.post(url, cartItem, {
         headers: {
-          authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
       });
       return res.data;
@@ -34,7 +34,7 @@ export default class cartAPI {
       const productId = cartItem.productId;
       const res = await axios.get(`${url}/${productId}`, {
         headers: {
-          authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
       });
       return res.data;
@@ -51,7 +51,7 @@ export default class cartAPI {
         updateData,
         {
           headers: {
-            authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${token}`,
           },
         }
       );
@@ -66,7 +66,7 @@ export default class cartAPI {
     try {
       const res = await axios.delete(`${url}/${cartId}/product/${id}`, {
         headers: {
-          authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
       });
       return res.data;

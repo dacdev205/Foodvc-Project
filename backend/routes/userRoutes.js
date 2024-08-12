@@ -55,8 +55,8 @@ router.patch(
 );
 router.get(
   "/getUserByEmail/:email",
-  verifyToken,
-  checkPermission("read"),
+  // verifyToken,
+  // checkPermission("read"),
   usersAPI.getUserByEmail
 );
 router.delete(

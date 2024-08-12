@@ -16,7 +16,7 @@ const useUserCurrent = () => {
             `http://localhost:3000/users/getUserByEmail/${user.email}`,
             {
               headers: {
-                authorization: `Bearer ${token}`,
+                Authorization: `Bearer ${token}`,
               },
             }
           );

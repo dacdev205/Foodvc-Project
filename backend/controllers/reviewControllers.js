@@ -76,11 +76,11 @@ module.exports = class reviewAPI {
   }
   static async updateReviewByReviewId(req, res) {
     const reviewId = req.params.reviewId;
-    const { rating, comment } = req.body;
+    const { rating, comment, isEdited } = req.body;
     try {
       const updatedReview = await Review.findByIdAndUpdate(
         reviewId,
-        { rating, comment },
+        { rating, comment, isEdited },
         { new: true }
       );
 

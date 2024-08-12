@@ -1,6 +1,6 @@
-import React, { useContext, useState } from "react";
-import { AuthContext } from "../context/AuthProvider";
 import { useQuery } from "@tanstack/react-query";
+import useAxiosPublic from "./useAxiosPublic";
+import axios from "axios";
 import useUserCurrent from "./useUserCurrent";
 
 const useOrders = (
@@ -12,6 +12,7 @@ const useOrders = (
   const userData = useUserCurrent();
   const token = localStorage.getItem("access-token");
   const id = userData?._id || "";
+  const axiosPublic = useAxiosPublic();
 
   const {
     refetch,
@@ -23,16 +24,19 @@ const useOrders = (
       if (!id) {
         return { orders: [] };
       }
-      const res = await fetch(`http://localhost:3000/order/order-user/${id}`, {
-        headers: {
-          authorization: `Bearer ${token}`,
-        },
-        params: { searchTerm, filterType, page, limit },
-      });
-      if (!res.ok) {
+      try {
+        const res = await axiosPublic.get(`/order/order-user/${id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          params: { searchTerm, filterType, page, limit },
+        });
+
+        return res.data;
+      } catch (error) {
+        console.error("Error fetching orders:", error);
         return { orders: [] };
       }
-      return res.json();
     },
   });
 

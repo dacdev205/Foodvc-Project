@@ -7,11 +7,11 @@ const router = express.Router();
 router.post(
   "/cancel-request",
   verifyToken,
-  checkPermission("dashboard_actions"),
+  checkPermission("cancel_order"),
   orderRequestAPI.createCancelRequest
 );
 router.get(
-  "/cancel-requests",
+  "/all-requests",
   verifyToken,
   checkPermission("dashboard_actions"),
   orderRequestAPI.getAllRequests

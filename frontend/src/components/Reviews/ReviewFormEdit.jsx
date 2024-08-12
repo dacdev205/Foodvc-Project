@@ -63,7 +63,11 @@ const ReviewFormEdit = ({
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (user && user?.email) {
-      await reviewAPI.updateReviewByReviewId(reviewId, { comment, rating });
+      await reviewAPI.updateReviewByReviewId(reviewId, {
+        comment,
+        rating,
+        isEdited: true,
+      });
       setIsModalOpen(false);
       toast.info("Đánh giá đã được chỉnh sửa!", {
         position: "bottom-right",

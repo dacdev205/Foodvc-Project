@@ -24,7 +24,7 @@ const ContactAdmin = () => {
             "http://localhost:3000/api/conversations/" + userData._id,
             {
               headers: {
-                authorization: `Bearer ${token}`,
+                Authorization: `Bearer ${token}`,
               },
             }
           );
@@ -45,7 +45,7 @@ const ContactAdmin = () => {
             "http://localhost:3000/api/messages/" + currentChat._id,
             {
               headers: {
-                authorization: `Bearer ${token}`,
+                Authorization: `Bearer ${token}`,
               },
             }
           );
@@ -118,7 +118,7 @@ const ContactAdmin = () => {
         message,
         {
           headers: {
-            authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${token}`,
           },
         }
       );

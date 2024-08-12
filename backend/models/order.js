@@ -36,6 +36,11 @@ const orderSchema = mongoose.Schema({
       },
     },
   ],
+  methodId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "MethodDelivery",
+    required: true,
+  },
   createdAt: {
     type: Date,
     default: Date.now,

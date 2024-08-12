@@ -8,7 +8,7 @@ export default class addressAPI {
     try {
       const res = await axios.post(url, address, {
         headers: {
-          authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
       });
       return res.data;
@@ -21,7 +21,7 @@ export default class addressAPI {
     try {
       const res = await axios.patch(`${url}/${addressToEdit}`, updateData, {
         headers: {
-          authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
       });
       return res.data;
@@ -37,7 +37,7 @@ export default class addressAPI {
         addressData,
         {
           headers: {
-            authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${token}`,
           },
         }
       );
@@ -70,7 +70,7 @@ export default class addressAPI {
   static async deleteAddress(id) {
     const res = await axios.delete(`${url}/${id}`, {
       headers: {
-        authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${token}`,
       },
     });
     return res.data;

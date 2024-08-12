@@ -6,7 +6,7 @@ export default class reviewAPI {
   static async getProductById(id) {
     const res = await axios.get(`${url}/${id}`, {
       headers: {
-        authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${token}`,
       },
     });
     return res.data;
@@ -16,7 +16,7 @@ export default class reviewAPI {
     try {
       const res = await axios.post(url, review, {
         headers: {
-          authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
       });
       return res.data;
@@ -30,7 +30,7 @@ export default class reviewAPI {
     try {
       const res = await axios.patch(`${url}/${reviewId}`, updateData, {
         headers: {
-          authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
       });
       return res.data;
@@ -44,7 +44,7 @@ export default class reviewAPI {
       `http://localhost:3000/reviews/editReview/${id}`,
       {
         headers: {
-          authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
       }
     );

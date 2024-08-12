@@ -6,7 +6,7 @@ export default class voucherAPI {
   static async getVoucherById(id) {
     const res = await axios.get(`${url}/${id}`, {
       headers: {
-        authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${token}`,
       },
     });
     return res.data;
@@ -14,7 +14,7 @@ export default class voucherAPI {
   static async getAllVoucher() {
     const res = await axios.get(url, {
       headers: {
-        authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${token}`,
       },
     });
     return res.data;
@@ -22,7 +22,7 @@ export default class voucherAPI {
   static async createVoucher(data) {
     const res = await axios.post(url, data, {
       headers: {
-        authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${token}`,
       },
     });
     return res.data;

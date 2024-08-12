@@ -26,7 +26,7 @@ const useAddress = (page = 1, limit = 2) => {
           `http://localhost:3000/address?email=${email}`,
           {
             headers: {
-              authorization: `Bearer ${token}`,
+              Authorization: `Bearer ${token}`,
             },
           }
         );

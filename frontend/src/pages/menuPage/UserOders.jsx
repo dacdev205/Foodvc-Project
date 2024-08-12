@@ -9,33 +9,57 @@ import Button from "@mui/material/Button";
 import MenuItem from "@mui/material/MenuItem";
 import Select from "@mui/material/Select";
 import { Pagination, CircularProgress } from "@mui/material";
+import axios from "axios";
+import ghnAPI from "../../api/ghnAPI";
 
 const UserOrders = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterType, setFilterType] = useState("orderCode");
   const [page, setPage] = useState(1);
   const [value, setValue] = useState(0);
-  const [productDetails, setProductDetails] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [cancelReason, setCancelReason] = useState("");
   const [loading, setLoading] = useState(false);
+  const [shopData, setShopData] = useState();
+  const [orderDetailGHN, setOrderDetailGHN] = useState();
   const [orders, totalPages, refetch] = useOrders(
     searchTerm,
     filterType,
     page,
-    5
+    2
   );
 
   useEffect(() => {
     setLoading(true);
     refetch().finally(() => setLoading(false));
-  }, [searchTerm, filterType, page, refetch]);
+  }, [searchTerm, filterType, page, value, refetch]);
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
-
+  useEffect(() => {
+    const fetchShopData = async () => {
+      try {
+        const res = await ghnAPI.getAddressFOODVC();
+        setShopData(res.data.shops[0]);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    const fetchOrderData = async () => {
+      try {
+        const res = await ghnAPI.getOrderDetailGHN({
+          client_order_code: selectedOrder?.orderCode,
+        });
+        setOrderDetailGHN(res.data.order_code);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    fetchOrderData();
+    fetchShopData();
+  }, [selectedOrder]);
   const handlePageChange = (event, value) => {
     setPage(value);
     refetch();
@@ -52,23 +76,32 @@ const UserOrders = () => {
     setIsModalOpen(true);
   };
 
-  const handleCancel = () => {
-    console.log("Hủy đơn hàng:", selectedOrder, "Lý do:", cancelReason);
+  const handleCancel = async () => {
+    const token = localStorage.getItem("access-token");
+    await axios.patch(
+      "http://localhost:3000/order/cancel-order",
+      {
+        orderId: selectedOrder._id,
+        reason: cancelReason,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    await ghnAPI.cancelOrder(
+      { order_codes: [orderDetailGHN] },
+      {
+        headers: {
+          ShopId: shopData?._id,
+        },
+      }
+    );
+
     setIsModalOpen(false);
     setCancelReason("");
   };
-
-  useEffect(() => {
-    if (orders.length) {
-      const products = orders.flatMap((order) =>
-        order.products.map((product) => ({
-          orderCode: order.orderCode,
-          ...product,
-        }))
-      );
-      setProductDetails(products);
-    }
-  }, [orders]);
 
   const filteredOrders = orders.filter((order) => {
     const statusFilter = {

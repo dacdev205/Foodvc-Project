@@ -24,7 +24,7 @@ const useWishList = () => {
       }
       const res = await fetch(`http://localhost:3000/wish-list/user/${id}`, {
         headers: {
-          authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
       });
       if (!res.ok) {

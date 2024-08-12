@@ -47,7 +47,7 @@ const Cards = ({ item }) => {
 
   const handleAddToCart = async () => {
     const cartItem = {
-      userId: userData._id,
+      userId: userData?._id,
       productId: item?.productId?._id,
       quantity: 1,
     };

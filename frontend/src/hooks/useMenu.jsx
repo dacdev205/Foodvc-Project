@@ -16,7 +16,7 @@ const useMenu = (
     queryFn: async () => {
       const res = await axiosPublic.get("/api/foodvc", {
         headers: {
-          authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
         params: {
           searchTerm,

@@ -26,7 +26,7 @@ const AddUserModal = ({
     queryFn: async () => {
       const res = await useAxiosSecure.get("/users/roles/getAll", {
         headers: {
-          authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
       });
       return res.data;

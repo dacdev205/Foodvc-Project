@@ -1,5 +1,7 @@
 const Cart = require("../models/cart");
 const Product = require("../models/product");
+const mongoose = require("mongoose");
+
 module.exports = class cartAPI {
   static async fetchAllProductsByUserId(req, res) {
     try {
@@ -47,7 +49,6 @@ module.exports = class cartAPI {
           ],
         });
       }
-      // Calculate total amount
       let totalAmount = 0;
       for (let item of cart.products) {
         const product = await Product.findById(item.productId);
@@ -64,7 +65,6 @@ module.exports = class cartAPI {
     }
   }
 
-  // Fetch product in cart by productId
   static async fetchProductInCartByID(req, res) {
     const { userId, productId } = req.params;
 
@@ -135,11 +135,23 @@ module.exports = class cartAPI {
     const cartId = req.params.cartId;
     const productId = req.params.productId;
 
+    if (!cartId || !mongoose.Types.ObjectId.isValid(cartId)) {
+      console.warn("Invalid cart ID");
+      return res
+        .status(200)
+        .json({ message: "Cart ID is invalid, but proceeding..." });
+    }
+
+    if (!productId || !mongoose.Types.ObjectId.isValid(productId)) {
+      return res.status(400).json({ message: "Invalid product ID" });
+    }
+
     try {
       const cart = await Cart.findById(cartId);
       if (!cart) {
         return res.status(404).json({ message: "Cart not found" });
       }
+
       const productIndex = cart.products.findIndex(
         (product) => product.productId.toString() === productId
       );

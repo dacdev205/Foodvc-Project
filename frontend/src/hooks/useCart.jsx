@@ -23,7 +23,7 @@ const useCart = () => {
       }
       const res = await fetch(`http://localhost:3000/cart/user/${id}`, {
         headers: {
-          authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
       });
       if (!res.ok) {

@@ -1,13 +1,16 @@
 import axios from "axios";
-const url = "http://localhost:3000/wish-list";
-const token = localStorage.getItem("access-token");
 
-export default class cartAPI {
+const url = "http://localhost:3000/wish-list";
+
+const getToken = () => localStorage.getItem("access-token");
+
+export default class CartAPI {
   static async getAllWishList(email) {
     try {
+      const token = getToken();
       const res = await axios.get(`${url}?email=${email}`, {
         headers: {
-          authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
       });
       return res.data;
@@ -16,11 +19,13 @@ export default class cartAPI {
       throw error;
     }
   }
+
   static async getProductToWishList(productId) {
     try {
+      const token = getToken();
       const res = await axios.get(`${url}/${productId}`, {
         headers: {
-          authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
       });
       return res.data;
@@ -31,19 +36,26 @@ export default class cartAPI {
   }
 
   static async addProductToWishList(wishItem) {
-    const res = await axios.post(url, wishItem, {
-      headers: {
-        authorization: `Bearer ${token}`,
-      },
-    });
-    return res.data;
+    try {
+      const token = getToken();
+      const res = await axios.post(url, wishItem, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      return res.data;
+    } catch (error) {
+      console.error("Error adding product to wish list:", error);
+      throw error;
+    }
   }
 
   static async updateProduct(productId, updateData) {
     try {
+      const token = getToken();
       const res = await axios.put(`${url}/${productId}`, updateData, {
         headers: {
-          authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
       });
       return res.data;
@@ -52,12 +64,19 @@ export default class cartAPI {
       throw error;
     }
   }
+
   static async deleteProduct(id) {
-    const res = await axios.delete(`${url}/${id}`, {
-      headers: {
-        authorization: `Bearer ${token}`,
-      },
-    });
-    return res.data;
+    try {
+      const token = getToken();
+      const res = await axios.delete(`${url}/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      return res.data;
+    } catch (error) {
+      console.error("Error deleting product:", error);
+      throw error;
+    }
   }
 }

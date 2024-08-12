@@ -17,7 +17,7 @@ const useInventory = (
     queryFn: async () => {
       const res = await axiosPublic.get("/inventory", {
         headers: {
-          authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
         params: {
           searchTerm,

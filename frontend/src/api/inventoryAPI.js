@@ -15,7 +15,7 @@ export default class inventoryAPI {
   static async addProduct(product) {
     const res = await axios.post(url, product, {
       headers: {
-        authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${token}`,
       },
     });
     return res.data;
@@ -25,7 +25,7 @@ export default class inventoryAPI {
     try {
       const res = await axios.patch(`${url}/${productId}`, updateData, {
         headers: {
-          authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
       });
       return res.data;
@@ -38,7 +38,7 @@ export default class inventoryAPI {
   static async deleteProductById(id) {
     const res = await axios.delete(`${url}/${id}`, {
       headers: {
-        authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${token}`,
       },
     });
     return res.data;

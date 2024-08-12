@@ -17,6 +17,9 @@ import voucherAPI from "../../api/voucherAPI";
 import useAuth from "../../hooks/useAuth";
 import { AuthContext } from "../../context/AuthProvider";
 import cartAPI from "../../api/cartAPI";
+import { useNavigate } from "react-router-dom";
+import PaymentMethodModal from "../../components/PaymentMethod";
+
 const Payment = () => {
   const [payment, refetch, isLoading] = usePayment();
   const userData = useUserCurrent();
@@ -39,7 +42,12 @@ const Payment = () => {
   const [discountedAmount, setDiscountedAmount] = useState(0);
   const GHN_TOKEN = import.meta.env.VITE_GHN_TOKEN;
   const token = localStorage.getItem("access-token");
-
+  const navigate = useNavigate();
+  const [isPaymentMethodModalOpen, setIsPaymentMethodModalOpen] =
+    useState(false);
+  const [paymentMethods, setPaymentMethods] = useState([]);
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(null);
+  const [paymentMethodSelected, setPaymentMethodSelected] = useState(false);
   const [amount, setAmount] = useState(0);
   const [addressUser, setAddress] = useState({
     fullName: "",
@@ -61,7 +69,33 @@ const Payment = () => {
     };
     fetchShopData();
   }, []);
+  useEffect(() => {
+    const fetchPaymentMethods = async () => {
+      try {
+        const methods = await axios.get(
+          "http://localhost:3000/method-deli/all_methods"
+        );
+        setPaymentMethods(methods.data);
+      } catch (error) {
+        console.error("Error fetching payment methods:", error);
+      }
+    };
 
+    fetchPaymentMethods();
+  }, []);
+  const handleOpenPaymentMethodModal = () => {
+    setIsPaymentMethodModalOpen(true);
+  };
+
+  const handleClosePaymentMethodModal = () => {
+    setIsPaymentMethodModalOpen(false);
+  };
+
+  const handleSelectPaymentMethod = (method) => {
+    setSelectedPaymentMethod(method);
+    setPaymentMethodSelected(true);
+    handleClosePaymentMethodModal();
+  };
   useEffect(() => {
     const fetchVoucherData = async () => {
       const res = await voucherAPI.getAllVoucher();
@@ -192,7 +226,52 @@ const Payment = () => {
       totalWidth,
     };
   };
+
   const handleBuyItem = async () => {
+    try {
+      if (selectedPaymentMethod.methodId === 1) {
+        await handleCODPayment();
+      } else if (selectedPaymentMethod.methodId === 2) {
+        await handleVNPayPayment();
+      } else {
+        console.error("Chưa chọn phương thức thanh toán!");
+        return;
+      }
+    } catch (error) {
+      console.error("Đã xảy ra lỗi trong quá trình thanh toán:", error);
+    }
+  };
+  const handleVNPayPayment = async () => {
+    const randomId = generateRandomString(20);
+    setIsSubmitting(true);
+    try {
+      const res = await axios.post("http://localhost:3000/method-deli/vn_pay", {
+        amount: subOrderTotal,
+        bankCode: "VNPAY",
+        language: "vn",
+      });
+      localStorage.setItem(
+        "orderData",
+        JSON.stringify({
+          userId: userData._id,
+          products: payment.flatMap((item) => item.products),
+          totalAmount: subOrderTotal,
+          orderCode: randomId,
+          note: note,
+          addressId: addressUser._id,
+          methodId: selectedPaymentMethod,
+        })
+      );
+      window.location.href = res.data.paymentUrl;
+      // await sendEmailToUser(user.email, randomId);
+    } catch (error) {
+      console.error("Payment error:", error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleCODPayment = async () => {
     const randomId = generateRandomString(20);
     const productData = extractProductData(payment);
     setIsSubmitting(true);
@@ -217,13 +296,13 @@ const Payment = () => {
       to_ward_name: addressUser?.ward.wardName,
       to_district_name: addressUser?.district.districtName,
       to_province_name: addressUser?.city.cityName,
-      cod_amount: orderTotal,
+      cod_amount: subOrderTotal,
       content: note,
       weight: productData.totalWeight,
       length: productData.totalLength,
       width: productData.totalWidth,
       height: productData.totalHeight,
-      cod_failed_amount: 2000,
+      cod_failed_amount: 0,
       pick_station_id: 1444,
       deliver_station_id: null,
       insurance_value: Math.min(orderTotal, 5000000),
@@ -246,7 +325,7 @@ const Payment = () => {
       return;
     } else {
       try {
-        payment.forEach(async (item) => {
+        for (const item of payment) {
           await orderAPI.postProductToOrder({
             userId: userData._id,
             products: item.products,
@@ -254,19 +333,26 @@ const Payment = () => {
             note: note,
             orderCode: randomId,
             addressId: addressUser._id,
+            methodId: selectedPaymentMethod,
           });
           await Promise.all(
             item.products.map(async (product) => {
               await cartAPI.deleteProduct(cart._id, product.productId._id);
             })
           );
-
           refetchCart();
-        });
+        }
         await sendEmailToUser(user.email, randomId);
         window.location.href = "/order-success";
       } catch (error) {
-        console.error("Lỗi khi xử lý mua hàng:", error);
+        if (error.response && error.response.status === 403) {
+          alert(
+            "Bạn đã hủy đơn hàng quá nhiều, chúng tôi đã hạn chế tính năng đặt hàng. Vui lòng liên hệ để hỗ trợ."
+          );
+          navigate("/");
+        } else {
+          console.error("Lỗi khi xử lý mua hàng:", error);
+        }
       } finally {
         setIsSubmitting(false);
       }
@@ -564,16 +650,29 @@ const Payment = () => {
             <div className="my-12 flex flex-col md:flex-row justify-between bg-white shadow-md rounded-lg p-6 text-black">
               <div className="md:w-1/2 space-y-3">
                 <div className="flex items-center">
-                  <span className="text-lg">Phương thức thanh toán </span>
+                  <span className="text-lg">Phương thức thanh toán: </span>
                 </div>
               </div>
               <div className="md:w-1/3 space-y-3">
                 <div className="flex items-center justify-between">
-                  <div>
-                    <span>Thanh toán khi nhận hàng</span>
-                  </div>
-                  <button className="text-sky-500">THAY ĐỔI</button>
+                  {selectedPaymentMethod && (
+                    <div className="my-5">
+                      <p>{selectedPaymentMethod.name}</p>
+                    </div>
+                  )}
+                  <button
+                    className="text-blue-400"
+                    onClick={handleOpenPaymentMethodModal}
+                  >
+                    {paymentMethodSelected ? "THAY ĐỔI" : "THIẾT LẬP"}
+                  </button>
                 </div>
+                <PaymentMethodModal
+                  isOpen={isPaymentMethodModalOpen}
+                  onClose={handleClosePaymentMethodModal}
+                  paymentMethods={paymentMethods}
+                  onSelectMethod={handleSelectPaymentMethod}
+                />
                 <div className="flex items-center justify-between">
                   <div>
                     <span>Tổng tiền hàng:</span>

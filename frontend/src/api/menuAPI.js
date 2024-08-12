@@ -6,7 +6,7 @@ export default class menuAPI {
   static async getProductById(id) {
     const res = await axios.get(`${url}/${id}`, {
       headers: {
-        authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${token}`,
       },
     });
     return res.data;
@@ -14,7 +14,7 @@ export default class menuAPI {
   static async getAllMenu() {
     const res = await axios.get(url, {
       headers: {
-        authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${token}`,
       },
     });
     return res.data;
@@ -23,7 +23,7 @@ export default class menuAPI {
   static async addProduct(product) {
     const res = await axios.post(url, product, {
       headers: {
-        authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${token}`,
       },
     });
     return res.data;
@@ -36,7 +36,7 @@ export default class menuAPI {
         updateData,
         {
           headers: {
-            authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${token}`,
           },
         }
       );
@@ -51,7 +51,7 @@ export default class menuAPI {
     try {
       const res = await axios.patch(`${url}/${productId}`, updateData, {
         headers: {
-          authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
       });
       return res.data;
@@ -63,7 +63,7 @@ export default class menuAPI {
   static async deleteProductById(id) {
     const res = await axios.delete(`${url}/${id}`, {
       headers: {
-        authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${token}`,
       },
     });
     return res.data;

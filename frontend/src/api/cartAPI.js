@@ -1,13 +1,14 @@
 import axios from "axios";
 const url = "http://localhost:3000/cart";
-const token = localStorage.getItem("access-token");
+const getToken = () => localStorage.getItem("access-token");
 
 export default class cartAPI {
   static async getAllCart(email) {
+    const token = getToken();
     try {
       const res = await axios.get(`${url}?email=${email}`, {
         headers: {
-          Authorization: `Bearer ${token}`,
+          authorization: `Bearer ${token}`,
         },
       });
       return res.data;
@@ -17,10 +18,11 @@ export default class cartAPI {
     }
   }
   static async postToCart(cartItem) {
+    const token = getToken();
     try {
       const res = await axios.post(url, cartItem, {
         headers: {
-          Authorization: `Bearer ${token}`,
+          authorization: `Bearer ${token}`,
         },
       });
       return res.data;
@@ -31,10 +33,12 @@ export default class cartAPI {
   }
   static async getProductToCart(cartItem) {
     try {
+      const token = getToken();
+
       const productId = cartItem.productId;
       const res = await axios.get(`${url}/${productId}`, {
         headers: {
-          Authorization: `Bearer ${token}`,
+          authorization: `Bearer ${token}`,
         },
       });
       return res.data;
@@ -46,12 +50,14 @@ export default class cartAPI {
 
   static async updateProduct(cartId, productId, updateData) {
     try {
+      const token = getToken();
+
       const res = await axios.patch(
         `${url}/${cartId}/product/${productId}`,
         updateData,
         {
           headers: {
-            Authorization: `Bearer ${token}`,
+            authorization: `Bearer ${token}`,
           },
         }
       );
@@ -64,9 +70,11 @@ export default class cartAPI {
 
   static async deleteProduct(cartId, id) {
     try {
+      const token = getToken();
+
       const res = await axios.delete(`${url}/${cartId}/product/${id}`, {
         headers: {
-          Authorization: `Bearer ${token}`,
+          authorization: `Bearer ${token}`,
         },
       });
       return res.data;

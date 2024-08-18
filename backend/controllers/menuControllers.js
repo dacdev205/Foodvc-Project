@@ -1,6 +1,7 @@
 const Menu = require("../models/menu");
 const fs = require("fs");
 const Product = require("../models/product");
+const Category = require("../models/category");
 module.exports = class menuAPI {
   static async fetchMenus(req, res) {
     try {
@@ -9,28 +10,94 @@ module.exports = class menuAPI {
         filterType = "name",
         category = "all",
         page = 1,
-        limit = 8,
+        limit = 5,
+        minPrice = 0,
+        maxPrice = Infinity,
+        minRating = 0,
+        maxRating = 5,
       } = req.query;
 
-      let menus = await Menu.find().populate("productId").exec();
+      let query = {};
 
-      if (searchTerm) {
-        if (filterType === "name") {
-          menus = menus.filter((menu) =>
-            menu.productId.name.toLowerCase().includes(searchTerm.toLowerCase())
-          );
+      // Filter by category if a specific category is selected
+      if (category && category !== "all") {
+        const categoryDoc = await Category.findOne({
+          name: { $regex: category, $options: "i" },
+        }).exec();
+
+        if (categoryDoc) {
+          const productIdsByCategory = await Product.find({
+            category: categoryDoc._id,
+          }).select("_id");
+
+          if (!productIdsByCategory.length) {
+            return res.json({ menus: [], totalPages: 0 });
+          }
+
+          query["productId"] = { $in: productIdsByCategory.map((p) => p._id) };
+        } else {
+          return res.json({ menus: [], totalPages: 0 });
         }
       }
 
-      if (category !== "all") {
-        menus = menus.filter((menu) => menu.productId.category === category);
+      // Filter by product name if searchTerm is provided
+      if (searchTerm && filterType === "name") {
+        const productIdsByName = await Product.find({
+          name: { $regex: searchTerm, $options: "i" },
+        }).select("_id");
+
+        if (query["productId"]) {
+          query["productId"]["$in"] = query["productId"]["$in"].filter((id) =>
+            productIdsByName.some((p) => p._id.equals(id))
+          );
+        } else {
+          query["productId"] = { $in: productIdsByName.map((p) => p._id) };
+        }
       }
 
-      const totalMenus = menus.length;
-      const totalPages = Math.ceil(totalMenus / limit);
-      const paginatedMenus = menus.slice((page - 1) * limit, page * limit);
+      // Filter by price range
+      const productIdsByPrice = await Product.find({
+        price: { $gte: Number(minPrice), $lte: Number(maxPrice) },
+      }).select("_id");
 
-      res.json({ menus: paginatedMenus, totalPages });
+      if (query["productId"]) {
+        query["productId"]["$in"] = query["productId"]["$in"].filter((id) =>
+          productIdsByPrice.some((p) => p._id.equals(id))
+        );
+      } else {
+        query["productId"] = { $in: productIdsByPrice.map((p) => p._id) };
+      }
+
+      // Filter by rating range
+      const menusByRating = await Menu.find(query)
+        .populate({
+          path: "reviews",
+          select: "rating",
+        })
+        .exec();
+
+      const menuIdsByRating = menusByRating
+        .filter((menu) => {
+          const ratings = menu.reviews.map((review) => review.rating);
+          const avgRating = ratings.length
+            ? ratings.reduce((sum, r) => sum + r, 0) / ratings.length
+            : 0;
+          return avgRating >= minRating && avgRating <= maxRating;
+        })
+        .map((menu) => menu._id);
+
+      query["_id"] = { $in: menuIdsByRating };
+
+      const totalMenus = await Menu.countDocuments(query);
+      const totalPages = Math.ceil(totalMenus / limit);
+
+      const menus = await Menu.find(query)
+        .populate("productId")
+        .skip((page - 1) * limit)
+        .limit(Number(limit))
+        .exec();
+
+      res.json({ menus, totalPages });
     } catch (err) {
       res.status(500).json({ message: err.message });
     }

@@ -20,6 +20,9 @@ const AddressForm = ({ setAddress, userId }) => {
   const [isDefaultAddress, setIsDefaultAddress] = useState(false);
   const { reset } = useForm();
   const GHN_TOKEN = import.meta.env.VITE_GHN_TOKEN;
+  const PROVINCE_API = import.meta.env.VITE_PROVINCE_URL;
+  const DISTRICT_API = import.meta.env.VITE_DISTRICT_URL;
+  const WARD_API = import.meta.env.VITE_WARD_URL;
 
   const [formData, setFormData] = useState({
     fullName: "",
@@ -34,15 +37,12 @@ const AddressForm = ({ setAddress, userId }) => {
   useEffect(() => {
     async function getAPIProvinces() {
       try {
-        const response = await axios.get(
-          "https://dev-online-gateway.ghn.vn/shiip/public-api/master-data/province",
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Token: GHN_TOKEN,
-            },
-          }
-        );
+        const response = await axios.get(PROVINCE_API, {
+          headers: {
+            "Content-Type": "application/json",
+            Token: GHN_TOKEN,
+          },
+        });
         const data = response.data.data;
         const formattedData = data.map((province) => ({
           id: province.ProvinceID,
@@ -55,7 +55,7 @@ const AddressForm = ({ setAddress, userId }) => {
       }
     }
     getAPIProvinces();
-  }, [GHN_TOKEN]);
+  }, [GHN_TOKEN, PROVINCE_API]);
 
   const handleCitySelect = async (cityName) => {
     const selectedCity = cities.find((city) => city.name === cityName);
@@ -67,19 +67,16 @@ const AddressForm = ({ setAddress, userId }) => {
     });
 
     try {
-      const res = await fetch(
-        "https://dev-online-gateway.ghn.vn/shiip/public-api/master-data/district",
-        {
-          method: "POST",
-          headers: {
-            Token: GHN_TOKEN,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            province_id: selectedCity.id,
-          }),
-        }
-      );
+      const res = await fetch(DISTRICT_API, {
+        method: "POST",
+        headers: {
+          Token: GHN_TOKEN,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          province_id: selectedCity.id,
+        }),
+      });
 
       const data = await res.json();
       if (data && data.data && Array.isArray(data.data)) {
@@ -108,19 +105,16 @@ const AddressForm = ({ setAddress, userId }) => {
     });
 
     try {
-      const res = await fetch(
-        "https://dev-online-gateway.ghn.vn/shiip/public-api/master-data/ward",
-        {
-          method: "POST",
-          headers: {
-            Token: GHN_TOKEN,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            district_id: selectedDistrict.DistrictID,
-          }),
-        }
-      );
+      const res = await fetch(WARD_API, {
+        method: "POST",
+        headers: {
+          Token: GHN_TOKEN,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          district_id: selectedDistrict.DistrictID,
+        }),
+      });
 
       const data = await res.json();
       if (data && data.data && Array.isArray(data.data)) {

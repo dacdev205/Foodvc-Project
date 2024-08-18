@@ -1,11 +1,10 @@
-import React, { useContext, useState } from "react";
-import { AuthContext } from "../context/AuthProvider";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import useUserCurrent from "./useUserCurrent";
 
 const useWishList = () => {
   const userData = useUserCurrent();
-  const token = localStorage.getItem("access-token");
+  const getToken = () => localStorage.getItem("access-token");
+  const token = getToken();
   const id = userData?._id || "";
   const queryClient = useQueryClient();
 
@@ -22,15 +21,25 @@ const useWishList = () => {
       if (!id) {
         return [];
       }
-      const res = await fetch(`http://localhost:3000/wish-list/user/${id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      if (!res.ok) {
+      try {
+        const res = await fetch(`http://localhost:3000/wish-list/user/${id}`, {
+          headers: {
+            authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (res.status === 404) {
+          return [];
+        }
+
+        if (!res.ok) {
+          return [];
+        }
+
+        return await res.json();
+      } catch (error) {
         return [];
       }
-      return res.json();
     },
   });
 

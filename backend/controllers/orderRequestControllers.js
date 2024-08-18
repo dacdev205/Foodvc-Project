@@ -1,4 +1,7 @@
+const Order = require("../models/order");
 const OrderRequest = require("../models/orderRequest");
+const statusesAPI = require("./statusesControllers");
+const Menu = require("../models/menu");
 module.exports = class orderRequestAPI {
   static async createCancelRequest(req, res) {
     try {
@@ -70,7 +73,6 @@ module.exports = class orderRequestAPI {
       const { id } = req.params;
       const { status } = req.body;
 
-      // Kiểm tra giá trị status hợp lệ
       if (!["Pending", "Approved", "Rejected"].includes(status)) {
         return res.status(400).json({ message: "Trạng thái không hợp lệ." });
       }
@@ -83,6 +85,43 @@ module.exports = class orderRequestAPI {
 
       if (!updatedRequest) {
         return res.status(404).json({ message: "Yêu cầu không tìm thấy." });
+      }
+
+      if (status === "Approved") {
+        const orderId = updatedRequest.orderId;
+        const cancelledStatusId = await statusesAPI.getStatusIdByName(
+          "Cancelled"
+        );
+
+        const updatedOrder = await Order.findByIdAndUpdate(
+          orderId,
+          { statusId: cancelledStatusId, updatedAt: Date.now() },
+          { new: true }
+        );
+
+        if (!updatedOrder) {
+          return res.status(404).json({ message: "Đơn hàng không tìm thấy." });
+        }
+
+        const products = updatedOrder.products;
+        for (const product of products) {
+          const { productId, quantity } = product;
+
+          const updatedMenuItem = await Menu.findOneAndUpdate(
+            { productId: productId },
+            { $inc: { quantity: quantity } },
+            { new: true }
+          );
+
+          if (!updatedMenuItem) {
+            console.error(
+              `Không thể cập nhật số lượng sản phẩm cho ID: ${productId}`
+            );
+            return res.status(404).json({
+              message: `Không tìm thấy sản phẩm với ID: ${productId}`,
+            });
+          }
+        }
       }
 
       res.status(200).json(updatedRequest);

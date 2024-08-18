@@ -1,14 +1,16 @@
 import axios from "axios";
 const url = "http://localhost:3000/address";
-const token = localStorage.getItem("access-token");
+const getToken = () => localStorage.getItem("access-token");
 
 export default class addressAPI {
   //
   static async postAddressToDB(address) {
+    const token = getToken();
+
     try {
       const res = await axios.post(url, address, {
         headers: {
-          Authorization: `Bearer ${token}`,
+          authorization: `Bearer ${token}`,
         },
       });
       return res.data;
@@ -18,10 +20,12 @@ export default class addressAPI {
     }
   }
   static async updateAddressInDB(addressToEdit, updateData) {
+    const token = getToken();
+
     try {
       const res = await axios.patch(`${url}/${addressToEdit}`, updateData, {
         headers: {
-          Authorization: `Bearer ${token}`,
+          authorization: `Bearer ${token}`,
         },
       });
       return res.data;
@@ -31,13 +35,14 @@ export default class addressAPI {
     }
   }
   static async updateAddressDefault(addressId, addressData) {
+    const token = getToken();
     try {
       const res = await axios.patch(
         `${url}/isDefault/${addressId}`,
         addressData,
         {
           headers: {
-            Authorization: `Bearer ${token}`,
+            authorization: `Bearer ${token}`,
           },
         }
       );
@@ -48,7 +53,7 @@ export default class addressAPI {
     }
   }
   static async setDefaultAddress(addressId) {
-    const token = localStorage.getItem("access-token");
+    const token = getToken();
 
     try {
       const res = await axios.patch(
@@ -56,7 +61,7 @@ export default class addressAPI {
         {},
         {
           headers: {
-            Authorization: `Bearer ${token}`,
+            authorization: `Bearer ${token}`,
           },
         }
       );
@@ -68,9 +73,10 @@ export default class addressAPI {
   }
 
   static async deleteAddress(id) {
+    const token = localStorage.getItem("access-token");
     const res = await axios.delete(`${url}/${id}`, {
       headers: {
-        Authorization: `Bearer ${token}`,
+        authorization: `Bearer ${token}`,
       },
     });
     return res.data;

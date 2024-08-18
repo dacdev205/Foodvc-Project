@@ -6,24 +6,37 @@ import menuAPI from "../../../api/menuAPI";
 import React, { useEffect, useState } from "react";
 import QuillEditor from "../../../ultis/QuillEditor";
 import productsAPI from "../../../api/productsAPI";
+import categoryAPI from "../../../api/categoryAPI";
 import { Bounce, toast } from "react-toastify";
 const UpdateItem = () => {
   const { register, handleSubmit, setValue } = useForm({ mode: "onChange" });
   const [product, setProduct] = useState(null);
+  const [categories, setCategories] = useState([]);
   const { id } = useParams();
   const { reset } = useForm();
   useEffect(() => {
     const fetchProductDetail = async () => {
       try {
         const response = await inventoryAPI.getProductById(id);
+        console.log(response);
+
         setProduct(response);
       } catch (error) {
         console.error("Error fetching product detail:", error);
       }
     };
-
+    const fetchCategories = async () => {
+      try {
+        const response = await categoryAPI.getAllCategory();
+        setCategories(response.categories);
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+      }
+    };
     fetchProductDetail();
+    fetchCategories();
   }, [id]);
+
   const onSubmit = async (data) => {
     try {
       const formData = new FormData();
@@ -32,7 +45,9 @@ const UpdateItem = () => {
       formData.append("quantity", data.quantity);
       formData.append("price", parseFloat(data.price));
       formData.append("recipe", data.recipe);
-      formData.append("image", data.image[0]);
+      if (data.image && data.image.length > 0) {
+        formData.append("image", data.image[0]);
+      }
       formData.append("brand", data.brand);
       formData.append("productionLocation", data.productionLocation);
       formData.append("instructions", data.instructions);
@@ -40,7 +55,12 @@ const UpdateItem = () => {
       formData.append("length", data.length);
       formData.append("width", data.width);
       formData.append("height", data.height);
+
       await productsAPI.updateProduct(product._id, formData);
+
+      const updatedProduct = await inventoryAPI.getProductById(product._id);
+      setProduct(updatedProduct);
+
       toast.success("Cập nhật thành công!", {
         position: "bottom-right",
         autoClose: 2000,
@@ -52,7 +72,7 @@ const UpdateItem = () => {
         theme: "colored",
         transition: Bounce,
       });
-      const updatedProduct = await productsAPI.getProductById(product._id);
+
       const menuUpdateData = {
         name: updatedProduct.name,
         category: updatedProduct.category,
@@ -72,16 +92,32 @@ const UpdateItem = () => {
 
       const productOnMenu = await menuAPI.getProductById(product._id);
 
-      if (productOnMenu === null) {
-        return;
-      } else {
+      if (productOnMenu) {
         await menuAPI.updateProduct(product._id, menuUpdateData);
       }
     } catch (error) {
-      console.log("Update menu failed", error);
+      console.error("Update failed", error);
     }
     reset();
   };
+  useEffect(() => {
+    if (product) {
+      reset({
+        name: product.name,
+        category: product.category._id,
+        quantity: product.quantity,
+        price: product.price,
+        brand: product.brand,
+        productionLocation: product.productionLocation,
+        instructions: product.instructions,
+        weight: product.weight,
+        length: product.length,
+        width: product.width,
+        height: product.height,
+        recipe: product.recipe,
+      });
+    }
+  }, [product, reset]);
 
   return (
     <div className="w-full md:w-[870px] px-4 mx-auto">
@@ -110,22 +146,21 @@ const UpdateItem = () => {
             <div className="flex gap-4">
               <div className="form-control w-full">
                 <label className="label">
-                  <span className="label- text-black">
-                    Loại sản phẩm(<span className="text-red">*</span>):
-                  </span>
+                  <span className="label-text text-black">Danh mục:</span>
                 </label>
                 <select
-                  {...register("category", { required: true })}
-                  className="select select-bordered w-full select-sm"
-                  defaultValue={product.category}
+                  {...register("category")}
+                  defaultValue={product?.category?._id}
+                  className="select select-bordered w-full text-black select-sm"
                 >
-                  <option value="">Chọn loại sản phẩm</option>
-                  <option value="protein">THỊT, CÁ, TRỨNG, HẢI SẢN</option>
-                  <option value="milk">SỮA CÁC LOẠI</option>
-                  <option value="soup">MÌ, MIẾN, CHÁO, PHỞ</option>
-                  <option value="vegetable">RAU CỦ, NẤM, TRÁI CÂY</option>
-                  <option value="drinks">BIA, NƯỚC GIẢI KHÁT</option>
-                  <option value="popular">NỔI BẬT</option>
+                  <option value="" disabled>
+                    Chọn danh mục
+                  </option>
+                  {categories.map((category) => (
+                    <option key={category._id} value={category._id}>
+                      {category.name}
+                    </option>
+                  ))}
                 </select>
               </div>
 

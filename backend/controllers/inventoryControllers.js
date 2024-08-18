@@ -3,7 +3,7 @@ const fs = require("fs");
 const Product = require("../models/product");
 const axios = require("axios");
 const Menu = require("../models/menu");
-
+const Category = require("../models/category");
 module.exports = class inventoryAPI {
   static async fetchInventorys(req, res) {
     try {
@@ -25,7 +25,14 @@ module.exports = class inventoryAPI {
             query.name = { $regex: searchTerm, $options: "i" };
             break;
           case "category":
-            query.category = { $regex: searchTerm, $options: "i" };
+            const category = await Category.findOne({
+              name: { $regex: searchTerm, $options: "i" },
+            });
+            if (category) {
+              query.category = category._id;
+            } else {
+              query.category = null;
+            }
             break;
           case "brand":
             query.brand = { $regex: searchTerm, $options: "i" };
@@ -64,7 +71,7 @@ module.exports = class inventoryAPI {
   static async fetchProductByID(req, res) {
     const id = req.params.id;
     try {
-      const product = await Product.findById(id);
+      const product = await Product.findById(id).populate("category");
       res.status(200).json(product);
     } catch (err) {
       res.status(500).json({ message: err.message });

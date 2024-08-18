@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import orderAPI from "../../api/orderAPI";
 import FormattedPrice from "../../ultis/FormatedPriece";
+
 import {
   Card,
   CardContent,
@@ -9,25 +10,30 @@ import {
   Modal,
   Typography,
   Box,
+  CircularProgress,
 } from "@mui/material";
 import { MdOutlineReceiptLong } from "react-icons/md";
 import ghnAPI from "../../api/ghnAPI";
-import axios from "axios";
 
 const OrderDetail = () => {
   const { id } = useParams();
   const [order, setOrder] = useState(null);
   const [orderDetailGHN, setOrderDetailGHN] = useState();
   const [openModal, setOpenModal] = useState(false);
-  const GHN_TOKEN = import.meta.env.VITE_GHN_TOKEN;
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const PRINT_URL = import.meta.env.VITE_PRINT_URL;
 
   useEffect(() => {
     const fetchOrderDetail = async () => {
+      setLoading(true);
       try {
         const response = await orderAPI.getOrderById(id);
         setOrder(response);
       } catch (error) {
         console.log(error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -77,18 +83,17 @@ const OrderDetail = () => {
 
       switch (format) {
         case "A5":
-          printUrl = `https://dev-online-gateway.ghn.vn/a5/public-api/printA5?token=${token}`;
+          printUrl = `${PRINT_URL}${token}`;
           break;
         case "80x80":
-          printUrl = `https://dev-online-gateway.ghn.vn/a5/public-api/print80x80?token=${token}`;
+          printUrl = `${PRINT_URL}${token}`;
           break;
         case "50x72":
-          printUrl = `https://dev-online-gateway.ghn.vn/a5/public-api/print52x70?token=${token}`;
+          printUrl = `${PRINT_URL}${token}`;
           break;
         default:
           return;
       }
-
       const iframe = document.createElement("iframe");
       iframe.style.position = "absolute";
       iframe.style.width = "0px";
@@ -108,7 +113,12 @@ const OrderDetail = () => {
 
   const handleOpenModal = () => setOpenModal(true);
   const handleCloseModal = () => setOpenModal(false);
-
+  if (loading)
+    return (
+      <div className="fixed inset-0 flex items-center justify-center z-50">
+        <CircularProgress color="success" />
+      </div>
+    );
   return (
     <div className="flex justify-center items-center min-h-screen">
       {order && (

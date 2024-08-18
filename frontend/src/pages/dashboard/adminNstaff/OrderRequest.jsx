@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { FaEdit, FaTrashAlt } from "react-icons/fa";
+import { FaEdit, FaEye, FaTrashAlt } from "react-icons/fa";
 import useAxiosSecure from "../../../hooks/useAxiosSecure";
 import ConfirmDeleteModal from "../../../ultis/ConfirmDeleteModal";
 import { Bounce, toast } from "react-toastify";
 import orderRequestAPI from "../../../api/orderRequest";
-import Pagination from "@mui/material/Pagination"; // Import Material UI Pagination
+import Pagination from "@mui/material/Pagination";
+import { CircularProgress } from "@mui/material";
 
 const ManageOrderRequests = () => {
   const axiosSecure = useAxiosSecure();
@@ -16,8 +17,10 @@ const ManageOrderRequests = () => {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [limit, setLimit] = useState(5);
+  const [loading, setLoading] = useState(true);
 
   const fetchOrders = async (searchTerm, page, limit) => {
+    setLoading(true);
     try {
       const response = await orderRequestAPI.getAllCancelReq(
         searchTerm,
@@ -35,6 +38,8 @@ const ManageOrderRequests = () => {
       console.error("Error fetching orders:", error);
       setOrders([]);
       setTotalPages(1);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -44,7 +49,7 @@ const ManageOrderRequests = () => {
 
   const handleDeleteOrder = async (orderId) => {
     try {
-      await axiosSecure.delete(`/orders/${orderId}`);
+      await axiosSecure.delete(`/order-request/cancel-request/${orderId}`);
       toast.success("Đơn hàng đã được xóa", {
         position: "bottom-right",
         autoClose: 5000,
@@ -100,83 +105,99 @@ const ManageOrderRequests = () => {
           className="input input-sm text-black"
         />
       </div>
-      <div className="overflow-x-auto">
-        <table className="table">
-          <thead>
-            <tr className="text-black border-style">
+      <div>
+        <table className="table shadow-lg">
+          <thead className="bg-green text-white rounded-lg">
+            <tr className="border-style">
               <th>#</th>
               <th>Mã đơn hàng</th>
               <th>Tên khách hàng</th>
               <th>Yêu cầu</th>
               <th>Trạng thái</th>
               <th>Ngày tạo</th>
-              <th>Chỉnh sửa</th>
+              <th>Chi tiết</th>
               <th>Xóa</th>
             </tr>
           </thead>
           <tbody>
-            {orders.map((order, index) => (
-              <tr key={index} className="boder border-gray-300">
-                <th className="text-black">{index + 1}</th>
-                <td className="text-black">{order.orderId.orderCode}</td>
-                <td className="text-black">{order.userId.name}</td>
-                <td className="text-black">
-                  {order.requestType === "Cancel"
-                    ? "Hủy đơn"
-                    : order.requestType === "Return"
-                    ? "Trả hàng"
-                    : order.requestType}
-                </td>
-                <td className="text-black">
-                  {order.status === "Pending"
-                    ? "Đang chờ xử lý"
-                    : order.status === "Approved"
-                    ? "Chấp thuận"
-                    : order.status === "Rejected"
-                    ? "Loại bỏ yêu cầu"
-                    : order.status}
-                </td>
-                <td className="text-black">
-                  {new Date(order.createdAt).toLocaleDateString()}
-                </td>
-                <td className="text-center">
-                  <Link to={`/admin/edit-order/${order._id}`}>
-                    <button className="btn btn-ghost btn-xs bg-orange-500 text-white">
-                      <FaEdit />
-                    </button>
-                  </Link>
-                </td>
-                <td>
-                  <button
-                    onClick={() => {
-                      setOrderToDelete(order._id);
-                      setShowConfirmModal(true);
-                    }}
-                    className="btn btn-ghost btn-xs text-red"
-                  >
-                    <FaTrashAlt />
-                  </button>
+            {loading ? (
+              <tr>
+                <td colSpan="8" className="text-center">
+                  <CircularProgress color="success" />
                 </td>
               </tr>
-            ))}
+            ) : orders.length > 0 ? (
+              orders.map((order, index) => (
+                <tr key={index}>
+                  <th className="text-black">{index + 1}</th>
+                  <td className="text-black">{order.orderId.orderCode}</td>
+                  <td className="text-black">{order.userId.name}</td>
+                  <td className="text-black">
+                    {order.requestType === "Cancel"
+                      ? "Hủy đơn"
+                      : order.requestType === "Return"
+                      ? "Trả hàng"
+                      : order.requestType}
+                  </td>
+                  <td className="text-black">
+                    {order.status === "Pending"
+                      ? "Đang chờ xử lý"
+                      : order.status === "Approved"
+                      ? "Chấp thuận"
+                      : order.status === "Rejected"
+                      ? "Loại bỏ yêu cầu"
+                      : order.status}
+                  </td>
+                  <td className="text-black">
+                    {new Date(order.createdAt).toLocaleDateString()}
+                  </td>
+                  <td className="text-center">
+                    <Link to={`/admin/edit-order/${order._id}`}>
+                      <button className="btn btn-ghost btn-xs text-blue-500">
+                        <FaEye />
+                      </button>
+                    </Link>
+                  </td>
+                  <td>
+                    <button
+                      onClick={() => {
+                        setOrderToDelete(order._id);
+                        setShowConfirmModal(true);
+                      }}
+                      className="btn btn-ghost btn-xs text-red"
+                    >
+                      <FaTrashAlt />
+                    </button>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="8" className="text-center text-gray-500 py-4">
+                  Không có yêu cầu nào
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
         <ConfirmDeleteModal
           showModal={showConfirmModal}
           onClose={() => setShowConfirmModal(false)}
           onConfirm={() => handleDeleteOrder(orderToDelete)}
-          title="Xác nhận xóa đơn hàng"
-          message="Bạn có chắc chắn muốn xóa đơn hàng này?"
+          title="Xác nhận xóa yêu cầu"
+          message="Bạn có chắc chắn muốn xóa yêu cầu này?"
         />
       </div>
-      <div className="flex justify-center mt-4">
-        <Pagination
-          count={totalPages}
-          page={page}
-          onChange={handlePageChange}
-          color="success"
-        />
-      </div>
+      {orders.length > 0 && (
+        <div className="flex justify-center mt-4">
+          <Pagination
+            count={totalPages}
+            page={page}
+            onChange={handlePageChange}
+            color="success"
+          />
+        </div>
+      )}
     </div>
   );
 };

@@ -9,15 +9,21 @@ const useInventory = (
   sortBy = "",
   sortOrder = "asc"
 ) => {
-  const axiosPublic = useAxiosPublic();
-  const token = localStorage.getItem("access-token");
+  const getToken = () => localStorage.getItem("access-token");
 
-  const { refetch, data: inventory = { inventory: [] } } = useQuery({
+  const axiosPublic = useAxiosPublic();
+  const token = getToken();
+
+  const {
+    refetch,
+    data: inventory = { inventory: [] },
+    isLoading,
+  } = useQuery({
     queryKey: ["inventory", searchTerm, filterType, page, limit],
     queryFn: async () => {
       const res = await axiosPublic.get("/inventory", {
         headers: {
-          Authorization: `Bearer ${token}`,
+          authorization: `Bearer ${token}`,
         },
         params: {
           searchTerm,
@@ -31,7 +37,7 @@ const useInventory = (
       return res.data;
     },
   });
-  return [inventory.inventory, inventory.totalPages, refetch];
+  return [inventory.inventory, inventory.totalPages, refetch, isLoading];
 };
 
 export default useInventory;

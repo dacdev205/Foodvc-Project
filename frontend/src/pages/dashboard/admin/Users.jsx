@@ -5,7 +5,7 @@ import useAxiosSecure from "../../../hooks/useAxiosSecure";
 import AddUserModal from "./AddUserModal";
 import ConfirmDeleteModal from "../../../ultis/ConfirmDeleteModal";
 import { Bounce, toast } from "react-toastify";
-import { Pagination } from "@mui/material";
+import { CircularProgress, Pagination } from "@mui/material";
 import userAPI from "../../../api/userAPI";
 
 const Users = () => {
@@ -15,11 +15,16 @@ const Users = () => {
   const [addUserModalOpen, setAddUserModalOpen] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [userToDelete, setUserToDelete] = useState(null);
-  const token = localStorage.getItem("access-token");
+  const getToken = () => localStorage.getItem("access-token");
+  const token = getToken();
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
-  const { refetch, data: users = [] } = useQuery({
+  const {
+    refetch,
+    data: users = [],
+    isLoading,
+  } = useQuery({
     queryKey: ["users", page, searchTerm, filterType],
     queryFn: async () => {
       const res = await axiosSecure.get(`/users/search`, {
@@ -30,15 +35,17 @@ const Users = () => {
     },
     keepPreviousData: true,
   });
+
   useEffect(() => {
     refetch();
   }, [page, refetch]);
+
   const { data: roles = [] } = useQuery({
     queryKey: ["roles"],
     queryFn: async () => {
       const res = await axiosSecure.get("/users/roles/getAll", {
         headers: {
-          Authorization: `Bearer ${token}`,
+          authorization: `Bearer ${token}`,
         },
       });
       return res.data;
@@ -175,7 +182,7 @@ const Users = () => {
         </div>
         <div>
           <button
-            className="btn bg-green text-white border-none hover:opacity-80 hover:bg-green"
+            className="btn bg-green text-white hover:opacity-80 hover:bg-green"
             onClick={() => setAddUserModalOpen(true)}
           >
             + Thêm người dùng
@@ -189,9 +196,9 @@ const Users = () => {
         </div>
       </div>
 
-      <div className="overflow-x-auto">
-        <table className="table md:w-[870px]">
-          <thead className="bg-green text-white rounded-lg">
+      <div>
+        <table className="table md:w-[870px] shadow-lg ">
+          <thead className="bg-green text-white rounded-lg ">
             <tr className="border-style">
               <th>#</th>
               <th>Tên người dùng</th>
@@ -201,39 +208,53 @@ const Users = () => {
             </tr>
           </thead>
           <tbody className="text-black">
-            {users.map((user, index) => (
-              <tr key={user._id} className="border-gray-300">
-                <th>{index + 1}</th>
-                <td>{user.name}</td>
-                <td>{user.email}</td>
-                <td>
-                  {user.roles[0].name === "admin" ? (
-                    "Admin"
-                  ) : (
-                    <select
-                      value={user.roles[0]._id}
-                      onChange={(e) => handleRoleChange(user, e.target.value)}
-                    >
-                      {roles
-                        .filter((role) => role.name.toLowerCase() !== "admin")
-                        .map((role) => (
-                          <option key={role._id} value={role._id}>
-                            {role.name}
-                          </option>
-                        ))}
-                    </select>
-                  )}
-                </td>
-                <td>
-                  <button
-                    onClick={() => handleDeleteClick(user)}
-                    className="btn btn-xs bg-white hover:bg-slate-300 text-red border-style"
-                  >
-                    <FaTrash />
-                  </button>
+            {isLoading ? (
+              <tr>
+                <td colSpan="5" className="text-center py-4">
+                  <CircularProgress color="success" />
                 </td>
               </tr>
-            ))}
+            ) : users.length === 0 ? (
+              <tr>
+                <td colSpan="5" className="text-center py-4">
+                  Không có người dùng nào
+                </td>
+              </tr>
+            ) : (
+              users.map((user, index) => (
+                <tr key={user._id} className="border-gray-300">
+                  <th>{index + 1}</th>
+                  <td>{user.name}</td>
+                  <td>{user.email}</td>
+                  <td>
+                    {user.roles[0].name === "admin" ? (
+                      "Admin"
+                    ) : (
+                      <select
+                        value={user.roles[0]._id}
+                        onChange={(e) => handleRoleChange(user, e.target.value)}
+                      >
+                        {roles
+                          .filter((role) => role.name.toLowerCase() !== "admin")
+                          .map((role) => (
+                            <option key={role._id} value={role._id}>
+                              {role.name}
+                            </option>
+                          ))}
+                      </select>
+                    )}
+                  </td>
+                  <td>
+                    <button
+                      onClick={() => handleDeleteClick(user)}
+                      className="btn btn-xs bg-white hover:bg-slate-300 text-red border-style"
+                    >
+                      <FaTrash />
+                    </button>
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>

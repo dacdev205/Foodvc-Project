@@ -23,6 +23,9 @@ const CartPageLazyLoading = lazy(() => import("../pages/menuPage/CartPage"));
 const DashBoardLayoutLazyLoading = lazy(() =>
   import("../layout/DashBoardLayout")
 );
+const OrderRequestDetailLazyLoading = lazy(() =>
+  import("../components/Order/OrderRequestDetail")
+);
 const DashboardLazyLoading = lazy(() =>
   import("../pages/dashboard/admin/Dashboard")
 );
@@ -33,6 +36,9 @@ const AddInventoryLazyLoading = lazy(() =>
 );
 const WishListPageLazyLoading = lazy(() =>
   import("../pages/menuPage/WishListPage")
+);
+const CategoryLazyLoading = lazy(() =>
+  import("../pages/dashboard/admin/CategoriesManagement")
 );
 const ManageInventoryLazyLoading = lazy(() =>
   import("../pages/dashboard/adminNstaff/ManageInventory")
@@ -70,6 +76,7 @@ const VerifyPasswordLazyLoading = lazy(() =>
 const ChangePasswordLazyLoading = lazy(() =>
   import("../components/Account/ChangePassword")
 );
+const WalletLazyLoading = lazy(() => import("../pages/menuPage/Wallet"));
 const ForgetPasswordLazyLoading = lazy(() =>
   import("../components/Account/ForgetPassword")
 );
@@ -214,6 +221,14 @@ const router = createBrowserRouter([
             ),
           },
           {
+            path: "wallet",
+            element: (
+              <Suspense fallback={<LoadingSpinner />}>
+                <WalletLazyLoading />
+              </Suspense>
+            ),
+          },
+          {
             path: "change-password",
             element: (
               <Suspense fallback={<LoadingSpinner />}>
@@ -308,6 +323,22 @@ const router = createBrowserRouter([
         element: (
           <Suspense>
             <UsersLazyLoading />
+          </Suspense>
+        ),
+      },
+      {
+        path: "edit-order/:id",
+        element: (
+          <Suspense>
+            <OrderRequestDetailLazyLoading />
+          </Suspense>
+        ),
+      },
+      {
+        path: "category",
+        element: (
+          <Suspense>
+            <CategoryLazyLoading />
           </Suspense>
         ),
       },

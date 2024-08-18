@@ -13,6 +13,7 @@ module.exports = class orderAPI {
       products,
       totalAmount,
       addressId,
+      orderRequestId,
       note,
       methodId,
     } = req.body;
@@ -22,9 +23,10 @@ module.exports = class orderAPI {
     );
     const methodDoc = await methodDeliAPI.getMethodIdByMethodId(methodId);
     let statusId;
-
+    let paymentStatus = false;
     if (methodDoc.methodId === 2) {
       statusId = waiting4PickupStatusId;
+      paymentStatus = true;
     } else {
       statusId = pendingStatusId;
     }
@@ -33,11 +35,13 @@ module.exports = class orderAPI {
         userId,
         orderCode,
         products,
+        orderRequestId,
         totalAmount,
         statusId,
         addressId,
         note,
         methodId,
+        paymentStatus,
       });
 
       for (const product of products) {
@@ -59,7 +63,7 @@ module.exports = class orderAPI {
     try {
       const { orderId, reason } = req.body;
       const email = req.decoded.email;
-      const user = await User.findOne({ email: email });
+      const user = await User.findOne({ email });
       const userId = user._id;
 
       const order = await Order.findOne({ _id: orderId, userId });
@@ -81,10 +85,10 @@ module.exports = class orderAPI {
       await order.save();
 
       const newRequest = new OrderRequest({
-        orderId: orderId,
-        userId: userId,
+        orderId,
+        userId,
         requestType: "Cancel",
-        reason: reason,
+        reason,
         status: "Approved",
       });
 
@@ -92,6 +96,8 @@ module.exports = class orderAPI {
 
       return res.status(200).json({
         message: "Đơn hàng đã được hủy thành công.",
+        showWarning: req.showWarning || false,
+        warningMessage: req.warningMessage || null,
         order,
         request: newRequest,
       });
@@ -103,6 +109,19 @@ module.exports = class orderAPI {
     }
   }
 
+  static async addOrderReq(req, res) {
+    try {
+      const { orderRequestId } = req.body;
+      const order = await Order.findByIdAndUpdate(
+        req.params.orderId,
+        { $push: { orderRequestId } },
+        { new: true }
+      );
+      res.json(order);
+    } catch (error) {
+      res.status(500).send("Có lỗi xảy ra khi cập nhật đơn hàng.");
+    }
+  }
   static async getUserOrders(req, res) {
     const userId = req.params.userId;
     const {
@@ -123,7 +142,8 @@ module.exports = class orderAPI {
         .skip((page - 1) * limit)
         .limit(Number(limit))
         .populate("statusId")
-        .populate("products.productId");
+        .populate("products.productId")
+        .populate("orderRequestId");
 
       const totalOrders = await Order.countDocuments(query);
       const totalPages = Math.ceil(totalOrders / limit);

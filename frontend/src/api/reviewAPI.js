@@ -1,12 +1,13 @@
 import axios from "axios";
 const url = "http://localhost:3000/reviews";
-const token = localStorage.getItem("access-token");
+const getToken = () => localStorage.getItem("access-token");
 
 export default class reviewAPI {
   static async getProductById(id) {
+    const token = getToken();
     const res = await axios.get(`${url}/${id}`, {
       headers: {
-        Authorization: `Bearer ${token}`,
+        authorization: `Bearer ${token}`,
       },
     });
     return res.data;
@@ -14,9 +15,10 @@ export default class reviewAPI {
 
   static async addReview(review) {
     try {
+      const token = getToken();
       const res = await axios.post(url, review, {
         headers: {
-          Authorization: `Bearer ${token}`,
+          authorization: `Bearer ${token}`,
         },
       });
       return res.data;
@@ -28,9 +30,10 @@ export default class reviewAPI {
 
   static async updateReviewByReviewId(reviewId, updateData) {
     try {
+      const token = getToken();
       const res = await axios.patch(`${url}/${reviewId}`, updateData, {
         headers: {
-          Authorization: `Bearer ${token}`,
+          authorization: `Bearer ${token}`,
         },
       });
       return res.data;
@@ -40,11 +43,12 @@ export default class reviewAPI {
     }
   }
   static async getReviewById(id) {
+    const token = getToken();
     const res = await axios.get(
       `http://localhost:3000/reviews/editReview/${id}`,
       {
         headers: {
-          Authorization: `Bearer ${token}`,
+          authorization: `Bearer ${token}`,
         },
       }
     );

@@ -19,6 +19,7 @@ import { AuthContext } from "../../context/AuthProvider";
 import cartAPI from "../../api/cartAPI";
 import { useNavigate } from "react-router-dom";
 import PaymentMethodModal from "../../components/PaymentMethod";
+import { Bounce, toast } from "react-toastify";
 
 const Payment = () => {
   const [payment, refetch, isLoading] = usePayment();
@@ -41,7 +42,8 @@ const Payment = () => {
   const [isVoucherApplied, setIsVoucherApplied] = useState(false);
   const [discountedAmount, setDiscountedAmount] = useState(0);
   const GHN_TOKEN = import.meta.env.VITE_GHN_TOKEN;
-  const token = localStorage.getItem("access-token");
+  const getToken = () => localStorage.getItem("access-token");
+  const token = getToken();
   const navigate = useNavigate();
   const [isPaymentMethodModalOpen, setIsPaymentMethodModalOpen] =
     useState(false);
@@ -94,8 +96,16 @@ const Payment = () => {
   const handleSelectPaymentMethod = (method) => {
     setSelectedPaymentMethod(method);
     setPaymentMethodSelected(true);
+    localStorage.setItem("selectedPaymentMethod", JSON.stringify(method));
     handleClosePaymentMethodModal();
   };
+  useEffect(() => {
+    const savedPaymentMethod = localStorage.getItem("selectedPaymentMethod");
+    if (savedPaymentMethod) {
+      setSelectedPaymentMethod(JSON.parse(savedPaymentMethod));
+      setPaymentMethodSelected(true);
+    }
+  }, []);
   useEffect(() => {
     const fetchVoucherData = async () => {
       const res = await voucherAPI.getAllVoucher();
@@ -229,6 +239,20 @@ const Payment = () => {
 
   const handleBuyItem = async () => {
     try {
+      if (!selectedPaymentMethod) {
+        toast.error("Vui lòng chọn hình thức thanh toán trước khi đặt hàng!", {
+          position: "bottom-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "colored",
+          transition: Bounce,
+        });
+        return;
+      }
       if (selectedPaymentMethod.methodId === 1) {
         await handleCODPayment();
       } else if (selectedPaymentMethod.methodId === 2) {
@@ -243,10 +267,12 @@ const Payment = () => {
   };
   const handleVNPayPayment = async () => {
     const randomId = generateRandomString(20);
+    const productData = extractProductData(payment);
+
     setIsSubmitting(true);
     try {
       const res = await axios.post("http://localhost:3000/method-deli/vn_pay", {
-        amount: subOrderTotal,
+        amount: amount,
         bankCode: "VNPAY",
         language: "vn",
       });
@@ -255,15 +281,61 @@ const Payment = () => {
         JSON.stringify({
           userId: userData._id,
           products: payment.flatMap((item) => item.products),
-          totalAmount: subOrderTotal,
+          totalAmount: amount,
           orderCode: randomId,
           note: note,
           addressId: addressUser._id,
           methodId: selectedPaymentMethod,
         })
       );
+      localStorage.setItem(
+        "orderDataPostGHN",
+        JSON.stringify({
+          payment_type_id: 2,
+          note: note,
+          required_note: "CHOXEMHANGKHONGTHU",
+          return_phone: `${shopData.phone}`,
+          return_address: `${shopData.address}`,
+          return_district_id: `${shopData.district_id}`,
+          return_ward_code: "",
+          client_order_code: randomId,
+          from_name: `${shopData.name}`,
+          from_phone: `${shopData.phone}`,
+          from_address: `${shopData.address}`,
+          from_ward_name: "Xuân Khánh",
+          from_district_name: "Ninh Kiều",
+          from_province_name: "Cần Thơ",
+          to_name: addressUser.fullName,
+          to_phone: addressUser.phone,
+          to_address: `${addressUser?.street}, ${addressUser?.ward.wardName}, ${addressUser?.district.districtName}, ${addressUser?.city.cityName}`,
+          to_ward_name: addressUser?.ward.wardName,
+          to_district_name: addressUser?.district.districtName,
+          to_province_name: addressUser?.city.cityName,
+          cod_amount: subOrderTotal,
+          content: note,
+          weight: productData.totalWeight,
+          length: productData.totalLength,
+          width: productData.totalWidth,
+          height: productData.totalHeight,
+          cod_failed_amount: 0,
+          pick_station_id: 1444,
+          deliver_station_id: null,
+          insurance_value: Math.min(orderTotal, 5000000),
+          service_id: 0,
+          service_type_id: 2,
+          coupon: null,
+          pickup_time: Math.floor(Date.now() / 1000),
+          pick_shift: getPickShifts(),
+          items: payment.flatMap((item) =>
+            item.products.map((product) => ({
+              name: product.productId.name,
+              quantity: product.quantity,
+              price: parseInt(product.productId.price),
+            }))
+          ),
+        })
+      );
       window.location.href = res.data.paymentUrl;
-      // await sendEmailToUser(user.email, randomId);
     } catch (error) {
       console.error("Payment error:", error);
     } finally {

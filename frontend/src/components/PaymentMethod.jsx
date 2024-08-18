@@ -24,9 +24,9 @@ const PaymentMethodModal = ({
             Chọn hình thức thanh toán
           </h3>
           <div className="mt-4 space-y-4">
-            {paymentMethods.map((method) => (
+            {paymentMethods.map((method, index) => (
               <button
-                key={method.id}
+                key={method.id || index}
                 className="btn w-full bg-green text-white hover:bg-green hover:opacity-80"
                 onClick={() => onSelectMethod(method)}
               >

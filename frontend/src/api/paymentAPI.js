@@ -1,13 +1,14 @@
 import axios from "axios";
 const url = "http://localhost:3000/check-out";
-const token = localStorage.getItem("access-token");
+const getToken = () => localStorage.getItem("access-token");
 
 export default class paymentAPI {
   static async getAllPayment(email) {
+    const token = getToken();
     try {
       const res = await axios.get(`${url}?email=${email}`, {
         headers: {
-          Authorization: `Bearer ${token}`,
+          authorization: `Bearer ${token}`,
         },
       });
       return res.data;
@@ -17,11 +18,12 @@ export default class paymentAPI {
     }
   }
   static async getProductToPayment(orderItem) {
+    const token = getToken();
     try {
       const productId = orderItem._id;
       const res = await axios.get(`${url}/${productId}`, {
         headers: {
-          Authorization: `Bearer ${token}`,
+          authorization: `Bearer ${token}`,
         },
       });
       return res.data;
@@ -31,10 +33,11 @@ export default class paymentAPI {
     }
   }
   static async postProductToPayment(ItemBuyNow) {
+    const token = getToken();
     try {
       const res = await axios.post(url, ItemBuyNow, {
         headers: {
-          Authorization: `Bearer ${token}`,
+          authorization: `Bearer ${token}`,
         },
       });
       return res.data;
@@ -44,10 +47,11 @@ export default class paymentAPI {
     }
   }
   static async updateProduct(productId, updateData) {
+    const token = getToken();
     try {
       const res = await axios.patch(`${url}/${productId}`, updateData, {
         headers: {
-          Authorization: `Bearer ${token}`,
+          authorization: `Bearer ${token}`,
         },
       });
       return res.data;
@@ -57,9 +61,10 @@ export default class paymentAPI {
     }
   }
   static async deleteProduct(id) {
+    const token = getToken();
     const res = await axios.delete(`${url}/${id}`, {
       headers: {
-        Authorization: `Bearer ${token}`,
+        authorization: `Bearer ${token}`,
       },
     });
     return res.data;

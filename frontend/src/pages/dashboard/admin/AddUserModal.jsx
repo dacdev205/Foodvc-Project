@@ -19,14 +19,15 @@ const AddUserModal = ({
   const [showPassword, setShowPassword] = useState(false);
   const [role, setRole] = useState("");
   const { createUserWithoutLogin } = useContext(AuthContext);
-  const token = localStorage.getItem("access-token");
+  const getToken = () => localStorage.getItem("access-token");
+  const token = getToken();
 
   const { data: roles = [] } = useQuery({
     queryKey: ["roles"],
     queryFn: async () => {
       const res = await useAxiosSecure.get("/users/roles/getAll", {
         headers: {
-          Authorization: `Bearer ${token}`,
+          authorization: `Bearer ${token}`,
         },
       });
       return res.data;

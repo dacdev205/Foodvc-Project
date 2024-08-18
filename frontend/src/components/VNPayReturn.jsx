@@ -8,6 +8,7 @@ import useCart from "../hooks/useCart";
 import useAuth from "../hooks/useAuth";
 import { AuthContext } from "../context/AuthProvider";
 import LoadingSpinner from "../ultis/LoadingSpinner";
+import ghnAPI from "../api/ghnAPI";
 
 const VNPayReturn = () => {
   const [searchParams] = useSearchParams();
@@ -44,7 +45,7 @@ const VNPayReturn = () => {
   }, [searchParams]);
 
   const isPaymentSuccessful = paymentResult.responseCode === "00";
-  const sendEmailToUser = async (email, orderId) => {
+  const sendEmailToUser = async (email, orderCode) => {
     try {
       await axios.post("http://localhost:3000/email", {
         email: email,
@@ -59,7 +60,7 @@ const VNPayReturn = () => {
         <body class="font-sans bg-gray-100">
           <div class="max-w-xl mx-auto p-8 bg-white rounded shadow">
             <h1 class="text-2xl font-bold text-center text-gray-800 mb-4">Xác nhận đơn hàng của bạn</h1>
-            <h2 class="text-lg font-semibold text-gray-700 mb-2">Mã đơn hàng: ${orderId}</h2>
+            <h2 class="text-lg font-semibold text-gray-700 mb-2">Mã đơn hàng: ${orderCode}</h2>
             <p class="text-gray-600 mb-2"><span class="font-semibold">Email:</span> ${email}</p>
             <p class="text-gray-600 mb-4">Cảm ơn bạn đã mua sắm tại FOODVC. Chúng tôi sẽ xử lý đơn hàng của bạn trong thời gian sớm nhất.</p>
           </div>
@@ -109,6 +110,7 @@ const VNPayReturn = () => {
     try {
       const orderData = JSON.parse(localStorage.getItem("orderData"));
       const rspCode = localStorage.getItem("RspCode");
+      const payload = localStorage.getItem("orderDataPostGHN");
       const res = {
         userId: orderData.userId,
         products: orderData.products,
@@ -125,7 +127,12 @@ const VNPayReturn = () => {
             await cartAPI.deleteProduct(cart._id, product.productId._id);
           })
         );
-        await sendEmailToUser(user.email, orderData.orderId);
+        await sendEmailToUser(user.email, orderData.orderCode);
+        const createOrderGhn = await ghnAPI.createOrder(payload);
+        if (!createOrderGhn.status === 200) {
+          console.error("Lỗi tạo đơn hàng GHN:", createOrderGhn.message);
+          return;
+        }
       }
       localStorage.removeItem("RspCode");
       localStorage.removeItem("orderData");

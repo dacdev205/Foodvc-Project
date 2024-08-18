@@ -321,6 +321,19 @@ const DashBoardLayout = () => {
               <li>
                 <Link
                   className={`active-link-2 ${
+                    location.pathname.startsWith("/admin/category")
+                      ? "text-green"
+                      : ""
+                  }`}
+                  to="/admin/category"
+                >
+                  <FaShoppingBag />
+                  Quản lý danh mục
+                </Link>
+              </li>
+              <li>
+                <Link
+                  className={`active-link-2 ${
                     location.pathname.startsWith("/admin/reviews")
                       ? "text-green"
                       : ""

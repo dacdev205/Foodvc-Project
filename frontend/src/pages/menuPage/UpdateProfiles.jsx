@@ -10,8 +10,10 @@ import { styled } from "@mui/material/styles";
 import Button from "@mui/material/Button";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import LoadingSpinner from "../../ultis/LoadingSpinner";
+import { CircularProgress } from "@mui/material";
 const UpdateProfile = () => {
-  const { updateUserProfile, user, updateUser } = useContext(AuthContext);
+  const { updateUserProfile, user, updateUser, loading } =
+    useContext(AuthContext);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const userData = useUserCurrent();
   const [photo, setPhoto] = useState(null);
@@ -87,12 +89,17 @@ const UpdateProfile = () => {
   const handlePhotoChange = (event) => {
     setPhoto(event.target.files[0]);
   };
-
+  if (loading)
+    return (
+      <div className="fixed inset-0 flex items-center justify-center z-50">
+        <CircularProgress color="success" />
+      </div>
+    );
   return (
     <div className="min-h-full lg:w-[890px] md:w-full sm:w-full shadow-md rounded-sm bg-white">
       {isSubmitting && (
-        <div className="fixed inset-0 flex items-center justify-center bg-gray-600 bg-opacity-50 z-50">
-          <LoadingSpinner />
+        <div className="fixed inset-0 flex items-center justify-center z-50">
+          <CircularProgress color="success" />
         </div>
       )}
       <div className="px-8 py-4">

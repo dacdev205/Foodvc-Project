@@ -34,6 +34,7 @@ router.get(
   checkPermission("read"),
   orderAPI.getUserOrders
 );
+router.patch("/:orderId/add-order-request", verifyToken, orderAPI.addOrderReq);
 router.patch(
   "/:id",
   verifyToken,

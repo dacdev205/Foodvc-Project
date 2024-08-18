@@ -10,7 +10,11 @@ const productSchema = mongoose.Schema({
   recipe: String,
   image: String,
   brand: String,
-  category: String,
+  category: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Category",
+    required: true,
+  },
   price: Number,
   quantity: Number,
   productionLocation: String,

@@ -1,13 +1,12 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import useUserCurrent from "./useUserCurrent";
-import { useEffect } from "react";
 
 const useCart = () => {
   const userData = useUserCurrent();
-  const token = localStorage.getItem("access-token");
   const id = userData?._id || "";
   const queryClient = useQueryClient();
-
+  const getToken = () => localStorage.getItem("access-token");
+  const token = getToken();
   const refetchCart = async () => {
     if (!id) {
       return;
@@ -21,15 +20,26 @@ const useCart = () => {
       if (!id) {
         return [];
       }
-      const res = await fetch(`http://localhost:3000/cart/user/${id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      if (!res.ok) {
+
+      try {
+        const res = await fetch(`http://localhost:3000/cart/user/${id}`, {
+          headers: {
+            authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (res.status === 404) {
+          return [];
+        }
+
+        if (!res.ok) {
+          return [];
+        }
+
+        return await res.json();
+      } catch (error) {
         return [];
       }
-      return res.json();
     },
   });
 

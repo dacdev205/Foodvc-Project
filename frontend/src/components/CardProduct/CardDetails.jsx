@@ -25,11 +25,8 @@ import LoadingSpinner from "../../ultis/LoadingSpinner";
 import { AuthContext } from "../../context/AuthProvider";
 import "react-toastify/dist/ReactToastify.css";
 import { Bounce, toast } from "react-toastify";
-import ConfirmDeleteModal from "../Modal/ConfirmDeleteModal";
 import "react-confirm-alert/src/react-confirm-alert.css";
 import useUserCurrent from "../../hooks/useUserCurrent";
-import axios from "axios";
-const token = localStorage.getItem("access-token");
 
 const CardDetails = () => {
   const { id } = useParams();

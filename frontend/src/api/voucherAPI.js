@@ -1,28 +1,31 @@
 import axios from "axios";
 const url = "http://localhost:3000/vouchers";
-const token = localStorage.getItem("access-token");
+const getToken = () => localStorage.getItem("access-token");
 
 export default class voucherAPI {
   static async getVoucherById(id) {
+    const token = getToken();
     const res = await axios.get(`${url}/${id}`, {
       headers: {
-        Authorization: `Bearer ${token}`,
+        authorization: `Bearer ${token}`,
       },
     });
     return res.data;
   }
   static async getAllVoucher() {
+    const token = getToken();
     const res = await axios.get(url, {
       headers: {
-        Authorization: `Bearer ${token}`,
+        authorization: `Bearer ${token}`,
       },
     });
     return res.data;
   }
   static async createVoucher(data) {
+    const token = getToken();
     const res = await axios.post(url, data, {
       headers: {
-        Authorization: `Bearer ${token}`,
+        authorization: `Bearer ${token}`,
       },
     });
     return res.data;

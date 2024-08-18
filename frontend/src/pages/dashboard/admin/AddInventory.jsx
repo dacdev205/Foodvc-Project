@@ -1,18 +1,32 @@
 import { styled } from "@mui/material/styles";
 import Button from "@mui/material/Button";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FaUtensils } from "react-icons/fa";
 import { useForm } from "react-hook-form";
 import inventoryAPI from "../../../api/inventoryAPI";
 import QuillEditor from "../../../ultis/QuillEditor";
 import { Bounce, toast } from "react-toastify";
+import categoryAPI from "../../../api/categoryAPI";
 const AddInventory = () => {
   const { register, handleSubmit, setValue, reset } = useForm({
     mode: "onChange",
   });
   const [photo, setPhoto] = useState(null);
+  const [categories, setCategories] = useState([]);
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const data = await categoryAPI.getAllCategory();
+        // console.log(data);
+        setCategories(data.categories);
+      } catch (error) {
+        console.log(error);
+      }
+    };
 
+    fetchCategories();
+  }, []);
   const VisuallyHiddenInput = styled("input")({
     clip: "rect(0 0 0 0)",
     clipPath: "inset(50%)",
@@ -107,12 +121,11 @@ const AddInventory = () => {
                 className="select select-bordered w-full select-sm"
               >
                 <option value="">Chọn loại sản phẩm</option>
-                <option value="protein">THỊT, CÁ, TRỨNG, HẢI SẢN</option>
-                <option value="milk">SỮA CÁC LOẠI</option>
-                <option value="soup">MÌ, MIẾN, CHÁO, PHỞ</option>
-                <option value="vegetable">RAU CỦ, NẤM, TRÁI CÂY</option>
-                <option value="drinks">BIA, NƯỚC GIẢI KHÁT</option>
-                <option value="popular">NỔI BẬT</option>
+                {categories.map((category) => (
+                  <option key={category._id} value={category._id}>
+                    {category.name}
+                  </option>
+                ))}
               </select>
             </div>
 

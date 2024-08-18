@@ -41,6 +41,17 @@ const orderSchema = mongoose.Schema({
     ref: "MethodDelivery",
     required: true,
   },
+  paymentStatus: {
+    type: Boolean,
+    default: false,
+  },
+  orderRequestId: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "OrderRequest",
+      required: true,
+    },
+  ],
   createdAt: {
     type: Date,
     default: Date.now,

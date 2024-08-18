@@ -6,6 +6,7 @@ import Slider from "react-slick";
 import Cards from "../../components/CardProduct/Cards";
 import menuAPI from "../../api/menuAPI";
 import { FaAngleRight, FaAngleLeft } from "react-icons/fa6";
+import useMenu from "../../hooks/useMenu";
 
 const SampleNextArrow = (props) => {
   const { className, style, onClick } = props;
@@ -36,20 +37,34 @@ const SamplePrevArrow = (props) => {
 const SpecialDishes = () => {
   const [recipes, setRecipes] = useState([]);
   const slider = React.useRef(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterType, setFilterType] = useState("name");
+  const [category, setCategory] = useState("popular");
+  const [page, setPage] = useState(1);
+  const [menu, totalPages, refetch, isLoading, error] = useMenu(
+    searchTerm,
+    filterType,
+    category,
+    page,
+    8
+  );
   useEffect(() => {
-    // Fetch data from the backend
     const fetchDataPopular = async () => {
       try {
-        const data = await menuAPI.getAllMenu();
-        const specials = data.filter((item) => item.category === "popular");
-        setRecipes(specials);
+        const specials = menu.filter(
+          (item) => item.productId.category === "popular"
+        );
+        if (JSON.stringify(specials) !== JSON.stringify(recipes)) {
+          setRecipes(specials);
+        }
       } catch (error) {
         console.error("Error fetching data:", error);
       }
     };
 
     fetchDataPopular();
-  }, []);
+  }, [menu, recipes]);
+
   const settings = {
     dots: true,
     infinite: false,

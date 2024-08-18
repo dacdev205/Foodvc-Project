@@ -10,7 +10,8 @@ const useOrders = (
   limit = 5
 ) => {
   const userData = useUserCurrent();
-  const token = localStorage.getItem("access-token");
+  const getToken = () => localStorage.getItem("access-token");
+  const token = getToken();
   const id = userData?._id || "";
   const axiosPublic = useAxiosPublic();
 
@@ -27,7 +28,7 @@ const useOrders = (
       try {
         const res = await axiosPublic.get(`/order/order-user/${id}`, {
           headers: {
-            Authorization: `Bearer ${token}`,
+            authorization: `Bearer ${token}`,
           },
           params: { searchTerm, filterType, page, limit },
         });

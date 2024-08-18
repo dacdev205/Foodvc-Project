@@ -4,7 +4,8 @@ import { useQuery } from "@tanstack/react-query";
 import useUserCurrent from "./useUserCurrent";
 
 const usePayment = () => {
-  const token = localStorage.getItem("access-token");
+  const getToken = () => localStorage.getItem("access-token");
+  const token = getToken();
   const userData = useUserCurrent();
   const id = userData?._id || "";
   const {
@@ -19,7 +20,7 @@ const usePayment = () => {
       }
       const res = await fetch(`http://localhost:3000/check-out/${id}`, {
         headers: {
-          Authorization: `Bearer ${token}`,
+          authorization: `Bearer ${token}`,
         },
       });
       if (!res.ok) {

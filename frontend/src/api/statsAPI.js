@@ -1,24 +1,26 @@
 import axios from "axios";
 const url = "http://localhost:3000/adminStats";
-const token = localStorage.getItem("access-token");
+const getToken = () => localStorage.getItem("access-token");
 
 export default class statsAPI {
   static async getAllStats() {
+    const token = getToken();
     const res = await axios.get(url, {
       headers: {
-        Authorization: `Bearer ${token}`,
+        authorization: `Bearer ${token}`,
       },
     });
     return res.data;
   }
   static async fetchSoldProducts(startDate, endDate) {
     try {
+      const token = getToken();
       const response = await axios.post(
         `${url}/products/sold`,
         {},
         {
           headers: {
-            Authorization: `Bearer ${token}`,
+            authorization: `Bearer ${token}`,
           },
           params: { startDate: startDate, endDate: endDate },
         }
@@ -32,11 +34,12 @@ export default class statsAPI {
 
   static async fetchDataByYear(selectedYear) {
     try {
+      const token = getToken();
       const res = await axios.get(
         `${url}/${selectedYear}`,
         {
           headers: {
-            Authorization: `Bearer ${token}`,
+            authorization: `Bearer ${token}`,
           },
         },
         {
@@ -53,11 +56,12 @@ export default class statsAPI {
   }
   static async fetchDataByMonth(selectedYear, selectedMonth) {
     try {
+      const token = getToken();
       const res = await axios.get(
         `${url}/${selectedYear}/${selectedMonth}`,
         {
           headers: {
-            Authorization: `Bearer ${token}`,
+            authorization: `Bearer ${token}`,
           },
         },
         {

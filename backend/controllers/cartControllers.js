@@ -136,7 +136,6 @@ module.exports = class cartAPI {
     const productId = req.params.productId;
 
     if (!cartId || !mongoose.Types.ObjectId.isValid(cartId)) {
-      console.warn("Invalid cart ID");
       return res
         .status(200)
         .json({ message: "Cart ID is invalid, but proceeding..." });

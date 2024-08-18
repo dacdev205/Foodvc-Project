@@ -12,7 +12,7 @@ import { Bounce, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import useUserCurrent from "../../hooks/useUserCurrent";
 import axios from "axios";
-const token = localStorage.getItem("access-token");
+import { FaSpinner } from "react-icons/fa"; // Import spinner icon
 
 const Cards = ({ item }) => {
   const { user } = useContext(AuthContext);
@@ -24,6 +24,8 @@ const Cards = ({ item }) => {
   const [heartFilledIds, setHeartFilledIds] = useState(
     JSON.parse(localStorage.getItem("heartFilledIds")) || []
   );
+
+  const [loading, setLoading] = useState(true); // State to manage loading
   useEffect(() => {
     const fetchProductDetail = async () => {
       try {
@@ -170,13 +172,14 @@ const Cards = ({ item }) => {
       <div className="card mr-5 md:my-5 shadow-xl relative hover:scale-105 transition-all duration-200">
         {/* icon wish list */}
         <div
-          className={`rating gap-1 absolute cursor-pointer right-2 top-2 p-4 z-10 heartStar bg-green ${
-            isHeartFilled ? "text-rose-500" : "text-white"
+          className={`rating gap-1 absolute cursor-pointer right-2 top-2 p-3 z-10 rounded-full shadow-lg transition-transform duration-300 ease-in-out hover:scale-110 ${
+            isHeartFilled ? "text-rose-500 bg-rose-100" : "text-white bg-green"
           }`}
           onClick={handleAddToWishList}
         >
           <FaHeart />
         </div>
+
         {item.quantity === 0 && (
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
             <span className="text-white text-lg font-bold bg-black bg-opacity-50 py-10 px-4 rounded-full no-hover-fade">
@@ -187,13 +190,22 @@ const Cards = ({ item }) => {
 
         <Link to={`/product/${item?.productId?._id}`}>
           <figure>
+            {loading && (
+              <div className="flex justify-center items-center h-72">
+                <FaSpinner className="animate-spin text-3xl text-green" />
+              </div>
+            )}
             <img
               src={PF + "/" + item?.productId?.image}
               alt={item?.productId?.name || "Product Image"}
-              className=" md:h-72 cursor-pointer"
+              className={`md:h-72 cursor-pointer ${
+                loading ? "hidden" : "block"
+              }`}
+              onLoad={() => setLoading(false)}
             />
           </figure>
         </Link>
+
         {/* card content */}
         <div className="card-body ">
           <Link to={`/product/${item?.productId?._id}`}>

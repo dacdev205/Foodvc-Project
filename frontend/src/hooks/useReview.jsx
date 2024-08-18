@@ -4,8 +4,8 @@ import { useQuery } from "@tanstack/react-query";
 
 const useReview = () => {
   const axiosPublic = useAxiosPublic();
-  const token = localStorage.getItem("access-token");
-
+  const getToken = () => localStorage.getItem("access-token");
+  const token = getToken();
   const {
     data: reviews = [],
     isPending: loading,
@@ -15,7 +15,7 @@ const useReview = () => {
     queryFn: async () => {
       const res = await axiosPublic.get("/reviews", {
         headers: {
-          Authorization: `Bearer ${token}`,
+          authorization: `Bearer ${token}`,
         },
       });
       return res.data;

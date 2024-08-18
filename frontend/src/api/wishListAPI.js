@@ -1,7 +1,5 @@
 import axios from "axios";
-
 const url = "http://localhost:3000/wish-list";
-
 const getToken = () => localStorage.getItem("access-token");
 
 export default class CartAPI {
@@ -10,7 +8,7 @@ export default class CartAPI {
       const token = getToken();
       const res = await axios.get(`${url}?email=${email}`, {
         headers: {
-          Authorization: `Bearer ${token}`,
+          authorization: `Bearer ${token}`,
         },
       });
       return res.data;
@@ -25,7 +23,7 @@ export default class CartAPI {
       const token = getToken();
       const res = await axios.get(`${url}/${productId}`, {
         headers: {
-          Authorization: `Bearer ${token}`,
+          authorization: `Bearer ${token}`,
         },
       });
       return res.data;
@@ -40,7 +38,7 @@ export default class CartAPI {
       const token = getToken();
       const res = await axios.post(url, wishItem, {
         headers: {
-          Authorization: `Bearer ${token}`,
+          authorization: `Bearer ${token}`,
         },
       });
       return res.data;
@@ -55,7 +53,7 @@ export default class CartAPI {
       const token = getToken();
       const res = await axios.put(`${url}/${productId}`, updateData, {
         headers: {
-          Authorization: `Bearer ${token}`,
+          authorization: `Bearer ${token}`,
         },
       });
       return res.data;
@@ -70,7 +68,7 @@ export default class CartAPI {
       const token = getToken();
       const res = await axios.delete(`${url}/${id}`, {
         headers: {
-          Authorization: `Bearer ${token}`,
+          authorization: `Bearer ${token}`,
         },
       });
       return res.data;

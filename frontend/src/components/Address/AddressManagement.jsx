@@ -5,7 +5,7 @@ import addressAPI from "../../api/addressAPI";
 import { FaPlus } from "react-icons/fa";
 import AddressFormv2 from "./AddressFormv2";
 import AddressFormEditv2 from "./AdressFormEditv2";
-import { Pagination } from "@mui/material";
+import { CircularProgress, Pagination } from "@mui/material";
 import axios from "axios";
 
 const AddressManagement = () => {
@@ -14,7 +14,10 @@ const AddressManagement = () => {
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [addressToDelete, setAddressToDelete] = useState(null);
   const [page, setPage] = useState(1);
-  const [addresses, totalPages, refetchAddress] = useAddress(page, 2);
+  const [addresses, totalPages, refetchAddress, isLoading] = useAddress(
+    page,
+    2
+  );
 
   const userData = useUserCurrent();
   if (!userData || !userData._id) {
@@ -54,7 +57,12 @@ const AddressManagement = () => {
     refetchAddress();
   };
   const sortedAddresses = addresses.sort((a, b) => b.isDefault - a.isDefault);
-
+  if (isLoading)
+    return (
+      <div className="fixed inset-0 flex items-center justify-center z-50">
+        <CircularProgress color="success" />
+      </div>
+    );
   return (
     <div>
       <div className="min-h-full lg:w-[890px] md:w-full sm:w-full shadow-md rounded-sm bg-white">

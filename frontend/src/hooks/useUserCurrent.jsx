@@ -5,7 +5,8 @@ import useAuth from "./useAuth";
 const useUserCurrent = () => {
   const { user } = useAuth();
   const [userData, setUserData] = useState(null);
-  const token = localStorage.getItem("access-token");
+  const getToken = () => localStorage.getItem("access-token");
+  const token = getToken();
   const [isFetched, setIsFetched] = useState(false);
 
   useEffect(() => {
@@ -16,7 +17,7 @@ const useUserCurrent = () => {
             `http://localhost:3000/users/getUserByEmail/${user.email}`,
             {
               headers: {
-                Authorization: `Bearer ${token}`,
+                authorization: `Bearer ${token}`,
               },
             }
           );

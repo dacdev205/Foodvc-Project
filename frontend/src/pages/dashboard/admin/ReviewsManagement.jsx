@@ -6,7 +6,7 @@ import reviewAPI from "../../../api/reviewAPI";
 import { FaTrash } from "react-icons/fa";
 import ConfirmDeleteModal from "../../../ultis/ConfirmDeleteModal";
 import userAPI from "../../../api/userAPI";
-import { Pagination } from "@mui/material";
+import { CircularProgress, Pagination } from "@mui/material";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -18,6 +18,7 @@ const ReviewsManagement = () => {
   const [reviewToDelete, setReviewToDelete] = useState(null);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [loading, setLoading] = useState(true);
 
   const [stats, setStats] = useState({
     total_reviews: 0,
@@ -28,6 +29,7 @@ const ReviewsManagement = () => {
   });
 
   const fetchReviewsAndStats = async (page = 1) => {
+    setLoading(true);
     try {
       const reviewsResponse = await axios.get("http://localhost:5000/data", {
         params: { page, limit: 5 },
@@ -49,6 +51,8 @@ const ReviewsManagement = () => {
       setStats(statsResponse.data);
     } catch (error) {
       console.error("There was an error fetching data!", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -151,7 +155,7 @@ const ReviewsManagement = () => {
         </select>
       </div>
 
-      <table className="table md:w-[870px]">
+      <table className="table md:w-[870px] shadow-lg">
         <thead className="bg-green text-white rounded-lg text-center">
           <tr className="border-style">
             <th>STT</th>
@@ -162,34 +166,66 @@ const ReviewsManagement = () => {
             <th>Thao tác</th>
           </tr>
         </thead>
-        <tbody>
-          {reviews.map((review, index) => (
-            <tr
-              key={review._id}
-              className="border-gray-300 text-black text-center"
-            >
-              <td>{index + 1}</td>
-              <td>{review.userName}</td>
-              <td>{review.rating}</td>
-              <td className="tooltip tooltip-bottom" data-tip={review.comment}>
-                {review.comment.slice(0, 30)}...
-              </td>
-              <td>
-                {review.sentiment === "positive" ? "Tích Cực" : "Tiêu Cực"}
-              </td>
-              <td className="py-2 px-4 flex space-x-2 justify-center">
-                <button
-                  className="btn btn-xs bg-white hover:bg-slate-300 text-red border-style"
-                  onClick={() => handleDeleteClick(review._id)}
-                >
-                  <FaTrash />
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
+        {loading ? (
+          <tr>
+            <td colSpan="12" className="text-center py-4">
+              <CircularProgress color="success" />
+            </td>
+          </tr>
+        ) : reviews.length === 0 ? (
+          <tr>
+            <td colSpan="12" className="text-center py-4">
+              Không có sản phẩm nào
+            </td>
+          </tr>
+        ) : (
+          <tbody>
+            <table className="table md:w-[870px]">
+              <thead className="bg-green text-white rounded-lg text-center">
+                <tr className="border-style">
+                  <th>STT</th>
+                  <th>Tên hiển thị</th>
+                  <th>Điểm sao</th>
+                  <th>Bình luận</th>
+                  <th>Cảm Xúc</th>
+                  <th>Thao tác</th>
+                </tr>
+              </thead>
+              <tbody>
+                {reviews.map((review, index) => (
+                  <tr
+                    key={review._id}
+                    className="border-gray-300 text-black text-center"
+                  >
+                    <td>{index + 1}</td>
+                    <td>{review.userName}</td>
+                    <td>{review.rating}</td>
+                    <td
+                      className="tooltip tooltip-bottom"
+                      data-tip={review.comment}
+                    >
+                      {review.comment.slice(0, 30)}...
+                    </td>
+                    <td>
+                      {review.sentiment === "positive"
+                        ? "Tích Cực"
+                        : "Tiêu Cực"}
+                    </td>
+                    <td className="py-2 px-4 flex space-x-2 justify-center">
+                      <button
+                        className="btn btn-xs bg-white hover:bg-slate-300 text-red border-style"
+                        onClick={() => handleDeleteClick(review._id)}
+                      >
+                        <FaTrash />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </tbody>
+        )}
       </table>
-
       <div className="w-[290px] max-w-3xl mx-auto mt-8">
         <Pie data={chartData} options={chartOptions} />
       </div>
@@ -203,14 +239,16 @@ const ReviewsManagement = () => {
       />
 
       {/* Pagination */}
-      <div className="flex justify-center mt-4">
-        <Pagination
-          count={totalPages}
-          page={page}
-          onChange={handlePageChange}
-          color="success"
-        />
-      </div>
+      {reviews.length > 0 && (
+        <div className="flex justify-center mt-4">
+          <Pagination
+            count={totalPages}
+            page={page}
+            onChange={handlePageChange}
+            color="success"
+          />
+        </div>
+      )}
     </div>
   );
 };

@@ -5,7 +5,7 @@ import useAuth from "../hooks/useAuth";
 import { Avatar } from "@mui/material";
 import { FaPen } from "react-icons/fa";
 import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
-import { CiUser } from "react-icons/ci";
+import { CiUser, CiWallet } from "react-icons/ci";
 import { BiNotepad } from "react-icons/bi";
 import { useActiveLink } from "../context/ActiveLinkProvider";
 import useUserCurrent from "../hooks/useUserCurrent";
@@ -34,7 +34,7 @@ const AccountManagement = () => {
   const isActive = (path) => location.pathname.startsWith(path);
 
   return (
-    <div className="drawer sm:drawer-open mt-16">
+    <div className="drawer sm:drawer-open">
       <input id="my-drawer-2" type="checkbox" className="drawer-toggle" />
       <div className="drawer-content flex flex-col sm:items-start sm:justify-start my-2 bg-slate-50">
         <div className="flex items-center justify-between mx-4 bg-white">
@@ -55,7 +55,7 @@ const AccountManagement = () => {
           aria-label="close sidebar"
           className="drawer-overlay"
         ></label>
-        <ul className="menu p-4 w-80 min-h-screen text-black bg-white shadow-md rounded-sm lg:mt-0 mt-16">
+        <ul className="menu p-4 w-80 min-h-screen text-black bg-white shadow-md rounded-sm lg:mt-0">
           <div className="p-4 flex">
             <div className="mr-2">
               <Avatar fontSize="small" sx={{ width: 42, height: 42 }}>
@@ -137,6 +137,17 @@ const AccountManagement = () => {
             >
               <BiNotepad />
               Đơn mua
+            </Link>
+          </li>
+          <li>
+            <Link
+              to="wallet"
+              className={`active-link-2 ${
+                isActive("/user/wallet") ? "text-green" : ""
+              }`}
+            >
+              <CiWallet />
+              Ví của tôi
             </Link>
           </li>
         </ul>

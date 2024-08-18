@@ -10,7 +10,6 @@ const AddVoucherModal = ({ isModalOpen, setIsModalOpen }) => {
   const [voucherDiscountPercent, setVoucherDiscountPercent] = useState("");
   const [voucherStatus, setVoucherStatus] = useState("");
   const [voucherExpiredDate, setVoucherExpiredDate] = useState("");
-  const token = localStorage.getItem("access-token");
 
   useEffect(() => {
     if (isModalOpen) {

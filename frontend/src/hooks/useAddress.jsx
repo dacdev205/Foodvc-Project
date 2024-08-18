@@ -4,9 +4,10 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 const useAddress = (page = 1, limit = 2) => {
   const { user } = useContext(AuthContext);
-  const token = localStorage.getItem("access-token");
   const queryClient = useQueryClient();
   const email = user?.email || "";
+  const getToken = () => localStorage.getItem("access-token");
+  const token = getToken();
 
   const refetchAddress = async () => {
     if (!email) {
@@ -26,7 +27,7 @@ const useAddress = (page = 1, limit = 2) => {
           `http://localhost:3000/address?email=${email}`,
           {
             headers: {
-              Authorization: `Bearer ${token}`,
+              authorization: `Bearer ${token}`,
             },
           }
         );

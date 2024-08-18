@@ -14,7 +14,7 @@ module.exports = class sendEmailAPI {
 
     try {
       const message = await transporter.sendMail({
-        from: '"FOODVC" <congdat147x.email>',
+        from: '"FOODVC" <foodfoodvc@gmail.com>',
         to: email,
         subject: subject,
         html: `

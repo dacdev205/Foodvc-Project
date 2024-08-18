@@ -1,48 +1,36 @@
+// Menu Component
 import React, { useState, useEffect } from "react";
 import Cards from "../../components/CardProduct/Cards";
 import { Pagination } from "@mui/material";
 import useMenu from "../../hooks/useMenu";
 import CircularProgress from "@mui/material/CircularProgress";
+import SidebarFilter from "../../components/LayoutDisplay/SidebarFilter";
 
 const Menu = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterType, setFilterType] = useState("name");
   const [category, setCategory] = useState("all");
   const [page, setPage] = useState(1);
+  const [priceRange, setPriceRange] = useState([0, 1000]);
+  const [ratingRange, setRatingRange] = useState([0, 5]);
+
   const [menu, totalPages, refetch, isLoading, error] = useMenu(
     searchTerm,
     filterType,
     category,
     page,
-    8
+    8,
+    priceRange,
+    ratingRange
   );
 
   useEffect(() => {
     refetch();
   }, [page, searchTerm, filterType, category, refetch]);
 
-  const handleSearch = (e) => {
-    setSearchTerm(e.target.value);
-    setPage(1);
-  };
-
-  const handleCategoryChange = (category) => {
-    setCategory(category);
-    setPage(1);
-  };
-
   const handlePageChange = (event, value) => {
     setPage(value);
   };
-
-  if (isLoading)
-    return (
-      <div className="flex justify-center items-center min-h-screen">
-        <CircularProgress />
-      </div>
-    );
-
-  if (error) return <div className="text-center py-4">Failed to load menu</div>;
 
   return (
     <div>
@@ -63,84 +51,57 @@ const Menu = () => {
           </div>
         </div>
       </div>
-
-      <div className="section-container">
-        <div className="flex flex-col md:flex-row flex-wrap md:justify-between items-center space-y-3 mb-8">
-          <div className="flex items-center my-2">
-            <label htmlFor="search" className="mr-2 text-black">
-              Tìm kiếm theo tên:
-            </label>
-            <input
-              type="text"
-              id="search"
-              placeholder="Nhập tên sản phẩm"
-              value={searchTerm}
-              onChange={handleSearch}
-              className="border p-2 rounded-md text-black input-sm"
-            />
-          </div>
+      <div className="flex">
+        {/* Sidebar */}
+        <div className="">
+          <SidebarFilter
+            searchTerm={searchTerm}
+            setSearchTerm={setSearchTerm}
+            filterType={filterType}
+            setFilterType={setFilterType}
+            category={category}
+            setCategory={setCategory}
+            priceRange={priceRange}
+            setPriceRange={setPriceRange}
+            ratingRange={ratingRange}
+            setRatingRange={setRatingRange}
+          />
         </div>
 
-        <div className="flex flex-row justify-start md:items-center md:gap-8 gap-4 flex-wrap text-black mb-8">
-          <button
-            onClick={() => handleCategoryChange("all")}
-            className={category === "all" ? "active" : ""}
-          >
-            Tất cả
-          </button>
-          <button
-            onClick={() => handleCategoryChange("protein")}
-            className={category === "protein" ? "active" : ""}
-          >
-            Thịt, cá, trứng, hải sản
-          </button>
-          <button
-            onClick={() => handleCategoryChange("vegetable")}
-            className={category === "vegetable" ? "active" : ""}
-          >
-            Rau củ, nấm, trái cây
-          </button>
-          <button
-            onClick={() => handleCategoryChange("soup")}
-            className={category === "soup" ? "active" : ""}
-          >
-            Mì, miến, cháo, phở
-          </button>
-          <button
-            onClick={() => handleCategoryChange("milk")}
-            className={category === "milk" ? "active" : ""}
-          >
-            Sữa các loại
-          </button>
-          <button
-            onClick={() => handleCategoryChange("drinks")}
-            className={category === "drinks" ? "active" : ""}
-          >
-            Bia, nước giải khát
-          </button>
-        </div>
-
-        <div className="grid lg:grid-cols-4 sm:grid-cols-2 grid-cols-1 gap-4">
-          {menu.length > 0 ? (
-            menu.map((item) => <Cards key={item.productId._id} item={item} />)
+        {/* Content */}
+        <div className="flex-1 ml-4">
+          {isLoading ? (
+            <div className="flex flex-1 justify-center items-center min-h-screen">
+              <CircularProgress color="success" />
+            </div>
           ) : (
-            <p className="text-center py-4 text-gray-500">
-              Không có sản phẩm nào.
-            </p>
+            <div className="grid lg:grid-cols-4 sm:grid-cols-2 grid-cols-1 gap-4">
+              {menu.length > 0 ? (
+                menu.map((item) => (
+                  <Cards key={item.productId._id} item={item} />
+                ))
+              ) : (
+                <div className="flex justify-center items-center col-span-full">
+                  <p className="text-center py-4 text-gray-500">
+                    Không có sản phẩm nào.
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
+
+          {menu.length > 0 && !isLoading && (
+            <div className="flex justify-center mt-4">
+              <Pagination
+                count={totalPages}
+                page={page}
+                onChange={handlePageChange}
+                color="success"
+              />
+            </div>
           )}
         </div>
       </div>
-
-      {menu.length > 0 && (
-        <div className="flex justify-center mt-4">
-          <Pagination
-            count={totalPages}
-            page={page}
-            onChange={handlePageChange}
-            color="success"
-          />
-        </div>
-      )}
     </div>
   );
 };

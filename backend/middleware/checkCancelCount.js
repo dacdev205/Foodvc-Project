@@ -6,7 +6,7 @@ const User = require("../models/user");
 const checkCancelCount = async (req, res, next) => {
   try {
     const email = req.decoded.email;
-    const user = await User.findOne({ email: email });
+    const user = await User.findOne({ email });
     if (!user) {
       return res.status(401).json({ message: "Unauthorized" });
     }
@@ -28,14 +28,16 @@ const checkCancelCount = async (req, res, next) => {
       updatedAt: { $gte: sixMonthsAgo },
     });
 
-    if (cancelledOrdersCount === 2) {
-      res.status(200).json({
-        message:
-          "Bạn đã hủy 2 đơn hàng trong vòng 6 tháng qua. Vui lòng cẩn thận, nếu hủy thêm 1 đơn nữa bạn sẽ bị hạn chế quyền tạo đơn hàng mới.",
-      });
-      return next();
+    if (cancelledOrdersCount === 1) {
+      req.showWarning = true;
+      req.warningMessage =
+        "Bạn đã hủy 2 đơn hàng trong vòng 6 tháng qua. Vui lòng cẩn thận, nếu hủy thêm 1 đơn nữa bạn sẽ bị hạn chế quyền tạo đơn hàng mới.";
     }
-
+    if (cancelledOrdersCount === 2) {
+      req.showWarning = true;
+      req.warningMessage =
+        "Bạn đã hủy 3 đơn hàng trong vòng 6 tháng qua. Chúng tôi sẽ hạn chế quyền tạo đơn hàng mới của ban.";
+    }
     if (cancelledOrdersCount >= 3) {
       return res.status(403).json({
         message:

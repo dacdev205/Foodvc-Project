@@ -45,7 +45,7 @@ router.get(
 
 router.post("/", usersAPI.createUser);
 
-router.get("/:id", verifyToken, checkPermission("read"), usersAPI.getSigleUser);
+router.get("/:id", usersAPI.getSigleUser);
 router.patch(
   "/:id",
   upload,
@@ -53,12 +53,7 @@ router.patch(
   checkPermission("update_profile"),
   usersAPI.updateUser
 );
-router.get(
-  "/getUserByEmail/:email",
-  // verifyToken,
-  // checkPermission("read"),
-  usersAPI.getUserByEmail
-);
+router.get("/getUserByEmail/:email", usersAPI.getUserByEmail);
 router.delete(
   "/:id",
   verifyToken,

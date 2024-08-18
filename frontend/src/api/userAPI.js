@@ -1,22 +1,24 @@
 import axios from "axios";
 const url = "http://localhost:3000/users";
-const token = localStorage.getItem("access-token");
+const getToken = () => localStorage.getItem("access-token");
 
 export default class userAPI {
   static async getSingleUserById(id) {
+    const token = getToken();
     const res = await axios.get(`${url}/${id}`, {
       headers: {
-        Authorization: `Bearer ${token}`,
+        authorization: `Bearer ${token}`,
       },
     });
     return res.data;
   }
   static async updateUserProfile(userId, updateData) {
     try {
+      const token = getToken();
       const res = await axios.patch(`${url}/${userId}`, updateData, {
         headers: {
           "Content-Type": "multipart/form-data",
-          Authorization: `Bearer ${token}`,
+          authorization: `Bearer ${token}`,
         },
       });
       return res.data;
@@ -26,25 +28,28 @@ export default class userAPI {
     }
   }
   static async getAllRoles() {
+    const token = getToken();
     const res = await axios.get(`${url}/roles/getAll`, {
       headers: {
-        Authorization: `Bearer ${token}`,
+        authorization: `Bearer ${token}`,
       },
     });
     return res.data;
   }
   static async getRoleById(roleId) {
+    const token = getToken();
     const res = await axios.get(`${url}/roles/role-detail/${roleId}`, {
       headers: {
-        Authorization: `Bearer ${token}`,
+        authorization: `Bearer ${token}`,
       },
     });
     return res.data;
   }
   static async getUserByEmail(email) {
+    const token = getToken();
     const res = await axios.get(`${url}/getUserByEmail/${email}`, {
       headers: {
-        Authorization: `Bearer ${token}`,
+        authorization: `Bearer ${token}`,
       },
     });
     return res.data;

@@ -4,19 +4,42 @@ import { useQuery } from "@tanstack/react-query";
 const useMenu = (
   searchTerm = "",
   filterType = "name",
-  category,
+  category = "all",
   page = 1,
-  limit = 2
+  limit = 5,
+  priceRange = [0, 1000000],
+  ratingRange = [0, 5]
 ) => {
   const axiosPublic = useAxiosPublic();
-  const token = localStorage.getItem("access-token");
 
-  const { refetch, data: menus = { menus: [] } } = useQuery({
-    queryKey: ["menus", { searchTerm, filterType, category, page, limit }],
+  const effectiveRatingRange =
+    Array.isArray(ratingRange) && ratingRange.length === 2
+      ? ratingRange
+      : [0, 5];
+  const getToken = () => localStorage.getItem("access-token");
+  const token = getToken();
+
+  const {
+    refetch,
+    data: menus = { menus: [], totalPages: 0 },
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: [
+      "menus",
+      searchTerm,
+      filterType,
+      category,
+      page,
+      limit,
+      priceRange,
+      effectiveRatingRange,
+    ],
+
     queryFn: async () => {
       const res = await axiosPublic.get("/api/foodvc", {
         headers: {
-          Authorization: `Bearer ${token}`,
+          authorization: `Bearer ${token}`,
         },
         params: {
           searchTerm,
@@ -24,13 +47,17 @@ const useMenu = (
           category,
           page,
           limit,
+          minPrice: priceRange[0],
+          maxPrice: priceRange[1],
+          minRating: effectiveRatingRange[0],
+          maxRating: effectiveRatingRange[1],
         },
       });
       return res.data;
     },
   });
 
-  return [menus.menus, menus.totalPages, refetch];
+  return [menus.menus, menus.totalPages, refetch, isLoading, error];
 };
 
 export default useMenu;

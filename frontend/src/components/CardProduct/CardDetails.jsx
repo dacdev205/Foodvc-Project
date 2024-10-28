@@ -1,11 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, {
-  useCallback,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import React, { useCallback, useContext, useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import styles from "../../CssModule/CardDetails.module.css";
 import menuAPI from "../../api/menuAPI";
@@ -43,7 +37,7 @@ const CardDetails = () => {
   const [reviewToDelete, setReviewToDelete] = useState(null);
   const [priceOrginals, setPrices] = useState([]);
   const [cart, refetchCart] = useCart();
-  const [commented, setCommented] = useState(false);
+
   const [editReviewId, setEditReviewId] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showActions, setShowActions] = useState(false);
@@ -101,12 +95,6 @@ const CardDetails = () => {
     setIsDeleteModalOpen(true);
   }, []);
 
-  useEffect(() => {
-    const commentedByUser = localStorage.getItem(`${id}-${userData?._id}`);
-    if (commentedByUser) {
-      setCommented(true);
-    }
-  });
   // handleIncrease
   const handleIncrease = () => {
     const newQuantity = quantityDefault + 1;
@@ -181,8 +169,6 @@ const CardDetails = () => {
   const handleReviewSubmit = async (reviewData) => {
     try {
       const userOrdersResponse = await orderAPI.getUserOrders(userData._id);
-
-      // Ensure userOrdersResponse is an object with an orders array
       const userOrders = userOrdersResponse.orders;
 
       if (!Array.isArray(userOrders)) {
@@ -190,19 +176,22 @@ const CardDetails = () => {
       }
 
       let productFound = false;
+
       userOrders.forEach((userOrder) => {
-        userOrder.products.forEach((productOrder) => {
-          if (
-            productOrder.productId._id.toString() ===
-            product.productId._id.toString()
-          ) {
-            productFound = true;
-          }
-        });
+        if (userOrder.statusId.name === "Completed") {
+          userOrder.products.forEach((productOrder) => {
+            if (
+              productOrder.productId._id.toString() ===
+              product.productId._id.toString()
+            ) {
+              productFound = true;
+            }
+          });
+        }
       });
 
       if (!productFound) {
-        toast.error("Vui lòng mua sản phẩm trước khi đánh giá", {
+        toast.error("Chỉ được đánh giá sản phẩm khi đã trải nghiệm.", {
           position: "bottom-right",
           autoClose: 5000,
           hideProgressBar: false,
@@ -215,12 +204,13 @@ const CardDetails = () => {
         });
         return;
       } else {
-        console.log("good");
+        console.log("Product found in eligible order.");
       }
     } catch (error) {
       console.error("Error handling review submission:", error);
     }
 
+    // Proceed with adding the review
     toast.success("Cảm ơn bạn đã gửi đánh giá!", {
       position: "bottom-right",
       autoClose: 5000,
@@ -232,29 +222,23 @@ const CardDetails = () => {
       theme: "colored",
       transition: Bounce,
     });
+
     await reviewAPI.addReview({
       ...reviewData,
       userId: userData._id,
     });
 
-    localStorage.setItem(`${id}-${userData?._id}`, "commented");
-    setCommented(true);
     const updatedReviews = await reviewAPI.getProductById(id);
     setReviews(updatedReviews);
     reset();
   };
+
   const updateReviews = async () => {
     const updatedReviews = await reviewAPI.getProductById(id);
     setReviews(updatedReviews);
   };
   const renderReviewFormOrMessage = () => {
-    if (commented) {
-      return <p>Bạn đã bình luận về sản phẩm này.</p>;
-    } else {
-      return (
-        <ReviewForm productId={product._id} onSubmit={handleReviewSubmit} />
-      );
-    }
+    return <ReviewForm productId={product._id} onSubmit={handleReviewSubmit} />;
   };
   const renderRating = (rating) => {
     const fullStars = Math.floor(rating);

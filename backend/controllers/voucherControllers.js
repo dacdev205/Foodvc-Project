@@ -16,6 +16,7 @@ function generateVoucherCode(name) {
 module.exports = class voucherAPI {
   static async createVoucher(req, res) {
     const {
+      shopId,
       name,
       quantity,
       voucher_describe,
@@ -27,6 +28,7 @@ module.exports = class voucherAPI {
     const code = generateVoucherCode(name);
 
     const newVoucher = new Voucher({
+      shopId: shopId,
       name: name,
       code: code,
       quantity: quantity,
@@ -44,8 +46,9 @@ module.exports = class voucherAPI {
     }
   }
   static async getAllVouchers(req, res) {
+    const shopId = req.params.shopId;
     try {
-      const vouchers = await Voucher.find({});
+      const vouchers = await Voucher.find({ shopId });
       res.status(200).json(vouchers);
     } catch (error) {
       res.status(500).json({ message: error.message });

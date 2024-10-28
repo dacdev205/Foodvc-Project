@@ -18,7 +18,7 @@ let upload = multer({
 }).single("image");
 
 router.patch(
-  "/:id",
+  "/:id/:shopId",
   verifyToken,
   checkPermission("dashboard_actions"),
   upload,

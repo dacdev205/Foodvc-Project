@@ -1,20 +1,34 @@
 import React, { useState, useEffect } from "react";
-import useMenu from "../../../hooks/useMenu";
 import axios from "axios";
 import inventoryAPI from "../../../api/inventoryAPI";
 import FormattedPrice from "../../../ultis/FormatedPriece";
 import { FaCheck } from "react-icons/fa6";
 import { Bounce, toast } from "react-toastify";
+import useMenuAdmin from "../../../hooks/useMenuAdmin";
+import useUserCurrent from "../../../hooks/useUserCurrent";
 const AddVoucher = () => {
-  const [menu, , refetch] = useMenu();
+  const userData = useUserCurrent();
+  const shopId = userData?.shops[0];
+
   const PF = "http://localhost:3000";
   const [searchTerm, setSearchTerm] = useState("");
   const [sortType, setSortType] = useState("name");
   const [sortOrder, setSortOrder] = useState("asc");
   const [selectedCategory, setSelectedCategory] = useState("");
   const [discountPercentage, setDiscountPercentage] = useState("");
-  const categories = [...new Set(menu.map((item) => item.productId.category))];
   const [selectedProducts, setSelectedProducts] = useState([]);
+  const [filterType, setFilterType] = useState("name");
+  const [category, setCategory] = useState("all");
+  const [page, setPage] = useState(1);
+  const [menu, totalPages, refetch, isLoading, error] = useMenuAdmin(
+    searchTerm,
+    filterType,
+    category,
+    page,
+    5,
+    shopId
+  );
+  const categories = [...new Set(menu.map((item) => item.productId.category))];
 
   useEffect(() => {
     refetch();

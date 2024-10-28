@@ -1,38 +1,55 @@
 /* eslint-disable react/prop-types */
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { FaStar } from "react-icons/fa";
 import styles from "../../CssModule/ReviewForm.module.css";
 import useUserCurrent from "../../hooks/useUserCurrent";
+import rankAPI from "../../api/rankAPI";
 
 const ReviewForm = ({ productId, userId, onSubmit }) => {
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState("");
   const [ratingError, setRatingError] = useState(false);
   const userData = useUserCurrent();
-  const handleSubmit = (e) => {
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
     if (userData?._id) {
-      e.preventDefault();
       if (rating === 0) {
         setRatingError(true);
         return;
       }
-      onSubmit({ productId, userId, rating, comment });
-      setRating(0);
-      setComment("");
-      setRatingError(false);
-      document.getElementById("modal-review").close();
+
+      const totalAmount = 50;
+      const pointsToAdd = Math.floor(totalAmount * 0.1);
+
+      try {
+        await onSubmit({ productId, userId, rating, comment });
+
+        await rankAPI.addPoint({ userId: userData._id, pointsToAdd });
+
+        setRating(0);
+        setComment("");
+        setRatingError(false);
+
+        document.getElementById("modal-review").close();
+      } catch (error) {
+        console.error("Error adding points or submitting review:", error);
+      }
     } else {
       setRating(0);
       setComment("");
       document.getElementById("modal-login").showModal();
     }
   };
+
   const handleCloseModal = () => {
     setRating(0);
     setComment("");
     setRatingError(false);
     document.getElementById("modal-review").close();
   };
+
   const handleRatingClick = (selectedRating) => {
     setRatingError(false);
     setRating(selectedRating);
@@ -52,7 +69,7 @@ const ReviewForm = ({ productId, userId, onSubmit }) => {
             display: "inline-block",
           }}
         >
-          <FaStar></FaStar>
+          <FaStar />
         </span>
       );
     }
@@ -81,12 +98,9 @@ const ReviewForm = ({ productId, userId, onSubmit }) => {
                 {ratingError && (
                   <span
                     style={{ color: "red" }}
-                    size="100px"
                     className="flex justify-center"
-                    id="ratingError"
                   >
-                    {" "}
-                    Please select a rating.
+                    Vui lòng để lại sao.
                   </span>
                 )}
               </div>
@@ -109,7 +123,6 @@ const ReviewForm = ({ productId, userId, onSubmit }) => {
               </div>
             </form>
             <button
-              htmlFor="modal-review"
               onClick={handleCloseModal}
               className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2 hover:bg-slate-300"
             >

@@ -12,6 +12,15 @@ export default class userAPI {
     });
     return res.data;
   }
+  static async getUserRank(id) {
+    const token = getToken();
+    const res = await axios.get(`${url}/ranking/${id}`, {
+      headers: {
+        authorization: `Bearer ${token}`,
+      },
+    });
+    return res.data;
+  }
   static async updateUserProfile(userId, updateData) {
     try {
       const token = getToken();

@@ -12,9 +12,9 @@ export default class voucherAPI {
     });
     return res.data;
   }
-  static async getAllVoucher() {
+  static async getAllVoucher(shopId) {
     const token = getToken();
-    const res = await axios.get(url, {
+    const res = await axios.get(`${url}/${shopId}`, {
       headers: {
         authorization: `Bearer ${token}`,
       },

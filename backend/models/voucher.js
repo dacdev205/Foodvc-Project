@@ -30,6 +30,15 @@ const voucherSchema = mongoose.Schema({
     type: Number,
     default: 1,
   },
+  shopId: { type: mongoose.Schema.Types.ObjectId, ref: "Shop" },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
+  updatedAt: {
+    type: Date,
+    default: Date.now,
+  },
 });
 
 // create a model instance

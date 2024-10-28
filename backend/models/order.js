@@ -34,6 +34,7 @@ const orderSchema = mongoose.Schema({
         required: true,
         min: 1,
       },
+      shopId: { type: mongoose.Schema.Types.ObjectId, ref: "Shop" },
     },
   ],
   methodId: {

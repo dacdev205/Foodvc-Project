@@ -23,6 +23,7 @@ const productSchema = mongoose.Schema({
   weight: Number,
   width: Number,
   instructions: String,
+  shopId: { type: mongoose.Schema.Types.ObjectId, ref: "Shop" },
   expirationDate: {
     type: Date,
     default: function () {
@@ -34,6 +35,14 @@ const productSchema = mongoose.Schema({
   transferredToMenu: {
     type: Boolean,
     default: false,
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
+  updatedAt: {
+    type: Date,
+    default: Date.now,
   },
 });
 

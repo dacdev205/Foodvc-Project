@@ -1,8 +1,8 @@
 /* eslint-disable react/prop-types */
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import { Bounce, toast } from "react-toastify";
 import voucherAPI from "../../api/voucherAPI";
+import useUserCurrent from "../../hooks/useUserCurrent";
 
 const AddVoucherModal = ({ isModalOpen, setIsModalOpen }) => {
   const [voucherName, setVoucherName] = useState("");
@@ -10,6 +10,8 @@ const AddVoucherModal = ({ isModalOpen, setIsModalOpen }) => {
   const [voucherDiscountPercent, setVoucherDiscountPercent] = useState("");
   const [voucherStatus, setVoucherStatus] = useState("");
   const [voucherExpiredDate, setVoucherExpiredDate] = useState("");
+  const userData = useUserCurrent();
+  const shopId = userData?.shops[0];
 
   useEffect(() => {
     if (isModalOpen) {
@@ -23,6 +25,7 @@ const AddVoucherModal = ({ isModalOpen, setIsModalOpen }) => {
     e.preventDefault();
     try {
       const newVoucher = {
+        shopId: shopId,
         name: voucherName,
         voucher_describe: voucherDescribe,
         voucher_discount_persent: voucherDiscountPercent,

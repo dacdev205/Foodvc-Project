@@ -39,7 +39,7 @@ const ChartMonthlyRevenue = ({ data, selectedYear }) => {
       if (data && data.monthlyRevenue) {
         data.monthlyRevenue.forEach((item) => {
           const monthIndex = item._id - 1;
-          values[monthIndex] = item.totalAmount;
+          values[monthIndex] = item.totalRevenue; // Update here
         });
       }
 
@@ -79,7 +79,7 @@ const ChartMonthlyRevenue = ({ data, selectedYear }) => {
 
   return (
     <div>
-      <canvas className="chart-line-style" ref={chartRef}></canvas>
+      <canvas ref={chartRef} className="chart-line-style" />
     </div>
   );
 };

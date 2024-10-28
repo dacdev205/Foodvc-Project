@@ -26,6 +26,7 @@ const orderRequestSchema = new Schema({
     enum: ["Pending", "Approved", "Rejected"],
     default: "Pending",
   },
+  shopId: { type: mongoose.Schema.Types.ObjectId, ref: "Shop" },
   createdAt: {
     type: Date,
     default: Date.now,

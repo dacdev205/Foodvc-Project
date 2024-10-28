@@ -1,5 +1,6 @@
 import useAxiosPublic from "./useAxiosPublic";
 import { useQuery } from "@tanstack/react-query";
+import useUserCurrent from "../hooks/useUserCurrent";
 
 const useInventory = (
   searchTerm = "",
@@ -7,10 +8,11 @@ const useInventory = (
   page = 1,
   limit = 5,
   sortBy = "",
-  sortOrder = "asc"
+  sortOrder = "asc",
+  shopId = ""
 ) => {
+  const userData = useUserCurrent();
   const getToken = () => localStorage.getItem("access-token");
-
   const axiosPublic = useAxiosPublic();
   const token = getToken();
 
@@ -32,6 +34,7 @@ const useInventory = (
           limit,
           sortBy,
           sortOrder,
+          shopId,
         },
       });
       return res.data;

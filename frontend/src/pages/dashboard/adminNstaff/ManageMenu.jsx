@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
-import useMenu from "../../../hooks/useMenu";
 import FormattedPrice from "../../../ultis/FormatedPriece";
 import { CircularProgress, Pagination } from "@mui/material";
+import useMenuAdmin from "../../../hooks/useMenuAdmin";
+import useUserCurrent from "../../../hooks/useUserCurrent";
 
 const ManageMenu = () => {
   const PF = "http://localhost:3000";
@@ -9,12 +10,16 @@ const ManageMenu = () => {
   const [filterType, setFilterType] = useState("name");
   const [category, setCategory] = useState("all");
   const [page, setPage] = useState(1);
-  const [menu, totalPages, refetch, isLoading, error] = useMenu(
+  const userData = useUserCurrent();
+  const shopId = userData?.shops[0];
+
+  const [menu, totalPages, refetch, isLoading, error] = useMenuAdmin(
     searchTerm,
     filterType,
     category,
     page,
-    5
+    5,
+    shopId
   );
 
   useEffect(() => {

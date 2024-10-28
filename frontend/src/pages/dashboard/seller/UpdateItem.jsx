@@ -8,16 +8,20 @@ import QuillEditor from "../../../ultis/QuillEditor";
 import productsAPI from "../../../api/productsAPI";
 import categoryAPI from "../../../api/categoryAPI";
 import { Bounce, toast } from "react-toastify";
+import useUserCurrent from "../../../hooks/useUserCurrent";
 const UpdateItem = () => {
   const { register, handleSubmit, setValue } = useForm({ mode: "onChange" });
   const [product, setProduct] = useState(null);
   const [categories, setCategories] = useState([]);
   const { id } = useParams();
   const { reset } = useForm();
+  const userData = useUserCurrent();
+  const shopId = userData?.shops[0];
+
   useEffect(() => {
     const fetchProductDetail = async () => {
       try {
-        const response = await inventoryAPI.getProductById(id);
+        const response = await inventoryAPI.getProductById(id, shopId);
         console.log(response);
 
         setProduct(response);
@@ -35,7 +39,7 @@ const UpdateItem = () => {
     };
     fetchProductDetail();
     fetchCategories();
-  }, [id]);
+  }, [id, shopId]);
 
   const onSubmit = async (data) => {
     try {
@@ -56,9 +60,12 @@ const UpdateItem = () => {
       formData.append("width", data.width);
       formData.append("height", data.height);
 
-      await productsAPI.updateProduct(product._id, formData);
+      await productsAPI.updateProduct(product._id, shopId, formData);
 
-      const updatedProduct = await inventoryAPI.getProductById(product._id);
+      const updatedProduct = await inventoryAPI.getProductById(
+        product._id,
+        shopId
+      );
       setProduct(updatedProduct);
 
       toast.success("Cập nhật thành công!", {

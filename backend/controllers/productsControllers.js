@@ -14,11 +14,11 @@ module.exports = class productAPI {
   }
 
   static async updateProduct(req, res) {
-    const id = req.params.id;
+    const { id, shopId } = req.params;
     let new_image = "";
 
     try {
-      const existingProduct = await Product.findById(id);
+      const existingProduct = await Product.findOne({ _id: id, shopId });
 
       if (!existingProduct) {
         return res.status(404).json({ message: "Product not found" });

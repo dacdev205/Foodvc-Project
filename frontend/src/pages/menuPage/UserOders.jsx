@@ -18,8 +18,10 @@ import { Bounce, toast } from "react-toastify";
 import WarningModal from "../../components/Modal/WarningModal";
 import orderAPI from "../../api/orderAPI";
 import orderRequestAPI from "../../api/orderRequest";
+import { useNavigate } from "react-router-dom";
 
 const UserOrders = () => {
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [filterType, setFilterType] = useState("orderCode");
   const [page, setPage] = useState(1);
@@ -89,7 +91,9 @@ const UserOrders = () => {
     setSelectedOrder(order);
     setIsModalOpen(true);
   };
-
+  const handleOrderClick = (orderId) => {
+    navigate(`/user/orders/${orderId}`);
+  };
   const handleCancel = async () => {
     const orderId = selectedOrder._id;
     try {
@@ -192,7 +196,6 @@ const UserOrders = () => {
       });
     }
   };
-
   const getOrderStatusMessage = (order) => {
     if (order.orderRequestId.length === 0) {
       return (
@@ -205,7 +208,9 @@ const UserOrders = () => {
         </Button>
       );
     }
-
+    const handleOrderClick = (orderId) => {
+      navigate(`/user/orders/${orderId}`);
+    };
     const orderRequestStatus = order.orderRequestId[0]?.status;
     if (orderRequestStatus === "Pending") {
       return <p>Yêu cầu của bạn đang được xử lý.</p>;
@@ -292,7 +297,11 @@ const UserOrders = () => {
             </div>
           ) : orders.length ? (
             filteredOrders.map((order, index) => (
-              <div key={index} className="mb-6">
+              <div
+                key={order._id}
+                onClick={() => handleOrderClick(order._id)}
+                className="mb-6 cursor-pointer hover:bg-slate-100 hover:scale-105 transition-all duration-200"
+              >
                 <div className="overflow-x-auto border-b border-gray-200 pb-4">
                   <div className="mb-2 flex justify-between">
                     <p className="text-sm text-gray-600">
@@ -301,6 +310,7 @@ const UserOrders = () => {
                         {order.statusId.description}
                       </span>
                     </p>
+
                     {renderOrderActions(order)}
                   </div>
                   {order.products.map((product, productIndex) => (

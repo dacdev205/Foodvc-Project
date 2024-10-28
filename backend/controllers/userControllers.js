@@ -1,6 +1,8 @@
 const User = require("../models/user");
 const fs = require("fs");
 const Role = require("../models/roles");
+const Shop = require("../models/shop");
+const UserRank = require("../models/userRank");
 module.exports = class usersAPI {
   // get all users
   static async getAllUsers(req, res) {
@@ -49,6 +51,25 @@ module.exports = class usersAPI {
       res.status(500).json({ message: "Internal Server Error" });
     }
   }
+  static async getUserRank(req, res) {
+    const userId = req.params.id;
+
+    try {
+      const user = await User.findById(userId).populate("rank");
+
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      if (!user.rank) {
+        return res.status(404).json({ message: "User rank not assigned" });
+      }
+
+      res.status(200).json({ rank: user.rank });
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  }
 
   static async getSigleUser(req, res) {
     const id = req.params.id;
@@ -62,19 +83,48 @@ module.exports = class usersAPI {
   static async getUserByEmail(req, res) {
     const email = req.params.email;
     try {
-      const user = await User.findOne({ email });
+      const user = await User.findOne({ email }).populate("rank");
       res.status(200).json(user);
     } catch (error) {
       res.status(500).json({ message: error.message });
     }
   }
-  // post a new user
+  static async searchUserNShopByName(req, res) {
+    const { name } = req.query;
+
+    try {
+      const users = await User.find({
+        name: { $regex: new RegExp(name, "i") },
+      }).populate("rank");
+
+      const shops = await Shop.find({
+        shopName: { $regex: new RegExp(name, "i") },
+      });
+
+      const results = {
+        users,
+        shops,
+      };
+
+      if (users.length > 0 || shops.length > 0) {
+        res
+          .status(200)
+          .json({ message: "Users and/or shops found", data: results });
+      } else {
+        res.status(404).json({ message: "No users or shops found" });
+      }
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  }
+
   static async createUser(req, res) {
     const { email, name, photoURL, role = "Người dùng" } = req.body;
     const query = { email };
 
     try {
       const existingUser = await User.findOne(query);
+      const bronzeRank = await UserRank.findOne({ user_rank_name: "Bronze" });
       if (existingUser) {
         return res.status(302).json({ message: "User already exists!" });
       }
@@ -88,6 +138,7 @@ module.exports = class usersAPI {
         name,
         photoURL,
         roles: [userRole._id],
+        rank: bronzeRank ? bronzeRank._id : null,
       });
       const result = await newUser.save();
 
@@ -165,7 +216,6 @@ module.exports = class usersAPI {
     }
   }
 
-  // delete a user
   static async deleteUser(req, res) {
     const userId = req.params.id;
     try {

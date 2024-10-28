@@ -59,7 +59,6 @@ const Payment = () => {
     district: { districtId: null, districtName: "" },
     ward: { wardCode: "", wardName: "" },
   });
-
   useEffect(() => {
     const fetchShopData = async () => {
       try {
@@ -138,10 +137,22 @@ const Payment = () => {
         });
       });
       total += shippingFee;
+
+      if (userData && userData?.rank.user_discount) {
+        const discountAmount = (total * userData?.rank.user_discount) / 100;
+        total -= discountAmount;
+      }
       setAmount(total);
       setOrderTotal(total);
     }
-  }, [payment, shippingFee, discountedAmount, vouchers, isVoucherApplied]);
+  }, [
+    payment,
+    shippingFee,
+    discountedAmount,
+    vouchers,
+    isVoucherApplied,
+    userData,
+  ]);
 
   const calculatePrice = (item) => {
     const totalPrice = item.productId.price * item.quantity;
@@ -268,7 +279,12 @@ const Payment = () => {
   const handleVNPayPayment = async () => {
     const randomId = generateRandomString(20);
     const productData = extractProductData(payment);
-
+    const productsWithShopId = payment.flatMap((item) =>
+      item.products.map((product) => ({
+        ...product,
+        shopId: product.productId.shopId,
+      }))
+    );
     setIsSubmitting(true);
     try {
       const res = await axios.post("http://localhost:3000/method-deli/vn_pay", {
@@ -280,7 +296,7 @@ const Payment = () => {
         "orderData",
         JSON.stringify({
           userId: userData._id,
-          products: payment.flatMap((item) => item.products),
+          products: productsWithShopId,
           totalAmount: amount,
           orderCode: randomId,
           note: note,
@@ -346,6 +362,12 @@ const Payment = () => {
   const handleCODPayment = async () => {
     const randomId = generateRandomString(20);
     const productData = extractProductData(payment);
+    const productsWithShopId = payment.flatMap((item) =>
+      item.products.map((product) => ({
+        ...product,
+        shopId: product.productId.shopId,
+      }))
+    );
     setIsSubmitting(true);
     const payload = {
       payment_type_id: 2,
@@ -400,7 +422,7 @@ const Payment = () => {
         for (const item of payment) {
           await orderAPI.postProductToOrder({
             userId: userData._id,
-            products: item.products,
+            products: productsWithShopId,
             totalAmount: amount,
             note: note,
             orderCode: randomId,
@@ -505,6 +527,7 @@ const Payment = () => {
   if (!userData || !userData._id) {
     return null;
   }
+
   if (isLoading) {
     return (
       <div>
@@ -710,6 +733,12 @@ const Payment = () => {
                   </div>
                 </div>
                 <div className="">
+                  <div className="flex justify-between">
+                    <span>Giảm giá hạng thành viên: </span>
+                    <span>{userData?.rank.user_discount}%</span>
+                  </div>
+                </div>
+                <div className="">
                   <div className="flex justify-end">
                     <span>Tổng sô tiền({payment.length} sản phẩm): </span>
                     <span className="text-green font-bold">
@@ -762,6 +791,12 @@ const Payment = () => {
                     className="text-green text-lg"
                     price={shippingFee}
                   />
+                </div>
+                <div className="">
+                  <div className="flex justify-between">
+                    <span>Giảm giá hạng thành viên: </span>
+                    <span>{userData?.rank.user_discount}%</span>
+                  </div>
                 </div>
                 <div className="flex items-center justify-between">
                   <div>

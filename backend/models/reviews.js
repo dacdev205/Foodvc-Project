@@ -6,7 +6,14 @@ const reviewSchema = mongoose.Schema({
   isEdited: { type: Boolean, default: false },
   rating: { type: Number, required: true },
   comment: { type: String },
-  createdAt: { type: Date, default: Date.now },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
+  updatedAt: {
+    type: Date,
+    default: Date.now,
+  },
 });
 // create a model instance
 module.exports = mongoose.model("Review", reviewSchema);

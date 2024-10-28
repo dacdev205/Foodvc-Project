@@ -9,7 +9,6 @@ import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { styled } from "@mui/material/styles";
 import Button from "@mui/material/Button";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
-import LoadingSpinner from "../../ultis/LoadingSpinner";
 import { CircularProgress } from "@mui/material";
 const UpdateProfile = () => {
   const { updateUserProfile, user, updateUser, loading } =

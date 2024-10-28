@@ -23,16 +23,20 @@ const CartPageLazyLoading = lazy(() => import("../pages/menuPage/CartPage"));
 const DashBoardLayoutLazyLoading = lazy(() =>
   import("../layout/DashBoardLayout")
 );
+const SellerLayoutLazyLoading = lazy(() => import("../layout/SellerLayout"));
 const OrderRequestDetailLazyLoading = lazy(() =>
   import("../components/Order/OrderRequestDetail")
 );
 const DashboardLazyLoading = lazy(() =>
   import("../pages/dashboard/admin/Dashboard")
 );
+const SellerDashboardLazyLoading = lazy(() =>
+  import("../pages/dashboard/seller/SellerDashboard")
+);
 const UsersLazyLoading = lazy(() => import("../pages/dashboard/admin/Users"));
 const NotFoundPageLazyLoading = lazy(() => import("../ultis/NotFoundPage"));
 const AddInventoryLazyLoading = lazy(() =>
-  import("../pages/dashboard/admin/AddInventory")
+  import("../pages/dashboard/seller/AddInventory")
 );
 const WishListPageLazyLoading = lazy(() =>
   import("../pages/menuPage/WishListPage")
@@ -44,11 +48,11 @@ const ManageInventoryLazyLoading = lazy(() =>
   import("../pages/dashboard/adminNstaff/ManageInventory")
 );
 const UpdateItemLazyLoading = lazy(() =>
-  import("../pages/dashboard/admin/UpdateItem")
+  import("../pages/dashboard/seller/UpdateItem")
 );
 const VNPayReturnLazyLoading = lazy(() => import("../components/VNPayReturn"));
 const AddVoucherLazyLoading = lazy(() =>
-  import("../pages/dashboard/admin/AddVoucher")
+  import("../pages/dashboard/seller/AddVoucher")
 );
 const ManageMenuLazyLoading = lazy(() =>
   import("../pages/dashboard/adminNstaff/ManageMenu")
@@ -83,11 +87,14 @@ const ForgetPasswordLazyLoading = lazy(() =>
 const OrderRequestLazyLoading = lazy(() =>
   import("../pages/dashboard/adminNstaff/OrderRequest")
 );
+const CreateShopLazyLoading = lazy(() =>
+  import("../pages/menuPage/CreateShop")
+);
 const MenuLazyLoading = lazy(() => import("../pages/menuPage/Menu"));
 const BlogLazyLoading = lazy(() => import("../pages/Blog/Blog"));
 const AboutLazyLoading = lazy(() => import("../pages/About/About"));
 const ReviewsManagementLazyLoading = lazy(() =>
-  import("../pages/dashboard/admin/ReviewsManagement")
+  import("../pages/dashboard/seller/ReviewsManagement")
 );
 
 const AddressesLazyLoading = lazy(() =>
@@ -99,6 +106,8 @@ import PrivateRouter from "../PrivateRouter/PrivateRouter";
 import AccountManagement from "../layout/AccountManagement";
 import ProtectedRoute from "../context/ProtectedRoute";
 import OrderSuccess from "../components/Order/OrderSuccess";
+import SearchResult from "../pages/menuPage/SearchResult";
+import UserOrderDetail from "../components/Order/UserOrderDetail";
 const CreateVoucherLazyLoading = lazy(() =>
   import("../pages/dashboard/adminNstaff/CreateVoucher")
 );
@@ -116,6 +125,14 @@ const router = createBrowserRouter([
         element: (
           <Suspense fallback={<LoadingSpinner />}>
             <HomeLazyLoading />
+          </Suspense>
+        ),
+      },
+      {
+        path: "/results/:id",
+        element: (
+          <Suspense fallback={<LoadingSpinner />}>
+            <SearchResult />
           </Suspense>
         ),
       },
@@ -205,10 +222,27 @@ const router = createBrowserRouter([
             ),
           },
           {
+            path: "create-shop",
+            element: (
+              <Suspense fallback={<LoadingSpinner />}>
+                <CreateShopLazyLoading />
+              </Suspense>
+            ),
+          },
+
+          {
             path: "orders",
             element: (
               <Suspense fallback={<LoadingSpinner />}>
                 <UserOrdersLazyLoading />
+              </Suspense>
+            ),
+          },
+          {
+            path: "orders/:orderId",
+            element: (
+              <Suspense fallback={<LoadingSpinner />}>
+                <UserOrderDetail />
               </Suspense>
             ),
           },
@@ -323,6 +357,138 @@ const router = createBrowserRouter([
         element: (
           <Suspense>
             <UsersLazyLoading />
+          </Suspense>
+        ),
+      },
+      {
+        path: "edit-order/:id",
+        element: (
+          <Suspense>
+            <OrderRequestDetailLazyLoading />
+          </Suspense>
+        ),
+      },
+      {
+        path: "category",
+        element: (
+          <Suspense>
+            <CategoryLazyLoading />
+          </Suspense>
+        ),
+      },
+      {
+        path: "add-inventory",
+        element: (
+          <Suspense>
+            <AddInventoryLazyLoading />
+          </Suspense>
+        ),
+      },
+      {
+        path: "manage-inventory",
+        element: (
+          <Suspense>
+            <ManageInventoryLazyLoading />
+          </Suspense>
+        ),
+      },
+      {
+        path: "manage-menu",
+        element: (
+          <Suspense>
+            <ManageMenuLazyLoading />
+          </Suspense>
+        ),
+      },
+      {
+        path: "update-item/:id",
+        element: (
+          <Suspense>
+            <UpdateItemLazyLoading />
+          </Suspense>
+        ),
+      },
+      {
+        path: "add-voucher",
+        element: (
+          <Suspense>
+            <AddVoucherLazyLoading />
+          </Suspense>
+        ),
+      },
+      {
+        path: "order-tracking",
+        element: (
+          <Suspense>
+            <OrdersTrackingLazyLoading />
+          </Suspense>
+        ),
+      },
+      {
+        path: "order-tracking/:id",
+        element: (
+          <Suspense>
+            <OrderDetailLazyLoading />
+          </Suspense>
+        ),
+      },
+      {
+        path: "help-users",
+        element: (
+          <Suspense>
+            <HelpUsersLazyLoading />
+          </Suspense>
+        ),
+      },
+      {
+        path: "report",
+        element: (
+          <Suspense>
+            <ReportTodayLazyLoading />
+          </Suspense>
+        ),
+      },
+      {
+        path: "create-voucher",
+        element: (
+          <Suspense>
+            <CreateVoucherLazyLoading />
+          </Suspense>
+        ),
+      },
+      {
+        path: "reviews",
+        element: (
+          <Suspense>
+            <ReviewsManagementLazyLoading />
+          </Suspense>
+        ),
+      },
+      {
+        path: "order-requests",
+        element: (
+          <Suspense>
+            <OrderRequestLazyLoading />
+          </Suspense>
+        ),
+      },
+    ],
+  },
+  {
+    path: "/seller",
+    element: (
+      <Suspense fallback={<LoadingSpinner />}>
+        <PrivateRouter>
+          <SellerLayoutLazyLoading />
+        </PrivateRouter>
+      </Suspense>
+    ),
+    children: [
+      {
+        path: "/seller",
+        element: (
+          <Suspense>
+            <SellerDashboardLazyLoading />
           </Suspense>
         ),
       },

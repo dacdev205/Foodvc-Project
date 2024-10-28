@@ -141,7 +141,7 @@ const VNPayReturn = () => {
     } finally {
       setIsSubmitting(false);
       refetchCart();
-      navigate("/");
+      navigate("/user/orders");
     }
   };
 
@@ -218,7 +218,7 @@ const VNPayReturn = () => {
           onClick={handleReturnHome}
           className="mt-6 w-full bg-green hover:bg-green hover:opacity-80 text-white font-semibold py-2 px-4 rounded-lg transition duration-300 ease-in-out"
         >
-          Quay về trang chính
+          Về trang mua
         </button>
       </div>
     </div>

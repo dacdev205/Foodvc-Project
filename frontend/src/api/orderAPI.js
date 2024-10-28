@@ -63,22 +63,36 @@ export default class orderAPI {
     });
     return res.data;
   }
-  static async getAllOrder(searchTerm, searchStatus, page, limit) {
+  static async getAllOrder(
+    searchTerm = "",
+    searchStatus = "",
+    page = 1,
+    limit = 5,
+    shopId
+  ) {
     const token = getToken();
 
-    const res = await axios.get(`${url}/allOrder`, {
-      headers: {
-        authorization: `Bearer ${token}`,
-      },
-      params: {
-        searchTerm,
-        searchStatus,
-        page,
-        limit,
-      },
-    });
-    return res.data;
+    try {
+      const res = await axios.get(`${url}/allOrder`, {
+        headers: {
+          authorization: `Bearer ${token}`,
+        },
+        params: {
+          searchTerm,
+          searchStatus,
+          page,
+          limit,
+          shopId,
+        },
+      });
+
+      return res.data;
+    } catch (error) {
+      console.error("Error fetching orders:", error);
+      throw error;
+    }
   }
+
   static async updateOrderStatus(orderId, statusId) {
     const token = getToken();
 

@@ -19,7 +19,7 @@ module.exports = class methodDeliAPI {
   }
   static async getMethodIdByMethodId(methodId) {
     try {
-      const method = await MethodDelivery.findOne(methodId);
+      const method = await MethodDelivery.findOne({ _id: methodId });
       if (method) {
         return method;
       } else {

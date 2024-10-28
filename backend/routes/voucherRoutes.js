@@ -11,7 +11,7 @@ router.post(
   voucherAPI.createVoucher
 );
 router.get(
-  "/",
+  "/:shopId",
   verifyToken,
   checkPermission("read"),
   voucherAPI.getAllVouchers

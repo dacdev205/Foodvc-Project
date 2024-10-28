@@ -3,10 +3,10 @@ const url = "http://localhost:3000/inventory";
 const getToken = () => localStorage.getItem("access-token");
 
 export default class inventoryAPI {
-  static async getProductById(id) {
+  static async getProductById(id, shopId) {
     const token = getToken();
 
-    const res = await axios.get(`${url}/${id}`);
+    const res = await axios.get(`${url}/${id}/${shopId}`);
     return res.data;
   }
   static async getAllMenu() {
@@ -16,9 +16,9 @@ export default class inventoryAPI {
     return res.data;
   }
 
-  static async addProduct(product) {
+  static async addProduct(data) {
     const token = getToken();
-    const res = await axios.post(url, product, {
+    const res = await axios.post(url, data, {
       headers: {
         authorization: `Bearer ${token}`,
       },
@@ -26,14 +26,18 @@ export default class inventoryAPI {
     return res.data;
   }
 
-  static async updateProduct(productId, updateData) {
+  static async updateProduct(productId, shopId, updateData) {
     const token = getToken();
     try {
-      const res = await axios.patch(`${url}/${productId}`, updateData, {
-        headers: {
-          authorization: `Bearer ${token}`,
-        },
-      });
+      const res = await axios.patch(
+        `${url}/${productId}/${shopId}`,
+        updateData,
+        {
+          headers: {
+            authorization: `Bearer ${token}`,
+          },
+        }
+      );
       return res.data;
     } catch (error) {
       console.error("Error updating product:", error);
@@ -41,10 +45,10 @@ export default class inventoryAPI {
     }
   }
 
-  static async deleteProductById(id) {
+  static async deleteProductById(id, shopId) {
     const token = getToken();
 
-    const res = await axios.delete(`${url}/${id}`, {
+    const res = await axios.delete(`${url}/${id}/${shopId}`, {
       headers: {
         authorization: `Bearer ${token}`,
       },

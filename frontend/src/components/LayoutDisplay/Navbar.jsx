@@ -7,6 +7,8 @@ import useCart from "../../hooks/useCart";
 import useAuth from "../../hooks/useAuth";
 import useWishList from "../../hooks/useWishList";
 import Modal from "../Account/Modal";
+import SearchBar from "../SearchBar/SearchBar";
+
 const Navbar = () => {
   const [isSticky, setSticky] = useState(false);
   const { user } = useAuth();
@@ -29,6 +31,7 @@ const Navbar = () => {
       window.addEventListener("scroll", handleScroll);
     };
   }, []);
+
   const navItem = (
     <>
       <li className="active-link rounded-box">
@@ -193,6 +196,8 @@ const Navbar = () => {
           )}
         </div>
       </div>
+
+      <SearchBar></SearchBar>
     </header>
   );
 };

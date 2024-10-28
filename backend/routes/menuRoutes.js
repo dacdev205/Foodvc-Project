@@ -26,6 +26,8 @@ router.post(
 );
 router.post("/add-to-menu", upload, menuAPI.createProduct);
 router.get("/", menuAPI.fetchMenus);
+router.get("/admin", menuAPI.fetchMenusAdmin);
+
 router.get("/:id", menuAPI.fetchProductByID);
 router.patch(
   "/quantity/:id",

@@ -6,7 +6,7 @@ const cookieParser = require("cookie-parser");
 const bodyParser = require("body-parser");
 const jwt = require("jsonwebtoken");
 const statusesAPI = require("./controllers/statusesControllers");
-
+const rankAPI = require("./controllers/rankControllers");
 const app = express();
 const port = process.env.PORT;
 
@@ -26,6 +26,7 @@ mongoose
   .then(async () => {
     console.log("Connected to database");
     await statusesAPI.initializeOrderStatuses();
+    await rankAPI.initializeUserRanks();
   })
   .catch((err) => console.log(err));
 
@@ -38,6 +39,8 @@ app.use("/reviews", require("./routes/reviewRoutes"));
 app.use("/inventory", require("./routes/inventoryRoutes"));
 app.use("/check-out", require("./routes/paymentRoutes"));
 app.use("/adminStats", require("./routes/adminStats"));
+app.use("/sellerStats", require("./routes/sellerStats"));
+app.use("/rank", require("./routes/rankRoutes"));
 app.use("/order", require("./routes/ordersRoutes"));
 app.use("/address", require("./routes/addressRoutes"));
 app.use("/api/conversations", require("./routes/conversationRoutes"));
@@ -49,7 +52,7 @@ app.use("/statuses", require("./routes/statusRoutes"));
 app.use("/order-request", require("./routes/orderRequestRoutes"));
 app.use("/method-deli", require("./routes/methodDeliRoutes"));
 app.use("/category", require("./routes/categoryRoutes"));
-
+app.use("/shop", require("./routes/shopRoutes"));
 app.post("/jwt", async (req, res) => {
   const user = req.body;
   const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {

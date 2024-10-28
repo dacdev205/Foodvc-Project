@@ -17,6 +17,7 @@ import ConfirmDeleteModal from "../../../ultis/ConfirmDeleteModal";
 import TransferToMenuModal from "../../../components/Modal/TransferToMenuModal";
 import UpdateQuantityModal from "../../../components/Modal/UpdateQuantityModal";
 import { Bounce, toast } from "react-toastify";
+import useUserCurrent from "../../../hooks/useUserCurrent";
 const ManageInventory = () => {
   const PF = "http://localhost:3000";
 
@@ -30,6 +31,8 @@ const ManageInventory = () => {
   const [productToRemove, setProductToRemove] = useState(null);
   const [sortBy, setSortBy] = useState("");
   const [sortOrder, setSortOrder] = useState("asc");
+  const userData = useUserCurrent();
+  const shopId = userData?.shops[0];
 
   const [openModal, setOpenModal] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
@@ -40,8 +43,10 @@ const ManageInventory = () => {
     page,
     5,
     sortBy,
-    sortOrder
+    sortOrder,
+    shopId
   );
+
   useEffect(() => {
     refetch();
   }, [page, searchTerm, filterType, refetch]);
@@ -93,6 +98,7 @@ const ManageInventory = () => {
       const response = await axiosSecure.post("/inventory/transfer-to-menu", {
         productId: selectedProduct._id,
         quantity: data.quantity,
+        shopId: shopId,
       });
 
       if (response.data.message === "Product transferred successfully") {
@@ -150,6 +156,7 @@ const ManageInventory = () => {
       const productIdToRemove = productToRemove._id;
       const response = await axiosSecure.post("/inventory/remove-from-menu", {
         productId: productIdToRemove,
+        shopId,
       });
 
       if (response.data.message === "Product removed from menu successfully") {
@@ -187,7 +194,7 @@ const ManageInventory = () => {
   };
 
   const handleDeleteItem = async (item) => {
-    const res = await inventoryAPI.deleteProductById(item._id);
+    const res = await inventoryAPI.deleteProductById(item._id, shopId);
     setShowConfirmModal(false);
     setProductToDelete(null);
     if (res) {
@@ -298,7 +305,7 @@ const ManageInventory = () => {
                     </td>
                     <td className="text-center text-black">{item.quantity}</td>
                     <td className="text-center">
-                      <Link to={`/admin/update-item/${item._id}`}>
+                      <Link to={`/seller/update-item/${item._id}`}>
                         <button className="btn btn-ghost btn-xs bg-orange-500 text-white">
                           <FaEdit />
                         </button>

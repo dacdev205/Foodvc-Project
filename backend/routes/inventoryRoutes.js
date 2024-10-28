@@ -33,14 +33,14 @@ router.get(
 router.post("/transfer-to-menu", inventoryAPI.postProductToMenu);
 router.post("/remove-from-menu", inventoryAPI.removeProductFromMenu);
 router.delete(
-  "/:id",
+  "/:id/:shopId",
   verifyToken,
-  checkPermission("dashboard_actions"),
+  // checkPermission("dashboard_actions"),
   inventoryAPI.deleteProductFromInventory
 );
-router.get("/:id", inventoryAPI.fetchProductByID);
+router.get("/:id/:shopId", inventoryAPI.fetchProductByID);
 router.patch(
-  "/:id",
+  "/:id/:shopId",
   verifyToken,
   checkPermission("dashboard_actions"),
   upload,

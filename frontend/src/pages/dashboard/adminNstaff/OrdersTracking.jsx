@@ -5,6 +5,7 @@ import { FaEye } from "react-icons/fa";
 import FormattedPrice from "../../../ultis/FormatedPriece";
 import { Bounce, toast } from "react-toastify";
 import { CircularProgress, Pagination } from "@mui/material";
+import useUserCurrent from "../../../hooks/useUserCurrent";
 
 const OrdersTracking = () => {
   const [allOrders, setAllOrders] = useState([]);
@@ -15,8 +16,14 @@ const OrdersTracking = () => {
   const [error, setError] = useState(null);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const userData = useUserCurrent();
+  const shopId = userData?.shops[0];
 
   useEffect(() => {
+    if (!shopId) {
+      return;
+    }
+
     const fetchAllOrders = async () => {
       setLoading(true);
       try {
@@ -24,21 +31,27 @@ const OrdersTracking = () => {
           searchTerm,
           searchStatus,
           page,
-          5
+          5,
+          shopId
         );
         setTotalPages(response.totalPages);
         setAllOrders(response.orders);
       } catch (error) {
         console.error("Failed to fetch orders:", error);
+        setError("Failed to fetch orders");
       } finally {
         setLoading(false);
       }
     };
 
     fetchAllOrders();
-  }, [searchTerm, searchStatus, page]);
+  }, [searchTerm, searchStatus, page, shopId]);
 
   useEffect(() => {
+    if (!shopId) {
+      return;
+    }
+
     const fetchStatuses = async () => {
       setLoading(true);
       try {
@@ -52,14 +65,17 @@ const OrdersTracking = () => {
     };
 
     fetchStatuses();
-  }, []);
+  }, [shopId]);
 
   const handleStatusChange = async (orderId, newStatusId) => {
     try {
       await orderAPI.updateOrderStatus(orderId, newStatusId);
       const updatedOrders = await orderAPI.getAllOrder(
         searchTerm,
-        searchStatus
+        searchStatus,
+        page,
+        5,
+        shopId
       );
       setAllOrders(updatedOrders.orders);
       toast.success("Trạng thái đã được cập nhật", {

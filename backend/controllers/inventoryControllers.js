@@ -4,6 +4,8 @@ const Product = require("../models/product");
 const axios = require("axios");
 const Menu = require("../models/menu");
 const Category = require("../models/category");
+const Shop = require("../models/shop");
+
 module.exports = class inventoryAPI {
   static async fetchInventorys(req, res) {
     try {
@@ -14,9 +16,14 @@ module.exports = class inventoryAPI {
         limit = 5,
         sortBy = "",
         sortOrder = "asc",
+        shopId,
       } = req.query;
 
-      const query = {};
+      if (!shopId) {
+        return res.status(400).json({ message: "shopId is required" });
+      }
+
+      const query = { shopId };
       const sortOptions = {};
 
       if (searchTerm) {
@@ -67,43 +74,73 @@ module.exports = class inventoryAPI {
     }
   }
 
-  // fetch product by id
+  // Fetch product by ID
   static async fetchProductByID(req, res) {
-    const id = req.params.id;
+    const { id, shopId } = req.params;
     try {
-      const product = await Product.findById(id).populate("category");
+      const product = await Product.findOne({ _id: id, shopId }).populate(
+        "category"
+      );
+      if (!product) {
+        return res
+          .status(404)
+          .json({ message: "Product not found in this shop" });
+      }
       res.status(200).json(product);
     } catch (err) {
       res.status(500).json({ message: err.message });
     }
   }
-  //create prduct
+
+  // Create product in inventory
   static async createProductInInventory(req, res) {
-    const productData = req.body;
+    const { shopId, ...productData } = req.body;
     const imagename = req.file.filename;
     productData.image = imagename;
     try {
-      const product = await Product.create(productData);
+      const product = await Product.create({ ...productData, shopId });
 
-      const inventoryItem = await Inventory.create({ productId: product._id });
+      const inventoryItem = await Inventory.create({
+        shopId: shopId,
+        productId: product._id,
+      });
+      const shop = await Shop.findById(shopId);
+      if (!shop) {
+        return res.status(404).json({ message: "Shop not found" });
+      }
+      shop.inventories.push(inventoryItem._id);
+      await shop.save();
 
-      return res.status(201).json(inventoryItem);
+      return res.status(201).json({ product, inventoryItem, shop });
     } catch (error) {
       return res.status(400).json({ message: error.message });
     }
   }
-  // post product to menu
+
+  // Post product to menu
   static async postProductToMenu(req, res) {
     try {
-      const { productId, quantity } = req.body;
-      const productInInventory = await Product.findById(productId);
+      const { productId, quantity, shopId } = req.body;
+      const productInInventory = await Product.findOne({
+        _id: productId,
+        shopId,
+      });
+
+      if (!productInInventory) {
+        return res
+          .status(404)
+          .json({ message: "Product not found in this shop" });
+      }
+
       productInInventory.quantity -= quantity;
       await productInInventory.save();
 
       await axios.post("http://localhost:3000/api/foodvc/add-to-menu", {
         productId,
         quantity,
+        shopId,
       });
+
       productInInventory.transferredToMenu = true;
       await productInInventory.save();
       res.status(200).json({ message: "Product transferred successfully" });
@@ -113,15 +150,18 @@ module.exports = class inventoryAPI {
     }
   }
 
+  // Update product in inventory
   static async updateProductInInventory(req, res) {
-    const id = req.params.id;
+    const { id, shopId } = req.params;
     let new_image = "";
 
     try {
-      const existingProduct = await Product.findById(id);
+      const existingProduct = await Product.findOne({ _id: id, shopId });
 
       if (!existingProduct) {
-        return res.status(404).json({ message: "Product not found" });
+        return res
+          .status(404)
+          .json({ message: "Product not found in this shop" });
       }
 
       if (req.file) {
@@ -149,12 +189,14 @@ module.exports = class inventoryAPI {
       res.status(500).json({ message: "Internal server error" });
     }
   }
+
+  // Remove product from menu
   static async removeProductFromMenu(req, res) {
     try {
-      const { productId } = req.body;
+      const { productId, shopId } = req.body;
 
       // Find the menu item associated with the given product ID
-      const menuItem = await Menu.findOne({ product: productId });
+      const menuItem = await Menu.findOne({ product: productId, shopId });
 
       if (!menuItem) {
         console.log("Menu item not found for product ID:", productId);
@@ -163,7 +205,10 @@ module.exports = class inventoryAPI {
           .json({ message: "Menu item not found for the product" });
       }
 
-      const productInInventory = await Product.findById(productId);
+      const productInInventory = await Product.findOne({
+        _id: productId,
+        shopId,
+      });
       if (!productInInventory) {
         return res
           .status(404)
@@ -187,12 +232,13 @@ module.exports = class inventoryAPI {
     }
   }
 
+  // Delete product from inventory
   static async deleteProductFromInventory(req, res) {
-    const id = req.params.id;
+    const { id, shopId } = req.params;
     try {
-      const productInMenu = await Menu.findById(id);
+      const productInMenu = await Menu.findOne({ _id: id, shopId });
       if (productInMenu) {
-        const imgItemMenu = await Menu.findByIdAndDelete(id);
+        const imgItemMenu = await Menu.findOneAndDelete({ _id: id, shopId });
         if (imgItemMenu.image != "") {
           try {
             fs.unlinkSync("./uploads/" + imgItemMenu.image);
@@ -201,14 +247,14 @@ module.exports = class inventoryAPI {
           }
         }
       }
-      const inventoryItem = await Inventory.findOne({ product: id });
+      const inventoryItem = await Inventory.findOne({ product: id, shopId });
       if (inventoryItem) {
         await Inventory.findByIdAndDelete(inventoryItem._id);
       }
 
-      const product = await Product.findById(id);
+      const product = await Product.findOne({ _id: id, shopId });
       if (product) {
-        const imgProduct = await Product.findByIdAndDelete(id);
+        const imgProduct = await Product.findByIdAndDelete({ _id: id, shopId });
         if (imgProduct.image != "") {
           try {
             fs.unlinkSync("./uploads/" + imgProduct.image);

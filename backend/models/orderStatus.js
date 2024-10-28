@@ -9,6 +9,14 @@ const orderStatusSchema = new mongoose.Schema({
   description: {
     type: String,
   },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
+  updatedAt: {
+    type: Date,
+    default: Date.now,
+  },
 });
 
 const OrderStatus = mongoose.model("OrderStatus", orderStatusSchema);

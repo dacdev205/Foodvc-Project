@@ -1,22 +1,24 @@
 import React, { useState, useEffect } from "react";
 import voucherAPI from "../../../api/voucherAPI";
 import AddVoucherModal from "../../../components/Voucher/AddVoucherModal";
+import useUserCurrent from "../../../hooks/useUserCurrent";
 
 const CreateVoucher = () => {
   const [voucher, setVoucher] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-
+  const userData = useUserCurrent();
+  const shopId = userData?.shops[0];
   useEffect(() => {
     const fetchVoucherList = async () => {
       try {
-        const data = await voucherAPI.getAllVoucher();
+        const data = await voucherAPI.getAllVoucher(shopId);
         setVoucher(data);
       } catch (error) {
         console.log(error);
       }
     };
     fetchVoucherList();
-  }, []);
+  }, [shopId]);
 
   const formatDateTime = (dateTimeString) => {
     const options = {

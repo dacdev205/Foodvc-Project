@@ -5,17 +5,42 @@ import useAuth from "../hooks/useAuth";
 import { Avatar } from "@mui/material";
 import { FaPen } from "react-icons/fa";
 import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
-import { CiUser, CiWallet } from "react-icons/ci";
+import { CiShop, CiUser, CiWallet } from "react-icons/ci";
 import { BiNotepad } from "react-icons/bi";
 import { useActiveLink } from "../context/ActiveLinkProvider";
 import useUserCurrent from "../hooks/useUserCurrent";
+import userAPI from "../api/userAPI";
 
 const AccountManagement = () => {
+  const [rank, setRank] = useState(null);
+  const [showRankDetails, setShowRankDetails] = useState(false);
   const { user } = useAuth();
   const userData = useUserCurrent();
   const [userProfileOpen, setUserProfileOpen] = useState(false);
   const location = useLocation();
   const { setActiveLink } = useActiveLink();
+
+  // Mảng các hạng, từ thấp đến cao, với màu sắc tương ứng
+  const ranks = [
+    { user_rank_name: "Bronze", user_rank_point: 0, color: "#cd7f32" }, // Màu đồng
+    { user_rank_name: "Silver", user_rank_point: 100, color: "#c0c0c0" }, // Màu bạc
+    { user_rank_name: "Gold", user_rank_point: 500, color: "#ffd700" }, // Màu vàng
+    { user_rank_name: "Platinum", user_rank_point: 1000, color: "#e5e4e2" }, // Màu bạch kim
+  ];
+
+  useEffect(() => {
+    const fetchRank = async () => {
+      if (userData?.rank) {
+        try {
+          const rankData = await userAPI.getUserRank(userData._id);
+          setRank(rankData);
+        } catch (error) {
+          console.error("Failed to fetch rank:", error);
+        }
+      }
+    };
+    fetchRank();
+  }, [userData]);
 
   useEffect(() => {
     setActiveLink(location.pathname);
@@ -31,7 +56,25 @@ const AccountManagement = () => {
     setUserProfileOpen(!userProfileOpen);
   };
 
+  const toggleRankDetails = () => {
+    setShowRankDetails(!showRankDetails);
+  };
+
   const isActive = (path) => location.pathname.startsWith(path);
+
+  const calculatePointsToNextRank = () => {
+    if (rank) {
+      const currentRankIndex = ranks.findIndex(
+        (r) => r.user_rank_name === rank.rank.user_rank_name
+      );
+
+      if (currentRankIndex !== -1 && currentRankIndex < ranks.length - 1) {
+        const nextRank = ranks[currentRankIndex + 1];
+        return nextRank.user_rank_point - userData.points;
+      }
+    }
+    return null;
+  };
 
   return (
     <div className="drawer sm:drawer-open">
@@ -50,11 +93,7 @@ const AccountManagement = () => {
         </div>
       </div>
       <div className="drawer-side shadow-md rounded-sm ">
-        <label
-          htmlFor="my-drawer-2"
-          aria-label="close sidebar"
-          className="drawer-overlay"
-        ></label>
+        <label htmlFor="my-drawer-2" className="drawer-overlay"></label>
         <ul className="menu p-4 w-80 min-h-screen text-black bg-white shadow-md rounded-sm lg:mt-0">
           <div className="p-4 flex">
             <div className="mr-2">
@@ -77,6 +116,43 @@ const AccountManagement = () => {
                   <FaPen className="mr-1" /> <span>Sửa hồ sơ</span>
                 </Link>
               </div>
+              {rank && (
+                <div>
+                  <span className="font-bold text-black">Hạng của bạn:</span>{" "}
+                  <span
+                    onClick={toggleRankDetails}
+                    className="text-sm cursor-pointer"
+                    style={{
+                      color: ranks.find(
+                        (r) => r.user_rank_name === rank.rank.user_rank_name
+                      )?.color,
+                    }} // Áp dụng màu
+                  >
+                    {rank.rank.user_rank_name}
+                  </span>
+                  {showRankDetails && (
+                    <div className="mt-2 text-sm text-gray-600">
+                      <p>Điểm hiện tại: {userData?.points}</p>
+                      {calculatePointsToNextRank() !== null ? (
+                        <p>
+                          Cần thêm: {calculatePointsToNextRank()} điểm để lên
+                          hạng{" "}
+                          {
+                            ranks[
+                              ranks.findIndex(
+                                (r) =>
+                                  r.user_rank_name === rank.rank.user_rank_name
+                              ) + 1
+                            ].user_rank_name
+                          }
+                        </p>
+                      ) : (
+                        <p>Bạn đã đạt hạng cao nhất!</p>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           </div>
 
@@ -150,6 +226,31 @@ const AccountManagement = () => {
               Ví của tôi
             </Link>
           </li>
+          {userData?.isSeller === true ? (
+            <li>
+              <Link
+                to="/admin"
+                className={`active-link-2 ${
+                  isActive("/admin") ? "text-green" : ""
+                }`}
+              >
+                <CiShop />
+                Shop của tôi
+              </Link>
+            </li>
+          ) : (
+            <li>
+              <Link
+                to="create-shop"
+                className={`active-link-2 ${
+                  isActive("/user/create-shop") ? "text-green" : ""
+                }`}
+              >
+                <CiShop />
+                Bắt đầu bán
+              </Link>
+            </li>
+          )}
         </ul>
       </div>
     </div>

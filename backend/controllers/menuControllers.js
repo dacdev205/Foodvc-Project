@@ -102,6 +102,107 @@ module.exports = class menuAPI {
       res.status(500).json({ message: err.message });
     }
   }
+  static async fetchMenusAdmin(req, res) {
+    try {
+      const {
+        searchTerm = "",
+        filterType = "name",
+        category = "all",
+        page = 1,
+        limit = 5,
+        shopId,
+        minPrice = 0,
+        maxPrice = Infinity,
+        minRating = 0,
+        maxRating = 5,
+      } = req.query;
+
+      let query = {};
+
+      if (shopId) {
+        query["shopId"] = shopId;
+      }
+
+      if (category && category !== "all") {
+        const categoryDoc = await Category.findOne({
+          name: { $regex: category, $options: "i" },
+        }).exec();
+
+        if (categoryDoc) {
+          const productIdsByCategory = await Product.find({
+            category: categoryDoc._id,
+          }).select("_id");
+
+          if (!productIdsByCategory.length) {
+            return res.json({ menus: [], totalPages: 0 });
+          }
+
+          query["productId"] = { $in: productIdsByCategory.map((p) => p._id) };
+        } else {
+          return res.json({ menus: [], totalPages: 0 });
+        }
+      }
+
+      if (searchTerm && filterType === "name") {
+        const productIdsByName = await Product.find({
+          name: { $regex: searchTerm, $options: "i" },
+        }).select("_id");
+
+        if (query["productId"]) {
+          query["productId"]["$in"] = query["productId"]["$in"].filter((id) =>
+            productIdsByName.some((p) => p._id.equals(id))
+          );
+        } else {
+          query["productId"] = { $in: productIdsByName.map((p) => p._id) };
+        }
+      }
+
+      const productIdsByPrice = await Product.find({
+        price: { $gte: Number(minPrice), $lte: Number(maxPrice) },
+      }).select("_id");
+
+      if (query["productId"]) {
+        query["productId"]["$in"] = query["productId"]["$in"].filter((id) =>
+          productIdsByPrice.some((p) => p._id.equals(id))
+        );
+      } else {
+        query["productId"] = { $in: productIdsByPrice.map((p) => p._id) };
+      }
+
+      // Filter by rating range
+      const menusByRating = await Menu.find(query)
+        .populate({
+          path: "reviews",
+          select: "rating",
+        })
+        .exec();
+
+      const menuIdsByRating = menusByRating
+        .filter((menu) => {
+          const ratings = menu.reviews.map((review) => review.rating);
+          const avgRating = ratings.length
+            ? ratings.reduce((sum, r) => sum + r, 0) / ratings.length
+            : 0;
+          return avgRating >= minRating && avgRating <= maxRating;
+        })
+        .map((menu) => menu._id);
+
+      query["_id"] = { $in: menuIdsByRating };
+
+      const totalMenus = await Menu.countDocuments(query);
+      const totalPages = Math.ceil(totalMenus / limit);
+
+      const menus = await Menu.find(query)
+        .populate("productId")
+        .skip((page - 1) * limit)
+        .limit(Number(limit))
+        .exec();
+
+      res.json({ menus, totalPages });
+    } catch (err) {
+      res.status(500).json({ message: err.message });
+    }
+  }
 
   // fetch product by id
   static async fetchProductByID(req, res) {
@@ -118,31 +219,32 @@ module.exports = class menuAPI {
 
   static async createProduct(req, res) {
     try {
-      const { productId, quantity } = req.body;
+      const { productId, quantity, shopId } = req.body;
 
-      const productInMenu = await Menu.findOne({ productId: productId });
+      if (!shopId) {
+        return res.status(400).json({ message: "shopId is required" });
+      }
+
+      const productInMenu = await Menu.findOne({ productId, shopId });
 
       if (productInMenu) {
         productInMenu.quantity += quantity;
         await productInMenu.save();
       } else {
-        const product = await Product.findById(productId);
-        if (!product) {
-          return res.status(404).json({ error: "Product not found" });
-        }
-
-        await Menu.create({
-          productId: product._id,
+        const newMenuProduct = new Menu({
+          productId,
           quantity,
+          shopId,
         });
+        await newMenuProduct.save();
       }
 
-      res.status(200).json({ message: "Product added to menu successfully" });
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ error: "Internal Server Error" });
+      res.status(201).json({ message: "Product added to menu successfully" });
+    } catch (err) {
+      res.status(500).json({ message: err.message });
     }
   }
+
   // Update product details in the menu
   static async updateProductInMenu(req, res) {
     const menuItemId = req.params.id;

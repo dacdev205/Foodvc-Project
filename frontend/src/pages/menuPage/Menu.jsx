@@ -11,7 +11,7 @@ const Menu = () => {
   const [filterType, setFilterType] = useState("name");
   const [category, setCategory] = useState("all");
   const [page, setPage] = useState(1);
-  const [priceRange, setPriceRange] = useState([0, 1000]);
+  const [priceRange, setPriceRange] = useState([0, 1000000]);
   const [ratingRange, setRatingRange] = useState([0, 5]);
 
   const [menu, totalPages, refetch, isLoading, error] = useMenu(

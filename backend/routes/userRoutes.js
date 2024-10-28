@@ -29,6 +29,7 @@ router.get(
   checkPermission("manage_users"),
   usersAPI.getAllUsers
 );
+router.get("/ranking/:id", verifyToken, usersAPI.getUserRank);
 router.post(
   "/admin/create-user",
   verifyToken,
@@ -44,7 +45,7 @@ router.get(
 );
 
 router.post("/", usersAPI.createUser);
-
+router.get("/search-detail", usersAPI.searchUserNShopByName);
 router.get("/:id", usersAPI.getSigleUser);
 router.patch(
   "/:id",

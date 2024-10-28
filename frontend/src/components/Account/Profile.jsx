@@ -18,7 +18,7 @@ import useUserCurrent from "../../hooks/useUserCurrent";
 const Profile = ({ user }) => {
   const { logOut } = useContext(AuthContext);
   const navigate = useNavigate();
-  const [adminPermission, isPermissionLoading] = usePermission("admin_pages");
+  const [sellerPermission, isPermissionLoading] = usePermission("seller_pages");
   const handleLogout = () => {
     logOut()
       .then(() => {
@@ -40,7 +40,7 @@ const Profile = ({ user }) => {
   return (
     <div>
       <Box sx={{ display: "flex", alignItems: "center", textAlign: "center" }}>
-        <Tooltip title="Account settings">
+        <Tooltip title="Cài đặt">
           <IconButton
             onClick={handleClick}
             size="small"
@@ -114,13 +114,13 @@ const Profile = ({ user }) => {
             Đơn mua
           </MenuItem>
         </Link>
-        {adminPermission && (
-          <Link to="/admin">
+        {sellerPermission && (
+          <Link to="/seller">
             <MenuItem onClick={handleClose}>
               <ListItemIcon>
                 <MdOutlineAdminPanelSettings />
               </ListItemIcon>
-              Trang quản lý
+              Shop của tôi
             </MenuItem>
           </Link>
         )}

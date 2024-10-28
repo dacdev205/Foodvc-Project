@@ -12,6 +12,14 @@ const walletSchema = new mongoose.Schema({
       date: { type: Date, default: Date.now },
     },
   ],
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
+  updatedAt: {
+    type: Date,
+    default: Date.now,
+  },
 });
 
 const Wallet = mongoose.model("Wallet", walletSchema);

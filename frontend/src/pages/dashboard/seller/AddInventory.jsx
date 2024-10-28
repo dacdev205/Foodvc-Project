@@ -8,12 +8,16 @@ import inventoryAPI from "../../../api/inventoryAPI";
 import QuillEditor from "../../../ultis/QuillEditor";
 import { Bounce, toast } from "react-toastify";
 import categoryAPI from "../../../api/categoryAPI";
+import useUserCurrent from "../../../hooks/useUserCurrent";
+
 const AddInventory = () => {
   const { register, handleSubmit, setValue, reset } = useForm({
     mode: "onChange",
   });
   const [photo, setPhoto] = useState(null);
   const [categories, setCategories] = useState([]);
+  const userData = useUserCurrent();
+  const shopId = userData?.shops[0];
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -52,6 +56,7 @@ const AddInventory = () => {
       formData.append("length", data.length);
       formData.append("width", data.width);
       formData.append("brand", data.brand);
+      formData.append("shopId", shopId);
       formData.append("productionLocation", data.productionLocation);
       formData.append("instructions", data.instructions);
       if (photo) {

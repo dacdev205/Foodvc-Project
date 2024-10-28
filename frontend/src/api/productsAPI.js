@@ -14,14 +14,18 @@ export default class productAPI {
     return res.data;
   }
 
-  static async updateProduct(productId, updateData) {
+  static async updateProduct(productId, shopId, updateData) {
     const token = getToken();
     try {
-      const res = await axios.patch(`${url}/${productId}`, updateData, {
-        headers: {
-          authorization: `Bearer ${token}`,
-        },
-      });
+      const res = await axios.patch(
+        `${url}/${productId}/${shopId}`,
+        updateData,
+        {
+          headers: {
+            authorization: `Bearer ${token}`,
+          },
+        }
+      );
       return res.data;
     } catch (error) {
       console.error("Error updating product:", error);

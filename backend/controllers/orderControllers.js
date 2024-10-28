@@ -5,6 +5,7 @@ const OrderStatus = require("../models/orderStatus");
 const User = require("../models/user");
 const OrderRequest = require("../models/orderRequest");
 const methodDeliAPI = require("./methodDeliControllers");
+const rankAPI = require("./rankControllers");
 module.exports = class orderAPI {
   static async createOrder(req, res) {
     const {
@@ -47,7 +48,9 @@ module.exports = class orderAPI {
       for (const product of products) {
         const foundProduct = await Menu.findOne({
           productId: product.productId,
+          shopId: product.shopId,
         });
+
         if (foundProduct) {
           foundProduct.quantity -= product.quantity;
           await foundProduct.save();
@@ -59,6 +62,7 @@ module.exports = class orderAPI {
       res.status(500).json({ message: error.message });
     }
   }
+
   static async cancelOrder(req, res) {
     try {
       const { orderId, reason } = req.body;
@@ -165,9 +169,14 @@ module.exports = class orderAPI {
         searchStatus = "",
         page = 1,
         limit = 5,
+        shopId,
       } = req.query;
 
       const filter = {};
+
+      if (shopId) {
+        filter["products.shopId"] = shopId;
+      }
 
       if (searchTerm) {
         filter.orderCode = { $regex: searchTerm, $options: "i" };

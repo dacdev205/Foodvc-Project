@@ -23,7 +23,16 @@ export default class menuAPI {
     });
     return res.data;
   }
+  static async getAllMenuAdmin() {
+    const token = getToken();
 
+    const res = await axios.get(`${url}/admin`, {
+      headers: {
+        authorization: `Bearer ${token}`,
+      },
+    });
+    return res.data;
+  }
   static async addProduct(product) {
     const token = getToken();
 

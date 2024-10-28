@@ -1,5 +1,6 @@
 const Review = require("../models/reviews");
 const Menu = require("../models/menu");
+const Shop = require("../models/shop");
 module.exports = class reviewAPI {
   static async getAllReviews(req, res) {
     try {
@@ -17,6 +18,7 @@ module.exports = class reviewAPI {
       if (!menu) {
         return res.status(404).json({ message: "Menu item not found" });
       }
+
       const newReview = await Review.create({
         productId: menu.productId,
         userId,
@@ -27,13 +29,39 @@ module.exports = class reviewAPI {
       menu.reviews.push(newReview._id);
       await menu.save();
 
-      res
-        .status(201)
-        .json({ message: "Review added successfully", review: newReview });
+      const shop = await Shop.findById(menu.shopId);
+      if (!shop) {
+        return res.status(404).json({ message: "Shop not found" });
+      }
+
+      const menus = await Menu.find({ shopId: shop._id });
+
+      let totalRating = 0;
+      let totalReviews = 0;
+
+      for (const menuItem of menus) {
+        const reviews = await Review.find({ _id: { $in: menuItem.reviews } });
+        const productRatingSum = reviews.reduce(
+          (sum, review) => sum + review.rating,
+          0
+        );
+        totalRating += productRatingSum;
+        totalReviews += reviews.length;
+      }
+
+      const shopRating = totalReviews > 0 ? totalRating / totalReviews : 0;
+      shop.shop_rating = shopRating;
+      await shop.save();
+
+      res.status(201).json({
+        message: "Review added successfully",
+        review: newReview,
+      });
     } catch (error) {
       res.status(500).json({ message: error.message });
     }
   }
+
   static async getReviewsByProductId(req, res) {
     const productId = req.params.productId;
     try {

@@ -27,6 +27,12 @@ router.get(
   checkPermission("read"),
   orderAPI.fetchAllOrder
 );
+router.get(
+  "/allOrder/admin",
+  verifyToken,
+  checkPermission("read"),
+  orderAPI.getAllOrdersAdmin
+);
 router.get("/:id", verifyToken, checkPermission("read"), orderAPI.getOrderById);
 router.get(
   "/order-user/:userId",
@@ -34,6 +40,7 @@ router.get(
   checkPermission("read"),
   orderAPI.getUserOrders
 );
+
 router.patch("/:orderId/add-order-request", verifyToken, orderAPI.addOrderReq);
 router.patch(
   "/:id",

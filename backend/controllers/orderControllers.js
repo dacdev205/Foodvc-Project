@@ -5,7 +5,6 @@ const OrderStatus = require("../models/orderStatus");
 const User = require("../models/user");
 const OrderRequest = require("../models/orderRequest");
 const methodDeliAPI = require("./methodDeliControllers");
-const rankAPI = require("./rankControllers");
 module.exports = class orderAPI {
   static async createOrder(req, res) {
     const {
@@ -197,7 +196,39 @@ module.exports = class orderAPI {
       res.status(500).json({ message: err.message });
     }
   }
+  static async getAllOrdersAdmin(req, res) {
+    try {
+      const {
+        searchTerm = "",
+        searchStatus = "",
+        page = 1,
+        limit = 10,
+      } = req.query;
 
+      const filter = {};
+
+      if (searchTerm) {
+        filter.orderCode = { $regex: searchTerm, $options: "i" };
+      }
+
+      if (searchStatus) {
+        filter.statusId = searchStatus;
+      }
+
+      const orders = await Order.find(filter)
+        .skip((page - 1) * limit)
+        .limit(Number(limit))
+        .populate("statusId")
+        .populate("products.productId");
+
+      const totalOrders = await Order.countDocuments(filter);
+      const totalPages = Math.ceil(totalOrders / limit);
+
+      res.status(200).json({ orders, totalPages });
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  }
   static async getOrderById(req, res) {
     const id = req.params.id;
     try {

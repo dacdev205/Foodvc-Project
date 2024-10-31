@@ -11,20 +11,29 @@ module.exports = class shopAPI {
       const user = await User.findOne({ email });
 
       if (!user) {
-        return res.status(401).json({ message: "Unauthorized" });
+        return res.status(401).json({ message: "Không có quyền truy cập" });
       }
 
-      const userId = user._id;
-      let shop_image = "";
+      const ownerId = user._id;
+      let shop_image = req.file ? req.file.filename : "";
 
-      if (req.file) {
-        shop_image = req.file.filename;
+      const existingShop = await Shop.findOne({ shopName: req.body.shopName });
+      if (existingShop) {
+        return res.status(400).json({ message: "Tên cửa hàng đã tồn tại" });
       }
 
       const newShop = new Shop({
-        ...req.body,
-        userId,
+        ownerId,
+        shopName: req.body.shopName,
         shop_image,
+        shop_isOpen: req.body.shop_isOpen ?? true,
+        shop_isActive: req.body.shop_isActive ?? true,
+        shop_wallet: req.body.shop_wallet ?? "",
+        shop_rating: req.body.shop_rating ?? 0,
+        description: req.body.description,
+        inventories: req.body.inventories || [],
+        addresses: req.body.addresses || [],
+        shopRank: req.body.shopRank || null,
       });
 
       await newShop.save();

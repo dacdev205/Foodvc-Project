@@ -4,6 +4,8 @@ const User = require("../models/user");
 const Role = require("../models/roles");
 const Review = require("../models/reviews");
 const Product = require("../models/product");
+const fs = require("fs");
+
 module.exports = class shopAPI {
   static async createShop(req, res) {
     try {
@@ -63,6 +65,78 @@ module.exports = class shopAPI {
     }
   }
 
+  static async fetchShopById(req, res) {
+    try {
+      const shop = await Shop.findById(req.params.shopId).populate("addresses");
+
+      if (!shop) {
+        return res.status(404).json({ message: "Cửa hàng không tồn tại" });
+      }
+
+      const { searchTerm = "", page = 1, limit = 5 } = req.query;
+
+      let query = { shopId: shop._id };
+
+      if (searchTerm) {
+        const productIdsByName = await Product.find({
+          name: { $regex: searchTerm, $options: "i" },
+        }).select("_id");
+
+        if (!productIdsByName.length) {
+          return res.status(200).json({
+            shop,
+            menuDetails: [],
+            totalPages: 0,
+            currentPage: page,
+          });
+        }
+
+        query["productId"] = { $in: productIdsByName.map((p) => p._id) };
+      }
+
+      const menus = await Menu.find(query)
+        .populate({
+          path: "productId",
+          select: "name price description image category",
+        })
+        .skip((page - 1) * limit)
+        .limit(Number(limit));
+
+      if (!menus.length) {
+        return res.status(200).json({
+          shop,
+          menuDetails: [],
+          totalPages: 0,
+          currentPage: page,
+        });
+      }
+
+      const totalMenus = await Menu.countDocuments(query);
+      const totalPages = Math.ceil(totalMenus / limit);
+      const menuDetails = await Promise.all(
+        menus.map(async (menu) => {
+          const populatedReviews = await Review.find({
+            _id: { $in: menu.reviews },
+          });
+
+          return {
+            product: menu.productId,
+            quantity: menu.quantity,
+            reviews: populatedReviews,
+          };
+        })
+      );
+
+      res.status(200).json({
+        shop,
+        menuDetails,
+        totalPages,
+        currentPage: page,
+      });
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  }
   static async getShopById(req, res) {
     try {
       const shop = await Shop.findById(req.params.shopId).populate("addresses");
@@ -135,19 +209,53 @@ module.exports = class shopAPI {
       res.status(500).json({ message: error.message });
     }
   }
-
   static async updateShop(req, res) {
+    const shopId = req.params.shopId;
+
+    const {
+      shopName,
+      shop_isOpen,
+      shop_isActive,
+      shop_wallet,
+      description,
+      inventories,
+      addresses,
+      shopRank,
+    } = req.body;
+
     try {
-      const updatedShop = await Shop.findByIdAndUpdate(
-        req.params.shopId,
-        req.body,
-        { new: true }
-      );
-      if (!updatedShop) {
+      const shop = await Shop.findById(shopId);
+      if (!shop) {
         return res.status(404).json({ message: "Cửa hàng không tồn tại" });
       }
-      res.status(200).json(updatedShop);
+
+      if (shopName) shop.shopName = shopName;
+      if (shop_isOpen !== undefined) shop.shop_isOpen = shop_isOpen;
+      if (shop_isActive !== undefined) shop.shop_isActive = shop_isActive;
+      if (shop_wallet) shop.shop_wallet = shop_wallet;
+      if (description) shop.description = description;
+      if (inventories) shop.inventories = inventories;
+      if (addresses) shop.addresses = addresses;
+      if (shopRank) shop.shopRank = shopRank;
+
+      if (req.file) {
+        if (shop.shop_image) {
+          try {
+            fs.unlinkSync("./uploads/" + shop.shop_image);
+          } catch (err) {
+            console.log("Error deleting old image:", err);
+          }
+        }
+        shop.shop_image = req.file.filename;
+      }
+
+      await shop.save();
+
+      res
+        .status(200)
+        .json({ message: "Cửa hàng đã được cập nhật thành công", shop });
     } catch (error) {
+      console.error("Error updating shop:", error);
       res.status(500).json({ message: error.message });
     }
   }

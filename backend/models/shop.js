@@ -7,7 +7,7 @@ const shopSchema = mongoose.Schema({
     required: true,
   },
   shopName: { type: String, required: true, unique: true },
-  shop_image: { type: String, required: true, unique: true },
+  shop_image: { type: String, unique: true },
   shop_isOpen: { type: Boolean, default: true },
   shop_isActive: { type: Boolean, default: true },
   shop_wallet: { type: String },

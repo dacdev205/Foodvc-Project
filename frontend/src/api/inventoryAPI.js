@@ -7,6 +7,7 @@ export default class inventoryAPI {
     const token = getToken();
 
     const res = await axios.get(`${url}/${id}/${shopId}`);
+
     return res.data;
   }
   static async getAllMenu() {
@@ -31,12 +32,7 @@ export default class inventoryAPI {
     try {
       const res = await axios.patch(
         `${url}/${productId}/${shopId}`,
-        updateData,
-        {
-          headers: {
-            authorization: `Bearer ${token}`,
-          },
-        }
+        updateData
       );
       return res.data;
     } catch (error) {

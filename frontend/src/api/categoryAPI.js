@@ -45,4 +45,14 @@ export default class categoryAPI {
     });
     return res.data;
   }
+
+  static async updateCategory(id, data) {
+    const token = getToken();
+    const res = await axios.put(`${url}/${id}`, data, {
+      headers: {
+        authorization: `Bearer ${token}`,
+      },
+    });
+    return res.data;
+  }
 }

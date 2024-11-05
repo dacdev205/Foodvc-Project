@@ -17,7 +17,20 @@ export default class CartAPI {
       throw error;
     }
   }
-
+  static async getWishStores(email) {
+    try {
+      const token = getToken();
+      const res = await axios.get(`${url}?email=${email}`, {
+        headers: {
+          authorization: `Bearer ${token}`,
+        },
+      });
+      return res.data;
+    } catch (error) {
+      console.error("Error fetching wish by email:", error);
+      throw error;
+    }
+  }
   static async getProductToWishList(productId) {
     try {
       const token = getToken();
@@ -32,15 +45,32 @@ export default class CartAPI {
       throw error;
     }
   }
-
-  static async addProductToWishList(wishItem) {
+  static async getShopToWishList(productId) {
     try {
       const token = getToken();
-      const res = await axios.post(url, wishItem, {
+      const res = await axios.get(`${url}/${productId}`, {
         headers: {
           authorization: `Bearer ${token}`,
         },
       });
+      return res.data;
+    } catch (error) {
+      console.error("Error getting product from wish:", error);
+      throw error;
+    }
+  }
+  static async addShopToWishList(wishItem) {
+    try {
+      const token = getToken();
+      const res = await axios.post(
+        `http://localhost:3000/wish-store`,
+        wishItem,
+        {
+          headers: {
+            authorization: `Bearer ${token}`,
+          },
+        }
+      );
       return res.data;
     } catch (error) {
       console.error("Error adding product to wish list:", error);
@@ -67,6 +97,20 @@ export default class CartAPI {
     try {
       const token = getToken();
       const res = await axios.delete(`${url}/${id}`, {
+        headers: {
+          authorization: `Bearer ${token}`,
+        },
+      });
+      return res.data;
+    } catch (error) {
+      console.error("Error deleting product:", error);
+      throw error;
+    }
+  }
+  static async deleteStore(id) {
+    try {
+      const token = getToken();
+      const res = await axios.delete(`http://localhost:3000/wish-store/${id}`, {
         headers: {
           authorization: `Bearer ${token}`,
         },

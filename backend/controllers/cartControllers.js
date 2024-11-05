@@ -6,9 +6,12 @@ module.exports = class cartAPI {
   static async fetchAllProductsByUserId(req, res) {
     try {
       const userId = req.params.id;
-      const cart = await Cart.findOne({ userId }).populate(
-        "products.productId"
-      );
+      const cart = await Cart.findOne({ userId }).populate({
+        path: "products.productId",
+        populate: {
+          path: "shopId",
+        },
+      });
 
       if (cart) {
         res.status(200).json(cart);

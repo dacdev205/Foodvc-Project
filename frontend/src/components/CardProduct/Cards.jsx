@@ -11,8 +11,7 @@ import useWishList from "../../hooks/useWishList";
 import { Bounce, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import useUserCurrent from "../../hooks/useUserCurrent";
-import axios from "axios";
-import { FaSpinner } from "react-icons/fa"; // Import spinner icon
+import { FaSpinner } from "react-icons/fa";
 
 const Cards = ({ item }) => {
   const { user } = useContext(AuthContext);
@@ -25,7 +24,7 @@ const Cards = ({ item }) => {
     JSON.parse(localStorage.getItem("heartFilledIds")) || []
   );
 
-  const [loading, setLoading] = useState(true); // State to manage loading
+  const [loading, setLoading] = useState(true);
   useEffect(() => {
     const fetchProductDetail = async () => {
       try {
@@ -139,7 +138,7 @@ const Cards = ({ item }) => {
         });
       }
     }
-    refetchWishList(); // Refetch danh sách yêu thích
+    refetchWishList();
   };
 
   const calculateAverageRating = (reviews) => {

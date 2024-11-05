@@ -30,7 +30,7 @@ const ChartProduct = ({ data }) => {
       );
 
       const chartLabels = categories.map((category) =>
-        category === "milk"
+        category?.name === "Rau"
           ? "Sữa các loại"
           : category === "drinks"
           ? "Bia, nước giải khát"

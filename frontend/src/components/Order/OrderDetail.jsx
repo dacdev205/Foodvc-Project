@@ -184,17 +184,18 @@ const OrderDetail = () => {
                       className="p-4 border border-gray-200 rounded-lg"
                     >
                       <p className="text-gray-700">
-                        <strong>Tên:</strong> {product.productId.name}
+                        <strong>Tên:</strong> {product.productId?.name}
                       </p>
                       <p className="text-gray-700">
-                        <strong>Phân loại:</strong> {product.productId.category}
+                        <strong>Phân loại:</strong>{" "}
+                        {product.productId?.category}
                       </p>
                       <p className="text-gray-700">
                         <strong>Số lượng:</strong> {product.quantity}
                       </p>
                       <p className="text-gray-700">
                         <strong>Giá:</strong>{" "}
-                        <FormattedPrice price={product.productId.price} />
+                        <FormattedPrice price={product.productId?.price} />
                       </p>
                     </div>
                   ))}

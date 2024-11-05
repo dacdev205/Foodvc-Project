@@ -167,70 +167,71 @@ const CardDetails = () => {
   };
 
   const handleReviewSubmit = async (reviewData) => {
-    try {
-      const userOrdersResponse = await orderAPI.getUserOrders(userData._id);
-      const userOrders = userOrdersResponse.orders;
+    // try {
+    const userOrdersResponse = await orderAPI.getUserOrders(userData._id);
+    const userOrders = userOrdersResponse.orders;
+    console.log(userOrders);
 
-      if (!Array.isArray(userOrders)) {
-        throw new Error("Expected userOrders to be an array.");
-      }
+    //   if (!Array.isArray(userOrders)) {
+    //     throw new Error("Expected userOrders to be an array.");
+    //   }
 
-      let productFound = false;
+    //   let productFound = false;
 
-      userOrders.forEach((userOrder) => {
-        if (userOrder.statusId.name === "Completed") {
-          userOrder.products.forEach((productOrder) => {
-            if (
-              productOrder.productId._id.toString() ===
-              product.productId._id.toString()
-            ) {
-              productFound = true;
-            }
-          });
-        }
-      });
+    //   userOrders.forEach((userOrder) => {
+    //     if (userOrder.statusId.name === "Completed") {
+    //       userOrder.products.forEach((productOrder) => {
+    //         if (
+    //           productOrder.productId._id.toString() ===
+    //           product.productId._id.toString()
+    //         ) {
+    //           productFound = true;
+    //         }
+    //       });
+    //     }
+    //   });
 
-      if (!productFound) {
-        toast.error("Chỉ được đánh giá sản phẩm khi đã trải nghiệm.", {
-          position: "bottom-right",
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "colored",
-          transition: Bounce,
-        });
-        return;
-      } else {
-        console.log("Product found in eligible order.");
-      }
-    } catch (error) {
-      console.error("Error handling review submission:", error);
-    }
+    //   if (!productFound) {
+    //     toast.error("Chỉ được đánh giá sản phẩm khi đã trải nghiệm.", {
+    //       position: "bottom-right",
+    //       autoClose: 5000,
+    //       hideProgressBar: false,
+    //       closeOnClick: true,
+    //       pauseOnHover: true,
+    //       draggable: true,
+    //       progress: undefined,
+    //       theme: "colored",
+    //       transition: Bounce,
+    //     });
+    //     return;
+    //   } else {
+    //     console.log("Product found in eligible order.");
+    //   }
+    // } catch (error) {
+    //   console.error("Error handling review submission:", error);
+    // }
 
-    // Proceed with adding the review
-    toast.success("Cảm ơn bạn đã gửi đánh giá!", {
-      position: "bottom-right",
-      autoClose: 5000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      theme: "colored",
-      transition: Bounce,
-    });
+    // // Proceed with adding the review
+    // toast.success("Cảm ơn bạn đã gửi đánh giá!", {
+    //   position: "bottom-right",
+    //   autoClose: 5000,
+    //   hideProgressBar: false,
+    //   closeOnClick: true,
+    //   pauseOnHover: true,
+    //   draggable: true,
+    //   progress: undefined,
+    //   theme: "colored",
+    //   transition: Bounce,
+    // });
 
-    await reviewAPI.addReview({
-      ...reviewData,
-      userId: userData._id,
-    });
+    // await reviewAPI.addReview({
+    //   ...reviewData,
+    //   userId: userData._id,
+    // });
 
-    const updatedReviews = await reviewAPI.getProductById(id);
-    setReviews(updatedReviews);
-    reset();
+    // const updatedReviews = await reviewAPI.getProductById(id);
+    // setReviews(updatedReviews);
+    // reset();
   };
 
   const updateReviews = async () => {

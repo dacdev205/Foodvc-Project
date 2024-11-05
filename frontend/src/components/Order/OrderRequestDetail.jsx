@@ -57,7 +57,7 @@ const OrderRequestDetail = () => {
       await orderRequestAPI.updateRequest(id, {
         status: "Rejected",
       });
-      navigate("/admin/order-requests");
+      navigate("/seller/order-requests");
       toast.info("Yêu cầu đã được loại bỏ!", {
         position: "bottom-right",
         autoClose: 5000,
@@ -97,7 +97,7 @@ const OrderRequestDetail = () => {
         theme: "colored",
         transition: Bounce,
       });
-      navigate("/admin/order-requests");
+      navigate("/seller/order-requests");
     } catch (error) {
       console.error("Lỗi khi đồng ý yêu cầu:", error);
     }

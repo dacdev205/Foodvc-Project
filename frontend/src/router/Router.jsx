@@ -45,7 +45,7 @@ const CategoryLazyLoading = lazy(() =>
   import("../pages/dashboard/admin/CategoriesManagement")
 );
 const ManageInventoryLazyLoading = lazy(() =>
-  import("../pages/dashboard/adminNstaff/ManageInventory")
+  import("../pages/dashboard/seller/ManageInventory")
 );
 const UpdateItemLazyLoading = lazy(() =>
   import("../pages/dashboard/seller/UpdateItem")
@@ -55,24 +55,24 @@ const AddVoucherLazyLoading = lazy(() =>
   import("../pages/dashboard/seller/AddVoucher")
 );
 const ManageMenuLazyLoading = lazy(() =>
-  import("../pages/dashboard/adminNstaff/ManageMenu")
+  import("../pages/dashboard/adminNseller/ManageMenu")
 );
 const PaymentLazyLoading = lazy(() => import("../pages/menuPage/Payment"));
 const UserOrdersLazyLoading = lazy(() => import("../pages/menuPage/UserOders"));
 const OrdersTrackingLazyLoading = lazy(() =>
-  import("../pages/dashboard/adminNstaff/OrdersTracking")
+  import("../pages/dashboard/adminNseller/OrdersTracking")
 );
 const OrderDetailLazyLoading = lazy(() =>
   import("../components/Order/OrderDetail")
 );
 const HelpUsersLazyLoading = lazy(() =>
-  import("../pages/dashboard/adminNstaff/HelpUsers")
+  import("../pages/dashboard/adminNseller/HelpUsers")
 );
 const ContactAdminLazyLoading = lazy(() =>
   import("../components/Helps/ContactAdmin")
 );
 const ReportTodayLazyLoading = lazy(() =>
-  import("../pages/dashboard/staff/ReportToday")
+  import("../pages/dashboard/seller/ReportToday")
 );
 const VerifyPasswordLazyLoading = lazy(() =>
   import("../components/Account/VerifyPassword")
@@ -85,7 +85,7 @@ const ForgetPasswordLazyLoading = lazy(() =>
   import("../components/Account/ForgetPassword")
 );
 const OrderRequestLazyLoading = lazy(() =>
-  import("../pages/dashboard/adminNstaff/OrderRequest")
+  import("../pages/dashboard/seller/OrderRequest")
 );
 const CreateShopLazyLoading = lazy(() =>
   import("../pages/menuPage/CreateShop")
@@ -108,8 +108,12 @@ import ProtectedRoute from "../context/ProtectedRoute";
 import OrderSuccess from "../components/Order/OrderSuccess";
 import SearchResult from "../pages/menuPage/SearchResult";
 import UserOrderDetail from "../components/Order/UserOrderDetail";
+import EditCategory from "../pages/dashboard/admin/EditCategory";
+import ShopManagement from "../pages/dashboard/seller/ShopManagement";
+import ShopDetail from "../pages/menuPage/ShopDetail";
+import WishStorePage from "../pages/menuPage/WishStore";
 const CreateVoucherLazyLoading = lazy(() =>
-  import("../pages/dashboard/adminNstaff/CreateVoucher")
+  import("../pages/dashboard/seller/CreateVoucher")
 );
 const router = createBrowserRouter([
   {
@@ -133,6 +137,14 @@ const router = createBrowserRouter([
         element: (
           <Suspense fallback={<LoadingSpinner />}>
             <SearchResult />
+          </Suspense>
+        ),
+      },
+      {
+        path: "/shop-detail/:id",
+        element: (
+          <Suspense fallback={<LoadingSpinner />}>
+            <ShopDetail />
           </Suspense>
         ),
       },
@@ -209,6 +221,7 @@ const router = createBrowserRouter([
           </Suspense>
         ),
       },
+
       {
         path: "/user",
         element: <AccountManagement />,
@@ -235,6 +248,14 @@ const router = createBrowserRouter([
             element: (
               <Suspense fallback={<LoadingSpinner />}>
                 <UserOrdersLazyLoading />
+              </Suspense>
+            ),
+          },
+          {
+            path: "wish-store",
+            element: (
+              <Suspense fallback={<LoadingSpinner />}>
+                <WishStorePage />
               </Suspense>
             ),
           },
@@ -361,7 +382,7 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path: "edit-order/:id",
+        path: "admin-edit-order/:id",
         element: (
           <Suspense>
             <OrderRequestDetailLazyLoading />
@@ -373,6 +394,14 @@ const router = createBrowserRouter([
         element: (
           <Suspense>
             <CategoryLazyLoading />
+          </Suspense>
+        ),
+      },
+      {
+        path: "category/edit/:id",
+        element: (
+          <Suspense>
+            <EditCategory />
           </Suspense>
         ),
       },
@@ -492,6 +521,7 @@ const router = createBrowserRouter([
           </Suspense>
         ),
       },
+
       {
         path: "edit-order/:id",
         element: (
@@ -513,6 +543,14 @@ const router = createBrowserRouter([
         element: (
           <Suspense>
             <AddInventoryLazyLoading />
+          </Suspense>
+        ),
+      },
+      {
+        path: "shop-management/:id",
+        element: (
+          <Suspense>
+            <ShopManagement />
           </Suspense>
         ),
       },

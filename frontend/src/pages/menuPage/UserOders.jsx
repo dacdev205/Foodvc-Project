@@ -297,13 +297,9 @@ const UserOrders = () => {
             </div>
           ) : orders.length ? (
             filteredOrders.map((order, index) => (
-              <div
-                key={order._id}
-                onClick={() => handleOrderClick(order._id)}
-                className="mb-6 cursor-pointer hover:bg-slate-100 hover:scale-105 transition-all duration-200"
-              >
-                <div className="overflow-x-auto border-b border-gray-200 pb-4">
-                  <div className="mb-2 flex justify-between">
+              <div key={order._id} className="mb-6 cursor-pointer  ">
+                <div className="overflow-x-auto border-b border-gray-200 pb-4 ">
+                  <div className="mb-2 flex justify-between ">
                     <p className="text-sm text-gray-600">
                       Trạng thái:{" "}
                       <span className="font-medium text-red-500">
@@ -311,11 +307,12 @@ const UserOrders = () => {
                       </span>
                     </p>
 
-                    {renderOrderActions(order)}
+                    <span> {renderOrderActions(order)}</span>
                   </div>
                   {order.products.map((product, productIndex) => (
                     <div
                       key={productIndex}
+                      onClick={() => handleOrderClick(order._id)}
                       className="flex items-center justify-between py-2 border-b border-gray-100"
                     >
                       <div className="flex items-center">

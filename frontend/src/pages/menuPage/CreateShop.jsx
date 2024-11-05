@@ -45,9 +45,9 @@ const CreateShop = () => {
   const onSubmit = async (data) => {
     const formData = new FormData();
     formData.append("shopName", data.shopName);
-    formData.append("des", data.des);
+    formData.append("description", data.description);
     formData.append("ownerId", userData?._id);
-    formData.append("image", data.shopImage[0]); // Append the image file
+    formData.append("image", data.shopImage[0]);
     formData.append("addresses", addressUser._id);
 
     try {
@@ -56,7 +56,7 @@ const CreateShop = () => {
         headers: {
           authorization: `Bearer ${token}`,
         },
-        body: formData, // Using FormData for file upload
+        body: formData,
       });
 
       if (!response.ok) {
@@ -69,7 +69,7 @@ const CreateShop = () => {
         autoClose: 2000,
       });
 
-      reset(); // Reset the form after success
+      reset();
       console.log("Shop created:", result);
     } catch (error) {
       toast.error("Failed to create shop. Please try again.", {
@@ -106,7 +106,7 @@ const CreateShop = () => {
             </label>
             <input
               type="text"
-              {...register("des", { required: true })}
+              {...register("description", { required: true })}
               className="input input-bordered w-full text-black"
             />
           </div>

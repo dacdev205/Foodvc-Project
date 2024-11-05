@@ -17,32 +17,22 @@ let storage = multer.diskStorage({
 let upload = multer({
   storage: storage,
 }).single("image");
-router.get(
-  "/search",
-  verifyToken,
-  checkPermission("manage_users"),
-  usersAPI.getUsers
-);
+router.get("/search", verifyToken, usersAPI.getUsers);
 router.get(
   "/",
   verifyToken,
-  checkPermission("manage_users"),
+  checkPermission("admin_actions"),
   usersAPI.getAllUsers
 );
 router.get("/ranking/:id", verifyToken, usersAPI.getUserRank);
 router.post(
   "/admin/create-user",
   verifyToken,
-  checkPermission("create_user"),
+  checkPermission("admin_actions"),
   usersAPI.createUserAdmin
 );
 
-router.get(
-  "/roles/role-detail/:id",
-  verifyToken,
-  checkPermission("manage_users"),
-  usersAPI.getRoleById
-);
+router.get("/roles/role-detail/:id", verifyToken, usersAPI.getRoleById);
 
 router.post("/", usersAPI.createUser);
 router.get("/search-detail", usersAPI.searchUserNShopByName);
@@ -51,21 +41,21 @@ router.patch(
   "/:id",
   upload,
   verifyToken,
-  checkPermission("update_profile"),
+  checkPermission("update"),
   usersAPI.updateUser
 );
 router.get("/getUserByEmail/:email", usersAPI.getUserByEmail);
 router.delete(
   "/:id",
   verifyToken,
-  checkPermission("delete_user"),
+  checkPermission("delete"),
   usersAPI.deleteUser
 );
 router.get("/getPermissions/:email", usersAPI.getPermissions);
 router.patch(
   "/:id/role",
   verifyToken,
-  checkPermission("update_role"),
+  checkPermission("admin_actions"),
   usersAPI.updateUserRole
 );
 router.get("/roles/getAll", usersAPI.getAllRoles);

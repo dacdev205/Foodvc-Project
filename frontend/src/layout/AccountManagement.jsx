@@ -5,7 +5,7 @@ import useAuth from "../hooks/useAuth";
 import { Avatar } from "@mui/material";
 import { FaPen } from "react-icons/fa";
 import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
-import { CiShop, CiUser, CiWallet } from "react-icons/ci";
+import { CiShop, CiShoppingCart, CiUser, CiWallet } from "react-icons/ci";
 import { BiNotepad } from "react-icons/bi";
 import { useActiveLink } from "../context/ActiveLinkProvider";
 import useUserCurrent from "../hooks/useUserCurrent";
@@ -20,12 +20,11 @@ const AccountManagement = () => {
   const location = useLocation();
   const { setActiveLink } = useActiveLink();
 
-  // Mảng các hạng, từ thấp đến cao, với màu sắc tương ứng
   const ranks = [
-    { user_rank_name: "Bronze", user_rank_point: 0, color: "#cd7f32" }, // Màu đồng
-    { user_rank_name: "Silver", user_rank_point: 100, color: "#c0c0c0" }, // Màu bạc
-    { user_rank_name: "Gold", user_rank_point: 500, color: "#ffd700" }, // Màu vàng
-    { user_rank_name: "Platinum", user_rank_point: 1000, color: "#e5e4e2" }, // Màu bạch kim
+    { user_rank_name: "Bronze", user_rank_point: 0, color: "#cd7f32" },
+    { user_rank_name: "Silver", user_rank_point: 100, color: "#c0c0c0" },
+    { user_rank_name: "Gold", user_rank_point: 500, color: "#ffd700" },
+    { user_rank_name: "Platinum", user_rank_point: 1000, color: "#e5e4e2" },
   ];
 
   useEffect(() => {
@@ -126,7 +125,7 @@ const AccountManagement = () => {
                       color: ranks.find(
                         (r) => r.user_rank_name === rank.rank.user_rank_name
                       )?.color,
-                    }} // Áp dụng màu
+                    }}
                   >
                     {rank.rank.user_rank_name}
                   </span>
@@ -217,6 +216,17 @@ const AccountManagement = () => {
           </li>
           <li>
             <Link
+              to="wish-store"
+              className={`active-link-2 ${
+                isActive("/user/wish-store") ? "text-green" : ""
+              }`}
+            >
+              <CiShoppingCart />
+              Cửa hàng yêu thích
+            </Link>
+          </li>
+          <li>
+            <Link
               to="wallet"
               className={`active-link-2 ${
                 isActive("/user/wallet") ? "text-green" : ""
@@ -229,9 +239,9 @@ const AccountManagement = () => {
           {userData?.isSeller === true ? (
             <li>
               <Link
-                to="/admin"
+                to="/seller"
                 className={`active-link-2 ${
-                  isActive("/admin") ? "text-green" : ""
+                  isActive("/seller") ? "text-green" : ""
                 }`}
               >
                 <CiShop />

@@ -6,31 +6,29 @@ const router = require("express").Router();
 router.get(
   "/user/:userId",
   verifyToken,
-  checkPermission("read"),
   favoritePdAPI.fetchAllWishListProductWithUserId
 );
 router.get(
   "/:productId",
   verifyToken,
-  checkPermission("read"),
   favoritePdAPI.fetchProductWishListByProductId
 );
 router.post(
   "/",
   verifyToken,
-  checkPermission("read"),
+  checkPermission("create"),
   favoritePdAPI.postProductToWishList
 );
 router.put(
   "/:id",
   verifyToken,
-  checkPermission("read"),
+  checkPermission("update"),
   favoritePdAPI.updateProductWishList
 );
 router.delete(
   "/:id",
   verifyToken,
-  checkPermission("read"),
+  checkPermission("delete"),
   favoritePdAPI.deleteProductInWishList
 );
 

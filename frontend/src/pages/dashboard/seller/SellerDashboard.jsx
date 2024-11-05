@@ -26,7 +26,12 @@ const SellerDashboard = () => {
   const userData = useUserCurrent();
   const shopId = userData?.shops[0];
 
-  const { refetch, data: stats = [] } = useQuery({
+  const {
+    refetch,
+    data: stats = [],
+    isLoading,
+    isError,
+  } = useQuery({
     queryKey: ["stats", shopId],
     queryFn: async () => {
       const res = await axiosSecure.get(`/sellerStats/${shopId}`);
@@ -45,8 +50,6 @@ const SellerDashboard = () => {
     setSelectedYear(year);
     if (shopId) {
       const newData = await sellerStats.fetchDataByYear(shopId, year);
-      console.log(newData);
-
       setMonthlyRevenueData(newData);
     }
   };
@@ -64,7 +67,7 @@ const SellerDashboard = () => {
     }
   };
 
-  const exportToExcel = (data, startDate, endDate) => {
+  const exportToExcel = async (data, startDate, endDate) => {
     if (!data || typeof data !== "object") {
       console.error("Invalid data");
       return;
@@ -82,14 +85,6 @@ const SellerDashboard = () => {
     const headers = ["Loại hàng", "Tên sản phẩm", "Số lượng", "Doanh thu"];
     worksheet.addRow(headers);
 
-    const columnWidths = [
-      { header: "Tháng", key: "Tháng", width: 15 },
-      { header: "Loại hàng", key: "Loại hàng", width: 20 },
-      { header: "Tên sản phẩm", key: "Tên sản phẩm", width: 25 },
-      { header: "Số lượng", key: "Số lượng", width: 15 },
-      { header: "Doanh thu", key: "Doanh thu", width: 20 },
-    ];
-
     Object.keys(data).forEach((category) => {
       data[category].products.forEach((product) => {
         const rowData = [
@@ -102,36 +97,10 @@ const SellerDashboard = () => {
       });
     });
 
-    columnWidths.forEach((column, index) => {
-      const columnIndex = index + 1;
-      const columnKey = worksheet.getColumn(columnIndex);
-      if (columnKey) columnKey.width = column.width;
-      else console.error(`Column '${column.key}' not found`);
-    });
-
-    worksheet.eachRow((row, rowNumber) => {
-      row.eachCell((cell, colNumber) => {
-        cell.font = { bold: true };
-        const isSecondRow = rowNumber === 2;
-        if (isSecondRow) {
-          cell.fill = {
-            type: "pattern",
-            pattern: "solid",
-            fgColor: { argb: "8FCE00" },
-          };
-          cell.alignment = { vertical: "middle", horizontal: "center" };
-        }
-        const borderStyles = {
-          top: "thin",
-          bottom: "thin",
-          left: "thin",
-          right: "thin",
-        };
-        cell.border = isSecondRow
-          ? borderStyles
-          : { ...borderStyles, horizontal: "center" };
-      });
-    });
+    worksheet.getColumn(1).width = 20;
+    worksheet.getColumn(2).width = 25;
+    worksheet.getColumn(3).width = 15;
+    worksheet.getColumn(4).width = 20;
 
     workbook.xlsx.writeBuffer().then((buffer) => {
       const blob = new Blob([buffer], {
@@ -155,7 +124,7 @@ const SellerDashboard = () => {
           endDate
         );
         setResult(data);
-        exportToExcel(data, startDate, endDate);
+        await exportToExcel(data, startDate, endDate);
       }
     } catch (error) {
       console.error("Error handling result click:", error);
@@ -168,8 +137,9 @@ const SellerDashboard = () => {
         Hi, {user.displayName}
       </h2>
       <div>
+        {isLoading && <div>Loading...</div>}
+        {isError && <div>Error loading data</div>}
         <div className="stats stats-vertical w-full lg:stats-horizontal shadow bg-white">
-          {/* stat div */}
           <div className="stat">
             <div className="stat-figure text-secondary text-3xl">
               <CiDollar />
@@ -178,16 +148,13 @@ const SellerDashboard = () => {
             <div className="stat-value">
               <FormattedPrice price={stats.revenue} />
             </div>
-            <div className="stat-desc"></div>
           </div>
-
           <div className="stat">
             <div className="stat-figure text-secondary text-3xl">
               <FaBook />
             </div>
             <div className="stat-title text-black">Mặt hàng hiện có</div>
             <div className="stat-value text-black">{stats.menuItems}</div>
-            <div className="stat-desc">↘︎ 90 (14%)</div>
           </div>
           <div className="stat">
             <div className="stat-figure text-secondary text-3xl">
@@ -195,7 +162,6 @@ const SellerDashboard = () => {
             </div>
             <div className="stat-title text-black">Tất cả đơn hàng</div>
             <div className="stat-value text-black">{stats.orders}</div>
-            <div className="stat-desc">↘︎ 90 (14%)</div>
           </div>
         </div>
         <div className="grid grid-cols-2 gap-4 mt-8">
@@ -205,9 +171,9 @@ const SellerDashboard = () => {
             </p>
             <select value={selectedYear} onChange={handleYearChange}>
               <option value={new Date().getFullYear()}>Năm hiện tại</option>
-              <option value={"2023"}>Năm 2023</option>
+              <option value="2023">Năm 2023</option>
+              {/* Add more years dynamically if needed */}
             </select>
-
             <ChartMonthlyRevenue
               data={monthlyRevenueData}
               selectedYear={selectedYear}
@@ -217,24 +183,12 @@ const SellerDashboard = () => {
             <p className="text-lg font-bold text-black">
               Danh mục sản phẩm bán được:
             </p>
-            <div>
-              <select value={selectedMonth} onChange={handleMonthChange}>
-                <option value={"1"}>Tháng 1</option>
-                <option value={"2"}>Tháng 2</option>
-                <option value={"3"}>Tháng 3</option>
-                <option value={"4"}>Tháng 4</option>
-                <option value={"5"}>Tháng 5</option>
-                <option value={"6"}>Tháng 6</option>
-                <option value={"7"}>Tháng 7</option>
-                <option value={"8"}>Tháng 8</option>
-                <option value={"9"}>Tháng 9</option>
-                <option value={"10"}>Tháng 10</option>
-                <option value={"11"}>Tháng 11</option>
-                <option value={"12"}>Tháng 12</option>
-              </select>
-
-              <ChartProduct data={productRevenueData} />
-            </div>
+            <select value={selectedMonth} onChange={handleMonthChange}>
+              {Array.from({ length: 12 }, (_, i) => (
+                <option key={i} value={i + 1}>{`Tháng ${i + 1}`}</option>
+              ))}
+            </select>
+            <ChartProduct data={productRevenueData} />
           </div>
         </div>
         <div className="mt-8">
@@ -253,7 +207,9 @@ const SellerDashboard = () => {
               Xuất báo cáo
             </button>
           </div>
-          {result && <div className="mt-4">{/* Render result here */}</div>}
+          {result && (
+            <div className="mt-4">Kết quả: {JSON.stringify(result)}</div>
+          )}
         </div>
       </div>
     </div>

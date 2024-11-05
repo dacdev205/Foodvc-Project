@@ -5,6 +5,7 @@ import { FaTrash, FaEdit, FaPlus } from "react-icons/fa";
 import ConfirmDeleteModal from "../../../ultis/ConfirmDeleteModal";
 import CreateCategoryModal from "../../../components/Modal/CreateCategoryModal";
 import categoryAPI from "../../../api/categoryAPI";
+import { useNavigate } from "react-router-dom";
 
 const CategoriesManagement = () => {
   const [categories, setCategories] = useState([]);
@@ -15,7 +16,7 @@ const CategoriesManagement = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
-
+  const navigate = useNavigate();
   const fetchCategories = async (page, searchTerm) => {
     setLoading(true);
     try {
@@ -39,7 +40,7 @@ const CategoriesManagement = () => {
 
   const handleSearchChange = (e) => {
     setSearchTerm(e.target.value);
-    setPage(1); // Reset về trang đầu khi tìm kiếm mới
+    setPage(1);
   };
 
   const handleDelete = async (id) => {
@@ -63,10 +64,11 @@ const CategoriesManagement = () => {
       handleDelete(categoryToDelete);
     }
   };
-
+  const handleEditClick = (id) => {
+    navigate(`edit/${id}`);
+  };
   const handleCreateCategory = async (newCategory) => {
     try {
-      // Call API to create category
       await categoryAPI.createCategory(newCategory);
       setShowCreateModal(false);
       await fetchCategories(page, searchTerm);
@@ -133,7 +135,10 @@ const CategoriesManagement = () => {
                   >
                     <FaTrash />
                   </button>
-                  <button className="btn btn-xs bg-white hover:bg-slate-300 text-blue border-style">
+                  <button
+                    className="btn btn-xs bg-white hover:bg-slate-300 text-blue border-style"
+                    onClick={() => handleEditClick(category._id)}
+                  >
                     <FaEdit />
                   </button>
                 </td>

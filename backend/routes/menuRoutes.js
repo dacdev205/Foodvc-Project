@@ -17,37 +17,19 @@ let storage = multer.diskStorage({
 let upload = multer({
   storage: storage,
 }).single("image");
-router.post(
-  "/",
-  verifyToken,
-  checkPermission("dashboard_actions"),
-  upload,
-  menuAPI.createProduct
-);
+router.post("/", upload, menuAPI.createProduct);
 router.post("/add-to-menu", upload, menuAPI.createProduct);
 router.get("/", menuAPI.fetchMenus);
-router.get("/admin", menuAPI.fetchMenusAdmin);
+router.get("/admin", checkPermission("seller_pages"), menuAPI.fetchMenusAdmin);
 
 router.get("/:id", menuAPI.fetchProductByID);
-router.patch(
-  "/quantity/:id",
-  verifyToken,
-  checkPermission("dashboard_actions"),
-  upload,
-  menuAPI.updateProductQuantityInMenu
-);
-router.patch(
-  "/:id",
-  verifyToken,
-  checkPermission("dashboard_actions"),
-  upload,
-  menuAPI.updateProductInMenu
-);
+router.patch("/quantity/:id", upload, menuAPI.updateProductQuantityInMenu);
+router.patch("/:id", upload, menuAPI.updateProductInMenu);
 
 router.post(
   "/apply-voucher",
   verifyToken,
-  checkPermission("read"),
+  checkPermission("create"),
   menuAPI.applyVoucher
 );
 

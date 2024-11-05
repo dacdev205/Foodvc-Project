@@ -18,19 +18,19 @@ router.get(
 router.post(
   "/",
   verifyToken,
-  checkPermission("create_cart"),
+  checkPermission("create"),
   cartAPI.postProductToCart
 );
 router.patch(
   "/:cartId/product/:productId",
   verifyToken,
-  checkPermission("update_cart"),
+  checkPermission("update"),
   cartAPI.updateProductInCart
 );
 router.delete(
   "/:cartId/product/:productId",
   verifyToken,
-  checkPermission("delete_cart"),
+  checkPermission("delete"),
   cartAPI.deleteProductInCart
 );
 

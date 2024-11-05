@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { FaRegStar, FaStar, FaStarHalf } from "react-icons/fa";
 import { useLocation, useParams, useNavigate } from "react-router-dom";
 import reviewAPI from "../../api/reviewAPI";
-import { Pagination } from "@mui/material";
+import { CircularProgress, Pagination } from "@mui/material";
 
 const SearchResult = () => {
   const { id } = useParams();
@@ -13,18 +13,17 @@ const SearchResult = () => {
   const [reviews, setReviews] = useState([]);
   const [menuDetails, setMenuDetails] = useState([]);
   const [loading, setLoading] = useState(true);
-  const isShop = !!result.shopName;
+  const isShop = !!result?.shopName;
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
   const [address, setAddress] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
-  console.log(result);
 
   useEffect(() => {
     const fetchShopMenuDetails = async (page = 1) => {
       try {
         const response = await fetch(
-          `http://localhost:3000/shop/get-shop/${result._id}?page=${page}`,
+          `http://localhost:3000/shop/get-shop/${result._id}`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -65,13 +64,12 @@ const SearchResult = () => {
     item.product.name.toLowerCase().includes(searchTerm)
   );
 
-  if (!result) {
+  if (loading)
     return (
-      <div className="text-center text-lg text-gray-500">
-        Không tìm thấy kết quả.
+      <div className="fixed inset-0 flex items-center justify-center z-50">
+        <CircularProgress color="success" />
       </div>
     );
-  }
 
   const calculateAverageRating = (reviews) => {
     if (!reviews || reviews.length === 0) {

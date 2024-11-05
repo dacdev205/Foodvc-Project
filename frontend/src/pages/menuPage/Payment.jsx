@@ -70,6 +70,7 @@ const Payment = () => {
     };
     fetchShopData();
   }, []);
+
   useEffect(() => {
     const fetchPaymentMethods = async () => {
       try {
@@ -107,11 +108,16 @@ const Payment = () => {
   }, []);
   useEffect(() => {
     const fetchVoucherData = async () => {
-      const res = await voucherAPI.getAllVoucher();
-      setVouchers(res);
+      payment.forEach((item) => {
+        item.products.forEach(async (product) => {
+          const shopId = product.productId.shopId;
+          const res = await voucherAPI.getAllVoucher(shopId);
+          setVouchers(res);
+        });
+      });
     };
     fetchVoucherData();
-  }, []);
+  }, [payment]);
   useEffect(() => {
     let total = 0;
     payment.forEach((item) => {

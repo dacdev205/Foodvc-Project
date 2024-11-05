@@ -17,18 +17,7 @@ let upload = multer({
   storage: storage,
 }).single("image");
 
-router.patch(
-  "/:id/:shopId",
-  verifyToken,
-  checkPermission("dashboard_actions"),
-  upload,
-  productsAPI.updateProduct
-);
-router.get(
-  "/:id",
-  verifyToken,
-  checkPermission("read"),
-  productsAPI.fetchProductByID
-);
+router.patch("/:id/:shopId", verifyToken, upload, productsAPI.updateProduct);
+router.get("/:id", verifyToken, productsAPI.fetchProductByID);
 
 module.exports = router;

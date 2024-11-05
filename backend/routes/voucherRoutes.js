@@ -7,37 +7,27 @@ const router = require("express").Router();
 router.post(
   "/",
   verifyToken,
-  checkPermission("dashboard_actions"),
+  checkPermission("seller_actions"),
   voucherAPI.createVoucher
 );
-router.get(
-  "/:shopId",
-  verifyToken,
-  checkPermission("read"),
-  voucherAPI.getAllVouchers
-);
-router.get(
-  "/:id",
-  verifyToken,
-  checkPermission("read"),
-  voucherAPI.getAllSingleVouchers
-);
+router.get("/:shopId", voucherAPI.getAllVouchers);
+router.get("/:id", verifyToken, voucherAPI.getAllSingleVouchers);
 router.delete(
   "/:id",
   verifyToken,
-  checkPermission("read"),
+  checkPermission("seller_actions"),
   voucherAPI.deleteVoucher
 );
 router.put(
   "/:id",
   verifyToken,
-  checkPermission("dashboard_actions"),
+  checkPermission("seller_actions"),
   voucherAPI.updateVoucher
 );
 router.post(
   "/apply",
   verifyToken,
-  checkPermission("read"),
+  checkPermission("create"),
   voucherAPI.applyVoucherToPayment
 );
 module.exports = router;

@@ -15,6 +15,7 @@ import {
   FaUsers,
   FaPercentage,
   FaShoppingBag,
+  FaChessBishop,
 } from "react-icons/fa";
 import { RiMoneyCnyCircleLine } from "react-icons/ri";
 import { IoIosAddCircle, IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
@@ -23,6 +24,7 @@ import Login from "../components/Account/Login";
 import useAuth from "../hooks/useAuth";
 import usePermission from "../hooks/usePermission";
 import orderRequestAPI from "../api/orderRequest";
+import useUserCurrent from "../hooks/useUserCurrent";
 
 const SellerLayout = () => {
   const { loading } = useAuth();
@@ -34,7 +36,8 @@ const SellerLayout = () => {
   const [supportOpen, setSupportOpen] = useState(false);
   const [orderRequests, setOrderRequests] = useState(0);
   const location = useLocation();
-
+  const userData = useUserCurrent();
+  const shopId = userData?.shops[0];
   const togglePromotions = () => setPromotionsOpen(!promotionsOpen);
   const toggleInventory = () => setInventoryOpen(!inventoryOpen);
   const toggleMenu = () => setMenuOpen(!menuOpen);
@@ -110,7 +113,17 @@ const SellerLayout = () => {
                   Dashboard
                 </Link>
               </li>
-
+              <li>
+                <Link
+                  className={`active-link-2 ${
+                    location.pathname === "/shop-management" ? "text-green" : ""
+                  }`}
+                  to={`/seller/shop-management/${shopId}`}
+                >
+                  <FaChessBishop />
+                  Quản lý cửa hàng
+                </Link>
+              </li>
               <li>
                 <div
                   onClick={toggleUsers}

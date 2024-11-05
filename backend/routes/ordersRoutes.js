@@ -5,53 +5,47 @@ const verifyToken = require("../middleware/verifyToken");
 const router = require("express").Router();
 //middleware
 
-router.post(
-  "/",
-  verifyToken,
-  checkCancelCount,
-  checkPermission("create_order"),
-  orderAPI.createOrder
-);
+router.post("/", verifyToken, checkCancelCount, orderAPI.createOrder);
 
 router.patch(
   "/cancel-order",
   verifyToken,
   checkCancelCount,
-  checkPermission("create_order"),
+  checkPermission("update"),
   orderAPI.cancelOrder
 );
 
 router.get(
   "/allOrder",
   verifyToken,
-  checkPermission("read"),
+  checkPermission("seller_actions"),
   orderAPI.fetchAllOrder
 );
 router.get(
   "/allOrder/admin",
   verifyToken,
-  checkPermission("read"),
+  checkPermission("admin_actions"),
   orderAPI.getAllOrdersAdmin
 );
 router.get("/:id", verifyToken, checkPermission("read"), orderAPI.getOrderById);
-router.get(
-  "/order-user/:userId",
-  verifyToken,
-  checkPermission("read"),
-  orderAPI.getUserOrders
-);
+router.get("/order-user/:userId", verifyToken, orderAPI.getUserOrders);
 
-router.patch("/:orderId/add-order-request", verifyToken, orderAPI.addOrderReq);
+router.patch(
+  "/:orderId/add-order-request",
+  verifyToken,
+  checkPermission("create"),
+  orderAPI.addOrderReq
+);
 router.patch(
   "/:id",
   verifyToken,
-  checkPermission("manage_orders"),
+  checkPermission("update"),
   orderAPI.updateOrderStatus
 );
 router.get(
   "/reports/today",
   verifyToken,
-  checkPermission("report_today"),
+  checkPermission("create"),
   orderAPI.reportRevenueToday
 );
 module.exports = router;

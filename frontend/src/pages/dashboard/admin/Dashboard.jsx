@@ -11,6 +11,7 @@ import ChartProduct from "../../../components/Chart/ChartProduct";
 import statsAPI from "../../../api/statsAPI";
 import ExcelJS from "exceljs";
 import axios from "axios";
+import useUserCurrent from "../../../hooks/useUserCurrent";
 const Dashboard = () => {
   const { user } = useAuth();
   const axiosSecure = useAxiosSecure();
@@ -22,7 +23,8 @@ const Dashboard = () => {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [result, setResult] = useState("");
-
+  const userData = useUserCurrent();
+  const shopId = userData?.shops[0];
   const { refetch, data: stats = [] } = useQuery({
     queryKey: ["stats"],
     queryFn: async () => {

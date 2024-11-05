@@ -18,13 +18,13 @@ router.get(
 router.post(
   "/",
   verifyToken,
-  checkPermission("create_order"),
+  checkPermission("create"),
   paymentAPI.createPayment
 );
 router.patch(
   "/:id",
   verifyToken,
-  checkPermission("update_order"),
+  checkPermission("update"),
   paymentAPI.updateProductInPayment
 );
 

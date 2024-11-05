@@ -24,14 +24,20 @@ const ReviewForm = ({ productId, userId, onSubmit }) => {
       const pointsToAdd = Math.floor(totalAmount * 0.1);
 
       try {
-        await onSubmit({ productId, userId, rating, comment });
+        const reviewResponse = await onSubmit({
+          productId,
+          userId,
+          rating,
+          comment,
+        });
 
-        await rankAPI.addPoint({ userId: userData._id, pointsToAdd });
+        if (reviewResponse?.success) {
+          await rankAPI.addPoint({ userId: userData._id, pointsToAdd });
+        }
 
         setRating(0);
         setComment("");
         setRatingError(false);
-
         document.getElementById("modal-review").close();
       } catch (error) {
         console.error("Error adding points or submitting review:", error);

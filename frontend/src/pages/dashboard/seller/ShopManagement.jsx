@@ -12,6 +12,7 @@ import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 const ShopManagement = () => {
   const { register, handleSubmit, setValue } = useForm({ mode: "onChange" });
   const [photo, setPhoto] = useState(null);
+  const [favoriteUserIds, setFavoriteUserIds] = useState([]);
 
   const { id } = useParams();
   const navigate = useNavigate();
@@ -48,6 +49,7 @@ const ShopManagement = () => {
           setShop(data.shop);
           setTotalPages(data.totalPages);
           setAddress(data.shop.addresses);
+          setFavoriteUserIds(data.favoriteUserIds || []);
         } else {
           console.error(data.message);
         }
@@ -184,12 +186,17 @@ const ShopManagement = () => {
 
       <div className="bg-white p-4 rounded-lg shadow-md mb-4 flex items-center space-x-6">
         <div className="text-center">
+          {loading && <CircularProgress size={24} color="success" />}
+
           <img
             src={
               photo ? URL.createObjectURL(photo) : PF + "/" + shop.shop_image
             }
             alt="Profile Image"
-            className="w-40 h-40 object-cover rounded-full border-4 border-gray-200 shadow-lg"
+            className={`w-40 h-40 object-cover rounded-full border-4 border-gray-200 shadow-lg ${
+              loading ? "hidden" : "block"
+            }`}
+            onLoad={() => setLoading(false)}
           />
 
           <form onSubmit={handleSubmit(onSubmit)}>
@@ -234,7 +241,10 @@ const ShopManagement = () => {
             <strong>Trạng thái:</strong>{" "}
             {shop.shop_isOpen ? "Mở cửa" : "Đóng cửa"}
           </p>
-
+          <p className="text-gray-700">
+            <span className="font-semibold">Số lượng người yêu thích: </span>
+            <span className="text-green-600">{favoriteUserIds.length}</span>
+          </p>
           <button
             onClick={handleEditClick}
             className="text-blue-500 hover:underline"
@@ -247,13 +257,7 @@ const ShopManagement = () => {
             <span className="font-semibold">Ngày tham gia: </span>
             {formattedJoinDate}
           </p>
-          <h3 className="text-md font-semibold text-gray-800 mb-2">
-            Đánh giá:
-          </h3>
-          <p className="flex">
-            {renderRating(calculateAverageRating(reviews))}
-          </p>
-          <p>Số lượng đánh giá: {reviews.length}</p>
+          <p className="">Đánh giá: {calculateAverageRating(reviews)} / 5</p>
         </div>
       </div>
 

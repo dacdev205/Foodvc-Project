@@ -12,4 +12,13 @@ export default class shopAPI {
     });
     return response.data;
   }
+  static async getShop(shopId) {
+    const token = getToken();
+    const response = await axios.get(`${url}/get-shop/${shopId}`, {
+      headers: {
+        authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  }
 }

@@ -3,7 +3,7 @@ import axios from "axios";
 import { Pie } from "react-chartjs-2";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import reviewAPI from "../../../api/reviewAPI";
-import { FaTrash } from "react-icons/fa";
+import { FaTrash, FaBrain } from "react-icons/fa"; // Add the FaBrain icon for the "Analyze" button
 import ConfirmDeleteModal from "../../../ultis/ConfirmDeleteModal";
 import userAPI from "../../../api/userAPI";
 import { CircularProgress, Pagination } from "@mui/material";
@@ -28,36 +28,45 @@ const ReviewsManagement = () => {
     negative_percentage: 0,
   });
 
-  const fetchReviewsAndStats = async (page = 1) => {
+  // Fetch sentiment statistics only once
+  const fetchStats = async () => {
+    try {
+      const statsResponse = await axios.get(
+        "http://localhost:5000/sentiment-stats"
+      );
+      setStats(statsResponse.data);
+    } catch (error) {
+      console.error("There was an error fetching sentiment stats!", error);
+    }
+  };
+
+  // Fetch reviews based on the page number
+  const fetchReviews = async (page = 1) => {
     setLoading(true);
     try {
-      const reviewsResponse = await axios.get("http://localhost:5000/data", {
+      const reviewsResponse = await axios.get("http://localhost:3000/reviews", {
         params: { page, limit: 5 },
       });
       const { reviews, totalPages } = reviewsResponse.data;
+
       const reviewsWithUserDetails = await Promise.all(
         reviews.map(async (review) => {
           const userResponse = await userAPI.getSingleUserById(review.userId);
           return { ...review, userName: userResponse.name };
         })
       );
-
       setReviews(reviewsWithUserDetails);
       setTotalPages(totalPages);
-
-      const statsResponse = await axios.get(
-        "http://localhost:5000/sentiment-stats"
-      );
-      setStats(statsResponse.data);
     } catch (error) {
-      console.error("There was an error fetching data!", error);
+      console.error("There was an error fetching reviews!", error);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchReviewsAndStats(page);
+    fetchStats();
+    fetchReviews(page);
   }, [page]);
 
   const chartData = {
@@ -66,10 +75,7 @@ const ReviewsManagement = () => {
       {
         label: "Sentiment Distribution",
         data: [stats.positive_reviews, stats.negative_reviews],
-        backgroundColor: [
-          "rgba(75, 192, 192, 0.5)", // Positive color
-          "rgba(255, 99, 132, 0.5)", // Negative color
-        ],
+        backgroundColor: ["rgba(75, 192, 192, 0.5)", "rgba(255, 99, 132, 0.5)"],
         borderColor: ["rgba(75, 192, 192, 1)", "rgba(255, 99, 132, 1)"],
         borderWidth: 1,
       },
@@ -103,6 +109,7 @@ const ReviewsManagement = () => {
 
   const handlePageChange = (event, value) => {
     setPage(value);
+    fetchReviews(value); // Fetch reviews for the new page
   };
 
   const handleDelete = async (id) => {
@@ -110,7 +117,7 @@ const ReviewsManagement = () => {
       await reviewAPI.deleteCommentByReviewId(id);
       setShowConfirmModal(false);
       setReviewToDelete(null);
-      await fetchReviewsAndStats(page);
+      fetchReviews(page); // Re-fetch reviews after deletion
     } catch (error) {
       console.error("Failed to delete review:", error);
     }
@@ -127,6 +134,36 @@ const ReviewsManagement = () => {
     }
   };
 
+  const handleAnalyzeSentiment = async () => {
+    try {
+      const updatedReviews = [...reviews];
+
+      for (let i = 0; i < updatedReviews.length; i++) {
+        const review = updatedReviews[i];
+        const response = await axios.post(
+          "http://localhost:5000/analyze-sentiment",
+          {
+            reviewId: review._id,
+            comment: review.comment,
+          }
+        );
+
+        const sentiment = response.data.sentiment;
+
+        await axios.post("http://localhost:3000/reviews/update-sentiment", {
+          reviewId: review._id,
+          sentiment,
+        });
+
+        updatedReviews[i].sentiment = sentiment;
+      }
+
+      setReviews(updatedReviews);
+    } catch (error) {
+      console.error("Error analyzing sentiment or updating database:", error);
+    }
+  };
+
   return (
     <div className="w-full md:w-[870px] px-4 mx-auto">
       <h2 className="text-2xl font-semibold my-4 text-black">
@@ -136,6 +173,61 @@ const ReviewsManagement = () => {
       <h2 className="text-md mb-4 text-gray-800">
         Tổng tất cả đánh giá: {stats.total_reviews}
       </h2>
+
+      {/* Raw Data Section */}
+      <h3 className="text-lg font-semibold my-4">Dữ liệu Gốc</h3>
+      <table className="table md:w-[870px] shadow-lg">
+        {loading ? (
+          <tr>
+            <td colSpan="12" className="text-center py-4">
+              <CircularProgress color="success" />
+            </td>
+          </tr>
+        ) : reviews.length === 0 ? (
+          <tr>
+            <td colSpan="12" className="text-center py-4">
+              Không có sản phẩm nào
+            </td>
+          </tr>
+        ) : (
+          <tbody>
+            <table className="table md:w-[870px]">
+              <thead className="bg-green text-white rounded-lg text-center">
+                <tr>
+                  <th>STT</th>
+                  <th>Tên người dùng</th>
+                  <th>Điểm sao</th>
+                  <th>Bình luận</th>
+                  <th>Thời gian</th>
+                </tr>
+              </thead>
+              <tbody>
+                {reviews.map((review, index) => (
+                  <tr
+                    key={review._id}
+                    className="border-gray-300 text-black text-center"
+                  >
+                    <td>{index + 1}</td>
+                    <td>{review.userName}</td>
+                    <td>{review.rating}</td>
+                    <td>{review.comment}</td>
+                    <td>{new Date(review.createdAt).toLocaleString()}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </tbody>
+        )}
+      </table>
+      <button
+        onClick={handleAnalyzeSentiment}
+        className="border rounded-lg  border-yellow-500 text-yellow-500 px-3 flex float-end m-2"
+      >
+        Phân tích
+      </button>
+
+      {/* Sentiment Analysis Section */}
+      <h3 className="text-lg font-semibold my-4">Sau khi phân tích đánh giá</h3>
       <div className="flex items-center my-2">
         <input
           type="text"
@@ -154,18 +246,7 @@ const ReviewsManagement = () => {
           <option value="negative">Tiêu Cực</option>
         </select>
       </div>
-
       <table className="table md:w-[870px] shadow-lg">
-        <thead className="bg-green text-white rounded-lg text-center">
-          <tr className="border-style">
-            <th>STT</th>
-            <th>Tên hiển thị</th>
-            <th>Điểm sao</th>
-            <th>Bình luận</th>
-            <th>Cảm Xúc</th>
-            <th>Thao tác</th>
-          </tr>
-        </thead>
         {loading ? (
           <tr>
             <td colSpan="12" className="text-center py-4">
@@ -208,13 +289,15 @@ const ReviewsManagement = () => {
                     </td>
                     <td>
                       {review.sentiment === "positive"
-                        ? "Tích Cực"
-                        : "Tiêu Cực"}
+                        ? "Tích cực"
+                        : review.sentiment === "negative"
+                        ? "Tiêu cực"
+                        : "Chưa phân tích"}
                     </td>
-                    <td className="py-2 px-4 flex space-x-2 justify-center">
+                    <td>
                       <button
-                        className="btn btn-xs bg-white hover:bg-slate-300 text-red border-style"
                         onClick={() => handleDeleteClick(review._id)}
+                        className="bg-red text-white p-2 rounded-md"
                       >
                         <FaTrash />
                       </button>
@@ -226,28 +309,25 @@ const ReviewsManagement = () => {
           </tbody>
         )}
       </table>
+
       <div className="w-[290px] max-w-3xl mx-auto mt-8">
         <Pie data={chartData} options={chartOptions} />
       </div>
 
-      <ConfirmDeleteModal
-        showModal={showConfirmModal}
-        onClose={() => setShowConfirmModal(false)}
-        onConfirm={confirmDeleteReview}
-        title="Xác nhận xóa đánh giá"
-        message="Bạn có chắc chắn muốn xóa đánh giá này?"
+      <Pagination
+        count={totalPages}
+        page={page}
+        onChange={handlePageChange}
+        variant="outlined"
+        shape="rounded"
       />
 
-      {/* Pagination */}
-      {reviews.length > 0 && (
-        <div className="flex justify-center mt-4">
-          <Pagination
-            count={totalPages}
-            page={page}
-            onChange={handlePageChange}
-            color="success"
-          />
-        </div>
+      {showConfirmModal && (
+        <ConfirmDeleteModal
+          show={showConfirmModal}
+          onClose={() => setShowConfirmModal(false)}
+          onConfirm={confirmDeleteReview}
+        />
       )}
     </div>
   );

@@ -1,13 +1,18 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useCallback, useContext, useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import {
+  useParams,
+  useNavigate,
+  Link,
+  useOutletContext,
+} from "react-router-dom";
 import styles from "../../CssModule/CardDetails.module.css";
 import menuAPI from "../../api/menuAPI";
 import reviewAPI from "../../api/reviewAPI";
 import ReviewForm from "../Reviews/ReviewForm";
 import cartAPI from "../../api/cartAPI";
 import { IoIosArrowUp, IoIosArrowDown } from "react-icons/io";
-import { FaStar, FaRegStar, FaStarHalf } from "react-icons/fa";
+import { FaStar, FaRegStar, FaStarHalf, FaRocketchat } from "react-icons/fa";
 import { useForm } from "react-hook-form";
 import inventoryAPI from "../../api/inventoryAPI";
 import useCart from "../../hooks/useCart";
@@ -21,6 +26,8 @@ import "react-toastify/dist/ReactToastify.css";
 import { Bounce, toast } from "react-toastify";
 import "react-confirm-alert/src/react-confirm-alert.css";
 import useUserCurrent from "../../hooks/useUserCurrent";
+import { CiShop } from "react-icons/ci";
+import conversationAPI from "../../api/conversationAPI";
 
 const CardDetails = () => {
   const { id } = useParams();
@@ -37,7 +44,9 @@ const CardDetails = () => {
   const [reviewToDelete, setReviewToDelete] = useState(null);
   const [priceOrginals, setPrices] = useState([]);
   const [cart, refetchCart] = useCart();
-
+  const context = useOutletContext();
+  const toggleContactAdmin = context ? context.toggleContactAdmin : () => {};
+  const [shopId, setShopId] = useState(null);
   const [editReviewId, setEditReviewId] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showActions, setShowActions] = useState(false);
@@ -75,10 +84,14 @@ const CardDetails = () => {
     const fetchProductDetail = async () => {
       try {
         const response = await menuAPI.getProductById(id);
+        setShopId(response.shopId._id);
         setProduct(response);
         const reviewsData = await reviewAPI.getProductById(id);
         setReviews(reviewsData);
-        const priceOriginalData = await inventoryAPI.getProductById(id);
+        const priceOriginalData = await inventoryAPI.getProductById(
+          id,
+          product.shopId._id
+        );
         setPrices(priceOriginalData);
       } catch (error) {
         if (!userData?._id) {
@@ -167,71 +180,71 @@ const CardDetails = () => {
   };
 
   const handleReviewSubmit = async (reviewData) => {
-    // try {
-    const userOrdersResponse = await orderAPI.getUserOrders(userData._id);
-    const userOrders = userOrdersResponse.orders;
-    console.log(userOrders);
+    try {
+      const userOrdersResponse = await orderAPI.getUserOrders(userData._id);
+      const userOrders = userOrdersResponse.orders;
+      console.log(userOrders);
 
-    //   if (!Array.isArray(userOrders)) {
-    //     throw new Error("Expected userOrders to be an array.");
-    //   }
+      if (!Array.isArray(userOrders)) {
+        throw new Error("Expected userOrders to be an array.");
+      }
 
-    //   let productFound = false;
+      let productFound = false;
 
-    //   userOrders.forEach((userOrder) => {
-    //     if (userOrder.statusId.name === "Completed") {
-    //       userOrder.products.forEach((productOrder) => {
-    //         if (
-    //           productOrder.productId._id.toString() ===
-    //           product.productId._id.toString()
-    //         ) {
-    //           productFound = true;
-    //         }
-    //       });
-    //     }
-    //   });
+      userOrders.forEach((userOrder) => {
+        if (userOrder.statusId.name === "Completed") {
+          userOrder.products.forEach((productOrder) => {
+            if (
+              productOrder.productId._id.toString() ===
+              product.productId._id.toString()
+            ) {
+              productFound = true;
+            }
+          });
+        }
+      });
 
-    //   if (!productFound) {
-    //     toast.error("Chỉ được đánh giá sản phẩm khi đã trải nghiệm.", {
-    //       position: "bottom-right",
-    //       autoClose: 5000,
-    //       hideProgressBar: false,
-    //       closeOnClick: true,
-    //       pauseOnHover: true,
-    //       draggable: true,
-    //       progress: undefined,
-    //       theme: "colored",
-    //       transition: Bounce,
-    //     });
-    //     return;
-    //   } else {
-    //     console.log("Product found in eligible order.");
-    //   }
-    // } catch (error) {
-    //   console.error("Error handling review submission:", error);
-    // }
+      if (!productFound) {
+        toast.error("Chỉ được đánh giá sản phẩm khi đã trải nghiệm.", {
+          position: "bottom-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "colored",
+          transition: Bounce,
+        });
+        return;
+      } else {
+        console.log("Product found in eligible order.");
+      }
+    } catch (error) {
+      console.error("Error handling review submission:", error);
+    }
 
-    // // Proceed with adding the review
-    // toast.success("Cảm ơn bạn đã gửi đánh giá!", {
-    //   position: "bottom-right",
-    //   autoClose: 5000,
-    //   hideProgressBar: false,
-    //   closeOnClick: true,
-    //   pauseOnHover: true,
-    //   draggable: true,
-    //   progress: undefined,
-    //   theme: "colored",
-    //   transition: Bounce,
-    // });
+    // Proceed with adding the review
+    toast.success("Cảm ơn bạn đã gửi đánh giá!", {
+      position: "bottom-right",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "colored",
+      transition: Bounce,
+    });
 
-    // await reviewAPI.addReview({
-    //   ...reviewData,
-    //   userId: userData._id,
-    // });
+    await reviewAPI.addReview({
+      ...reviewData,
+      userId: userData._id,
+    });
 
-    // const updatedReviews = await reviewAPI.getProductById(id);
-    // setReviews(updatedReviews);
-    // reset();
+    const updatedReviews = await reviewAPI.getProductById(id);
+    setReviews(updatedReviews);
+    reset();
   };
 
   const updateReviews = async () => {
@@ -354,6 +367,30 @@ const CardDetails = () => {
     }
 
     return priceNumber;
+  };
+  const handleContactSeller = async () => {
+    const senderId = userData._id;
+    const receiverId = shopId;
+
+    try {
+      const conversations = await conversationAPI.getConversationsByUserId(
+        senderId
+      );
+
+      const existingConversation = conversations.find(
+        (conv) =>
+          conv.members.includes(senderId) && conv.members.includes(receiverId)
+      );
+
+      if (existingConversation) {
+        toggleContactAdmin();
+      } else {
+        await conversationAPI.createConversation({ senderId, receiverId });
+        toggleContactAdmin();
+      }
+    } catch (error) {
+      console.error("Error checking or creating conversation:", error);
+    }
   };
   return (
     <div className="section-container ">
@@ -512,6 +549,34 @@ const CardDetails = () => {
               </tr>
             </tbody>
           </table>
+          <div className="flex items-center my-5">
+            <div className="avatar">
+              <div className="mask mask-squircle w-12 h-12 mr-1">
+                <img src={PF + "/" + product.shopId.shop_image} alt="product" />
+              </div>
+            </div>
+            <div className="mx-2">
+              <h1 className="text-lg font-semibold">
+                {product.shopId.shopName}
+              </h1>
+              <div className="flex">
+                <button
+                  onClick={handleContactSeller}
+                  className="flex items-center text-green p-2 rounded-md border-green border mr-2"
+                >
+                  <FaRocketchat />
+                  Chat ngay
+                </button>
+                <Link
+                  to={`/shop-detail/${product.shopId._id}`}
+                  className="flex items-center text-blue-400 p-2 rounded-md border-indigo-300 border"
+                >
+                  <CiShop />
+                  Xem shop
+                </Link>
+              </div>
+            </div>
+          </div>
           <h1 className="title font-bold mt-3">Chi tiết sản phẩm</h1>
           <div className={styles.customContentCardDetail}>
             <div

@@ -3,6 +3,8 @@ import { FaRegStar, FaStar, FaStarHalf } from "react-icons/fa";
 import { useLocation, useParams, useNavigate } from "react-router-dom";
 import reviewAPI from "../../api/reviewAPI";
 import { CircularProgress, Pagination } from "@mui/material";
+import ShopFavoriteButton from "../../components/ShopFavoriteButton";
+import useUserCurrent from "../../hooks/useUserCurrent";
 
 const SearchResult = () => {
   const { id } = useParams();
@@ -18,6 +20,8 @@ const SearchResult = () => {
   const [totalPages, setTotalPages] = useState(0);
   const [address, setAddress] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [favoriteUserIds, setFavoriteUserIds] = useState([]);
+  const userData = useUserCurrent();
 
   useEffect(() => {
     const fetchShopMenuDetails = async (page = 1) => {
@@ -39,6 +43,7 @@ const SearchResult = () => {
           setMenuDetails(data.menuDetails);
           setTotalPages(data.totalPages);
           setAddress(data.shop.addresses);
+          setFavoriteUserIds(data.favoriteUserIds || []);
         } else {
           console.error(data.message);
         }
@@ -177,15 +182,24 @@ const SearchResult = () => {
 
             {isShop ? (
               <>
+                <ShopFavoriteButton
+                  shopId={result._id}
+                  favoriteUserIds={favoriteUserIds}
+                  currentUserId={userData?._id}
+                />
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <p className="text-gray-700">
                     <span className="font-semibold">Trạng thái cửa hàng: </span>
-                    <span
-                      className={
-                        shop_isOpen ? "text-green-600" : "text-red-600"
-                      }
-                    >
+                    <span className={shop_isOpen ? "text-green" : "text-red"}>
                       {shop_isOpen ? "Đang mở cửa" : "Đã đóng cửa"}
+                    </span>
+                  </p>
+                  <p className="text-gray-700">
+                    <span className="font-semibold">
+                      Số lượng người yêu thích:{" "}
+                    </span>
+                    <span className="text-green-600">
+                      {favoriteUserIds.length}
                     </span>
                   </p>
                   <p className="text-gray-700 mt-2">
@@ -305,7 +319,7 @@ const SearchResult = () => {
             )}
           </div>
         </div>
-        {totalPages >= 1 && (
+        {totalPages > 1 && (
           <div className="flex justify-center mt-4">
             <Pagination
               count={totalPages}

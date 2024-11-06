@@ -10,7 +10,7 @@ import { BiNotepad } from "react-icons/bi";
 import { useActiveLink } from "../context/ActiveLinkProvider";
 import useUserCurrent from "../hooks/useUserCurrent";
 import userAPI from "../api/userAPI";
-
+import { useOutletContext } from "react-router-dom";
 const AccountManagement = () => {
   const [rank, setRank] = useState(null);
   const [showRankDetails, setShowRankDetails] = useState(false);
@@ -19,7 +19,7 @@ const AccountManagement = () => {
   const [userProfileOpen, setUserProfileOpen] = useState(false);
   const location = useLocation();
   const { setActiveLink } = useActiveLink();
-
+  const context = useOutletContext();
   const ranks = [
     { user_rank_name: "Bronze", user_rank_point: 0, color: "#cd7f32" },
     { user_rank_name: "Silver", user_rank_point: 100, color: "#c0c0c0" },
@@ -88,7 +88,7 @@ const AccountManagement = () => {
           </label>
         </div>
         <div className="mt-5 md:mt-2 mx-4 bg-slate-50">
-          <Outlet />
+          <Outlet context={context} />
         </div>
       </div>
       <div className="drawer-side shadow-md rounded-sm ">

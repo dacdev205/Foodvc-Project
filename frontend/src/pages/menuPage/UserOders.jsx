@@ -331,7 +331,7 @@ const UserOrders = () => {
                     </div>
                   ))}
                   <div className="text-right">
-                    <FormattedPrice price={order.totalAmount} />
+                    Tổng đơn hàng: <FormattedPrice price={order.totalAmount} />
                   </div>
                 </div>
               </div>

@@ -9,26 +9,23 @@ const ChatMessage = ({ message, userData }) => {
   useEffect(() => {
     scrollRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [message]);
+
   return (
     <div
       ref={scrollRef}
-      style={{
-        display: "flex",
-        justifyContent:
-          message.senderId === userData?._id ? "flex-end" : "flex-start",
-      }}
+      className={`flex ${
+        message.senderId === userData ? "justify-end" : "justify-start"
+      } mb-2 `}
     >
       <div
-        style={{
-          background:
-            message.senderId === userData?._id ? "#DCF8C6" : "#E5E7EB",
-          padding: "8px 12px",
-          borderRadius: "12px",
-          marginBottom: "8px",
-        }}
+        className={`max-w-xs p-2 rounded-lg   ${
+          message.senderId === userData
+            ? "bg-green text-white"
+            : "bg-gray-300 text-black"
+        }`}
       >
-        <p className="text-black">{message.content}</p>
-        <span className="text-sm">{format(message.createdAt)}</span>
+        <p className="text-sm">{message.content}</p>
+        <span className="text-xs">{format(message.createdAt)}</span>
       </div>
     </div>
   );

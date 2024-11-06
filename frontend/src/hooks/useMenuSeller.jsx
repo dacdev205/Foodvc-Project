@@ -1,7 +1,7 @@
 import useAxiosPublic from "./useAxiosPublic";
 import { useQuery } from "@tanstack/react-query";
 
-const useMenuAdmin = (
+const useMenuSeller = (
   searchTerm = "",
   filterType = "name",
   category = "all",
@@ -39,7 +39,7 @@ const useMenuAdmin = (
     ],
 
     queryFn: async () => {
-      const res = await axiosPublic.get("/api/foodvc/admin", {
+      const res = await axiosPublic.get("/api/foodvc/seller", {
         headers: {
           authorization: `Bearer ${token}`,
         },
@@ -63,4 +63,4 @@ const useMenuAdmin = (
   return [menus.menus, menus.totalPages, refetch, isLoading, error];
 };
 
-export default useMenuAdmin;
+export default useMenuSeller;

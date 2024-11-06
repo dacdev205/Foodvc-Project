@@ -140,6 +140,7 @@ const router = createBrowserRouter([
           </Suspense>
         ),
       },
+
       {
         path: "/menu",
         element: (
@@ -243,7 +244,14 @@ const router = createBrowserRouter([
               </Suspense>
             ),
           },
-
+          {
+            path: "orders/:orderId",
+            element: (
+              <Suspense fallback={<LoadingSpinner />}>
+                <UserOrderDetail />
+              </Suspense>
+            ),
+          },
           {
             path: "orders",
             element: (
@@ -260,14 +268,7 @@ const router = createBrowserRouter([
               </Suspense>
             ),
           },
-          {
-            path: "orders/:orderId",
-            element: (
-              <Suspense fallback={<LoadingSpinner />}>
-                <UserOrderDetail />
-              </Suspense>
-            ),
-          },
+
           {
             path: "addresses",
             element: (

@@ -2,7 +2,7 @@ import axios from "axios";
 const url = "http://localhost:3000/wish-list";
 const getToken = () => localStorage.getItem("access-token");
 
-export default class CartAPI {
+export default class wishListAPI {
   static async getAllWishList(email) {
     try {
       const token = getToken();
@@ -45,6 +45,23 @@ export default class CartAPI {
       throw error;
     }
   }
+  static async getUserToWishList(userId) {
+    try {
+      const token = getToken();
+      const res = await axios.get(
+        `http://localhost:3000/wish-store/user/${userId}`,
+        {
+          headers: {
+            authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      return res.data;
+    } catch (error) {
+      console.error("Error getting product from wish:", error);
+      throw error;
+    }
+  }
   static async getShopToWishList(productId) {
     try {
       const token = getToken();
@@ -71,6 +88,20 @@ export default class CartAPI {
           },
         }
       );
+      return res.data;
+    } catch (error) {
+      console.error("Error adding product to wish list:", error);
+      throw error;
+    }
+  }
+  static async addProductToWishList(wishItem) {
+    try {
+      const token = getToken();
+      const res = await axios.post(url, wishItem, {
+        headers: {
+          authorization: `Bearer ${token}`,
+        },
+      });
       return res.data;
     } catch (error) {
       console.error("Error adding product to wish list:", error);
@@ -107,17 +138,21 @@ export default class CartAPI {
       throw error;
     }
   }
-  static async deleteStore(id) {
+  static async deleteStore({ userId, shopId }) {
     try {
       const token = getToken();
-      const res = await axios.delete(`http://localhost:3000/wish-store/${id}`, {
-        headers: {
-          authorization: `Bearer ${token}`,
-        },
-      });
+      const res = await axios.delete(
+        `http://localhost:3000/wish-store/${shopId}`,
+        {
+          headers: {
+            authorization: `Bearer ${token}`,
+          },
+          data: { userId },
+        }
+      );
       return res.data;
     } catch (error) {
-      console.error("Error deleting product:", error);
+      console.error("Error deleting shop from wishlist:", error);
       throw error;
     }
   }

@@ -1,21 +1,46 @@
 import React, { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import {
+  useParams,
+  useNavigate,
+  useOutletContext,
+  Link,
+} from "react-router-dom";
 import orderAPI from "../../api/orderAPI";
+import conversationAPI from "../../api/conversationAPI";
 import { CircularProgress } from "@mui/material";
-import { FaInfoCircle, FaUser, FaShippingFast } from "react-icons/fa";
+import {
+  FaInfoCircle,
+  FaUser,
+  FaShippingFast,
+  FaSpinner,
+} from "react-icons/fa";
+import useUserCurrent from "../../hooks/useUserCurrent";
+import shopAPI from "../../api/shopAPI";
+import { CiShop } from "react-icons/ci";
 
 const UserOrderDetail = () => {
   const { orderId } = useParams();
   const [orderDetail, setOrderDetail] = useState(null);
   const PF = "http://localhost:3000";
   const navigate = useNavigate();
+  const context = useOutletContext();
+  const [shopId, setShopId] = useState(null);
+  const toggleContactAdmin = context ? context.toggleContactAdmin : () => {};
+  const userData = useUserCurrent();
+  const [shopDetail, setShopDetail] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchOrderDetail = async () => {
       try {
         const data = await orderAPI.getOrderById(orderId);
-        console.log(data);
+        setShopId(data.products[0].shopId);
         setOrderDetail(data);
+        if (data.products[0].shopId) {
+          const shopData = await shopAPI.getShop(data.products[0].shopId);
+
+          setShopDetail(shopData.shop);
+        }
       } catch (error) {
         console.error("Error fetching order:", error);
       }
@@ -30,6 +55,31 @@ const UserOrderDetail = () => {
     navigate(`/product/${productId}`);
   };
 
+  const handleContactSeller = async () => {
+    const senderId = userData._id;
+    const receiverId = shopId;
+
+    try {
+      const conversations = await conversationAPI.getConversationsByUserId(
+        senderId
+      );
+
+      const existingConversation = conversations.find(
+        (conv) =>
+          conv.members.includes(senderId) && conv.members.includes(receiverId)
+      );
+
+      if (existingConversation) {
+        toggleContactAdmin();
+      } else {
+        await conversationAPI.createConversation({ senderId, receiverId });
+        toggleContactAdmin();
+      }
+    } catch (error) {
+      console.error("Error checking or creating conversation:", error);
+    }
+  };
+
   return (
     <div className="bg-gray-100 min-h-screen p-6 flex">
       {orderDetail ? (
@@ -38,6 +88,7 @@ const UserOrderDetail = () => {
             Chi tiết đơn hàng
           </h1>
 
+          {/* Order Information Section */}
           <div className="mb-6 border-b pb-4">
             <h2 className="text-lg font-semibold mb-2 flex items-center">
               <FaInfoCircle className="mr-2 text-gray-600" /> Thông tin đơn hàng
@@ -57,7 +108,7 @@ const UserOrderDetail = () => {
                 {orderDetail.totalAmount.toLocaleString()} VND
               </p>
               <p>
-                <strong>Trạng thái thanh toán:</strong>{" "}
+                <strong>Trạng thái thanh toán:</strong>
                 <span
                   className={`font-medium ${
                     orderDetail.paymentStatus
@@ -73,6 +124,7 @@ const UserOrderDetail = () => {
             </div>
           </div>
 
+          {/* User Information Section */}
           <div className="mb-6 border-b pb-4">
             <h2 className="text-lg font-semibold mb-2 flex items-center">
               <FaUser className="mr-2 text-gray-600" /> Thông tin người dùng
@@ -87,6 +139,7 @@ const UserOrderDetail = () => {
             </div>
           </div>
 
+          {/* Shipping Address Section */}
           <div className="mb-6 border-b pb-4">
             <h2 className="text-lg font-semibold mb-2 flex items-center">
               <FaShippingFast className="mr-2 text-gray-600" /> Địa chỉ giao
@@ -102,7 +155,37 @@ const UserOrderDetail = () => {
               </p>
             </div>
           </div>
-
+          <div className="mb-6 border-b pb-4">
+            <h2 className="text-lg font-semibold mb-2 flex items-center">
+              Shop đã mua
+            </h2>
+            <div className="flex items-center mb-2">
+              <div className="avatar">
+                <div className="mask mask-squircle w-12 h-12 mr-1">
+                  {loading && <CircularProgress size={24} color="success" />}
+                  <img
+                    src={PF + "/" + shopDetail?.shop_image}
+                    alt="product"
+                    className={loading ? "hidden" : "block"}
+                    onLoad={() => setLoading(false)}
+                  />
+                </div>
+              </div>
+              <div>
+                <h1 className="text-lg font-semibold">
+                  {shopDetail?.shopName}
+                </h1>
+                <Link
+                  to={`/shop-detail/${shopDetail?._id}`}
+                  className="flex items-center text-blue-400 p-2 rounded-md border-indigo-300 border"
+                >
+                  <CiShop />
+                  Xem shop
+                </Link>
+              </div>
+            </div>
+          </div>
+          {/* Products List Section */}
           <div>
             <h2 className="text-lg font-semibold mb-2">
               Sản phẩm trong đơn hàng
@@ -139,6 +222,15 @@ const UserOrderDetail = () => {
                 </li>
               ))}
             </ul>
+          </div>
+
+          <div className="mt-6 text-center">
+            <button
+              onClick={handleContactSeller}
+              className="bg-green text-white py-2 px-4 rounded shadow hover:opacity-90 transition-colors"
+            >
+              Liên hệ người bán
+            </button>
           </div>
         </div>
       ) : (

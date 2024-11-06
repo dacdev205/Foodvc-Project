@@ -4,7 +4,7 @@ import inventoryAPI from "../../../api/inventoryAPI";
 import FormattedPrice from "../../../ultis/FormatedPriece";
 import { FaCheck } from "react-icons/fa6";
 import { Bounce, toast } from "react-toastify";
-import useMenuAdmin from "../../../hooks/useMenuAdmin";
+import useMenuAdmin from "../../../hooks/useMenuSeller";
 import useUserCurrent from "../../../hooks/useUserCurrent";
 const AddVoucher = () => {
   const userData = useUserCurrent();

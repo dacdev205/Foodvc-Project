@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { FaHeart, FaRegStar, FaStar, FaStarHalf } from "react-icons/fa";
+import { FaRegStar, FaStar, FaStarHalf } from "react-icons/fa";
 import { useNavigate, useParams } from "react-router-dom";
 import reviewAPI from "../../api/reviewAPI";
 import { CircularProgress, Pagination } from "@mui/material";
-import wishListAPI from "../../api/wishListAPI";
 import useUserCurrent from "../../hooks/useUserCurrent";
-import { Bounce, toast } from "react-toastify";
+import ShopFavoriteButton from "../../components/ShopFavoriteButton";
 const ShopDetail = () => {
   const { id } = useParams();
   const PF = "http://localhost:3000";
@@ -16,6 +15,7 @@ const ShopDetail = () => {
   const [totalPages, setTotalPages] = useState(0);
   const [address, setAddress] = useState([]);
   const [shopInfo, setShopInfo] = useState({});
+  const [favoriteUserIds, setFavoriteUserIds] = useState([]);
   const userData = useUserCurrent();
   const navigate = useNavigate();
 
@@ -39,6 +39,7 @@ const ShopDetail = () => {
           setMenuDetails(data.menuDetails);
           setTotalPages(data.totalPages);
           setAddress(data.shop.addresses);
+          setFavoriteUserIds(data.favoriteUserIds || []);
         } else {
           console.error(data.message);
         }
@@ -50,7 +51,7 @@ const ShopDetail = () => {
     };
 
     fetchShopDetails(page);
-  }, [id, page]);
+  }, [id, page, userData?._id]);
 
   const calculateAverageRating = (reviews) => {
     if (!reviews || reviews.length === 0) {
@@ -119,52 +120,6 @@ const ShopDetail = () => {
   const handleProductClick = (productId) => {
     navigate(`/product/${productId}`);
   };
-  const favoriteShop = async () => {
-    try {
-      const response = await fetch("http://localhost:3000/wish-store", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("access-token")}`,
-        },
-        body: JSON.stringify({
-          userId: userData._id,
-          shop: shopInfo._id,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (response.status === 201) {
-        toast.success("Thêm cửa hàng yêu thích thành công.", {
-          position: "bottom-right",
-          autoClose: 2000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "colored",
-          transition: Bounce,
-        });
-      } else {
-        console.error(data.message);
-        toast.error("Thêm cửa hàng yêu thích thất bại", {
-          position: "bottom-right",
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "colored",
-          transition: Bounce,
-        });
-      }
-    } catch (error) {
-      console.error("Error favoriting shop:", error);
-    }
-  };
 
   return (
     <div className="min-h-screen flex justify-center items-center bg-gray-100 py-8">
@@ -187,22 +142,26 @@ const ShopDetail = () => {
             <h2 className="text-2xl font-bold text-gray-800 mb-4">
               {shopInfo.shopName}
             </h2>
-            <button
-              onClick={favoriteShop}
-              className="flex items-center px-4 py-2 bg-red text-white rounded-md shadow-md transition duration-200 mb-4"
-            >
-              <FaHeart className="mr-2" /> Yêu thích cửa hàng
-            </button>
+            <ShopFavoriteButton
+              shopId={shopInfo._id}
+              favoriteUserIds={favoriteUserIds}
+              currentUserId={userData?._id}
+            />
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <p className="text-gray-700">
                 <span className="font-semibold">Trạng thái cửa hàng: </span>
                 <span
-                  className={
-                    shopInfo.shop_isOpen ? "text-green-600" : "text-red-600"
-                  }
+                  className={shopInfo.shop_isOpen ? "text-green" : "text-red"}
                 >
                   {shopInfo.shop_isOpen ? "Đang mở cửa" : "Đã đóng cửa"}
                 </span>
+              </p>
+              <p className="text-gray-700">
+                <span className="font-semibold">
+                  Số lượng người yêu thích:{" "}
+                </span>
+                <span className="text-green-600">{favoriteUserIds.length}</span>
               </p>
               <p className="text-gray-700 mt-2">
                 <span className="font-semibold">Ngày tham gia: </span>

@@ -50,7 +50,8 @@ const CartPage = () => {
             cart.products.map(async (item) => {
               if (item.productId && item.productId._id) {
                 const priceOriginalData = await inventoryAPI.getProductById(
-                  item.productId._id
+                  item.productId._id,
+                  item.productId.shopId._id
                 );
                 if (priceOriginalData && priceOriginalData.applyVoucher) {
                   updatedOriginalPrices[item.productId._id] =
@@ -259,6 +260,7 @@ const CartPage = () => {
     if (!acc[shopId]) {
       acc[shopId] = {
         shopName: item.productId.shopId.shopName,
+        shopImg: item.productId.shopId.shop_image,
         products: [],
       };
     }
@@ -306,9 +308,14 @@ const CartPage = () => {
         <div>
           <div>
             {Object.entries(productsByShop).map(
-              ([shopId, { shopName, products }]) => (
+              ([shopId, { shopName, shopImg, products }]) => (
                 <div key={shopId} className="mb-5">
                   <div className="flex items-center mb-3">
+                    <div className="avatar">
+                      <div className="mask mask-squircle w-10 h-10 mr-1">
+                        <img src={PF + "/" + shopImg} alt="product" />
+                      </div>
+                    </div>
                     <h2 className="text-xl font-semibold">{shopName}</h2>
                     <Link
                       to={`/shop-detail/${shopId}`}

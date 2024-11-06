@@ -6,14 +6,20 @@ import useWishStore from "../../hooks/useWishStore";
 import styles from "../../CssModule/CartnWishPage.module.css";
 import wishListAPI from "../../api/wishListAPI";
 import { Bounce, toast } from "react-toastify";
+import useUserCurrent from "../../hooks/useUserCurrent";
 
 const WishStorePage = () => {
   const [wishStores, refetchWishStore, isLoading] = useWishStore();
   const PF = "http://localhost:3000";
+  const userData = useUserCurrent();
 
   const handleDelete = async (item) => {
     try {
-      await wishListAPI.deleteStore(item?._id);
+      const res = await wishListAPI.deleteStore({
+        userId: userData._id,
+        shopId: item.shop._id,
+      });
+
       toast.info("Xóa cửa hàng yêu thích thành công.", {
         position: "bottom-right",
         autoClose: 2000,

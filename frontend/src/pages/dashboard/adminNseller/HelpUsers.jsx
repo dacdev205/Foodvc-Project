@@ -5,6 +5,8 @@ import axios from "axios";
 import Conversation from "../../../components/Chat/Conversations";
 import { io } from "socket.io-client";
 import ChatMessage from "../../../components/Chat/ChatMessage";
+import { CircularProgress } from "@mui/material";
+import userAPI from "../../../api/userAPI";
 
 const HelpUsers = () => {
   const [newMessage, setNewMessage] = useState("");
@@ -14,17 +16,23 @@ const HelpUsers = () => {
   const [messages, setMessages] = useState([]);
   const [onlineUsers, setOnlineUsers] = useState([]);
   const [arrivalMessage, setArrivalMessage] = useState(null);
+  const [loadingMessages, setLoadingMessages] = useState(false);
+  const [loadingConversations, setLoadingConversations] = useState(true);
+  const [partnerName, setPartnerName] = useState("");
+
   useEffect(() => {
     const getConversations = async () => {
       try {
         if (userData) {
           const res = await axios.get(
-            "http://localhost:3000/api/conversations/" + userData._id
+            "http://localhost:3000/api/conversations/" + userData?.shops[0]
           );
           setConversations(res.data);
         }
       } catch (err) {
         console.log(err);
+      } finally {
+        setLoadingConversations(false);
       }
     };
     getConversations();
@@ -32,6 +40,7 @@ const HelpUsers = () => {
 
   useEffect(() => {
     const getMessages = async () => {
+      setLoadingMessages(true);
       try {
         if (currentChat) {
           const res = await axios.get(
@@ -41,6 +50,8 @@ const HelpUsers = () => {
         }
       } catch (err) {
         console.log(err);
+      } finally {
+        setLoadingMessages(false);
       }
     };
     getMessages();
@@ -52,7 +63,7 @@ const HelpUsers = () => {
     socket.on("connect", () => {
       console.log("Connected to server");
       if (userData) {
-        socket.emit("addUser", userData._id);
+        socket.emit("addUser", userData?.shops[0]);
         socket.on("getUsers", (users) => {
           setOnlineUsers(users);
         });
@@ -67,28 +78,46 @@ const HelpUsers = () => {
       });
     });
     socket.on("disconnect", () => {
-      console.log("Disconnected from server");
       setOnlineUsers((prevUsers) =>
-        prevUsers.filter((user) => user.userId !== userData._id)
+        prevUsers.filter((user) => user.userId !== userData?.shops[0])
       );
     });
     return () => {
+      socket.emit("removeUser", userData?.shops[0]);
       socket.disconnect();
     };
   }, [userData]);
+
   useEffect(() => {
     arrivalMessage &&
       currentChat?.members.includes(arrivalMessage.senderId) &&
       setMessages((prev) => [...prev, arrivalMessage]);
   }, [arrivalMessage, currentChat]);
 
+  useEffect(() => {
+    const fetchPartnerName = async () => {
+      if (currentChat) {
+        const partnerId = currentChat.members.find(
+          (member) => member !== userData?.shops[0]
+        );
+        try {
+          const resUser = await userAPI.getSingleUserById(partnerId);
+          setPartnerName(resUser?.name || "Unknown User");
+        } catch (error) {
+          console.log(error);
+        }
+      }
+    };
+    fetchPartnerName();
+  }, [currentChat, userData]);
+
   const handleSendMessage = async (e) => {
     e.preventDefault();
     if (!newMessage.trim()) return;
     const message = {
-      senderId: userData._id,
+      senderId: userData?.shops[0],
       content: newMessage,
-      conversationId: currentChat._id,
+      conversationsId: currentChat._id,
     };
     const receiverId = currentChat.members.find(
       (member) => member !== userData._id
@@ -96,7 +125,7 @@ const HelpUsers = () => {
 
     const socket = io("http://localhost:8800");
     socket.emit("sendMessage", {
-      senderId: userData._id,
+      senderId: userData.shops[0],
       receiverId: receiverId,
       content: newMessage,
     });
@@ -107,7 +136,11 @@ const HelpUsers = () => {
       );
       setMessages([
         ...messages,
-        { senderId: userData._id, content: newMessage, createdAt: new Date() },
+        {
+          senderId: userData.shops[0],
+          content: newMessage,
+          createdAt: new Date(),
+        },
       ]);
       setNewMessage("");
     } catch (error) {
@@ -116,57 +149,84 @@ const HelpUsers = () => {
   };
 
   return (
-    <div className="flex h-screen bg-gray-200 ">
-      <div className=" bg-gray-300 p-6 overflow-y-auto">
-        {/* Hiển thị danh sách cuộc trò chuyện */}
-        {conversations.map((c) => (
-          <div onClick={() => setCurrentChat(c)} key={c._id}>
-            <Conversation conversation={c} currentUser={userData} />
-          </div>
-        ))}
-      </div>
-      <div className="bg-white p-6 flex flex-col md:w-[900px]">
-        {/* Hiển thị cuộc trò chuyện hiện tại */}
-        <div className="flex-1 overflow-y-auto ">
-          {currentChat ? (
-            <>
-              {messages.map((message, i) => (
-                <ChatMessage key={i} message={message} userData={userData} />
-              ))}
-            </>
+    <div className="w-full md:w-[980px] px-4 mx-auto">
+      <div className="flex h-[720px]">
+        <div className="bg-gray-200 p-4 rounded-lg overflow-y-auto w-auto">
+          {loadingConversations ? (
+            <div className="flex justify-center items-center">
+              <CircularProgress color="success" />
+            </div>
+          ) : conversations.length === 0 ? (
+            <p className="text-gray-500">Chưa có cuộc trò chuyện nào.</p>
           ) : (
-            <span>Open a conversation to start a chat.</span>
+            conversations.map((c) => {
+              const membersWithStatus = c.members.map((member) => ({
+                memberId: member,
+                isOnline: onlineUsers.some((user) => user.userId === member),
+              }));
+              return (
+                <div onClick={() => setCurrentChat(c)} key={c._id}>
+                  <Conversation
+                    conversation={c}
+                    currentUser={userData}
+                    membersWithStatus={membersWithStatus}
+                  />
+                </div>
+              );
+            })
           )}
         </div>
+        <div className="bg-white flex flex-col border-gray-300 w-2/3">
+          <nav className="p-4 bg-gray-100 border-b">
+            <h2 className="text-md">
+              {currentChat ? (
+                <>
+                  Đang trò chuyện với: <strong>{partnerName}</strong>
+                </>
+              ) : (
+                "Mở cuộc trò chuyện để bắt đầu chat."
+              )}
+            </h2>
+          </nav>
+          <div className="flex-1 overflow-y-auto w-full p-3 mt-3 scrollbar-thin scrollbar-webkit">
+            {loadingMessages ? (
+              <div className="flex justify-center items-center">
+                <CircularProgress color="success" />
+              </div>
+            ) : currentChat ? (
+              messages.length > 0 ? (
+                messages.map((message, i) => (
+                  <ChatMessage
+                    key={i}
+                    message={message}
+                    userData={userData?.shops[0]}
+                  />
+                ))
+              ) : (
+                <p className="text-gray-500 text-center mx-auto">
+                  Chưa có tin nhắn nào.
+                </p>
+              )
+            ) : (
+              ""
+            )}
+          </div>
+          <div className="flex mt-4">
+            <InputEmoji
+              value={newMessage}
+              onChange={setNewMessage}
+              placeholder="Nhập nội dung tin nhắn..."
+              cleanOnEnter
+              className="input flex-1 border border-gray-300 rounded-lg p-2 resize-none"
+            />
 
-        <div className="flex mt-4">
-          {/* Input để gửi tin nhắn */}
-          <InputEmoji
-            value={newMessage}
-            onChange={setNewMessage}
-            placeholder="Nhập nội dung tin nhắn..."
-            cleanOnEnter
-            className="input"
-          />
-          <button
-            onClick={handleSendMessage}
-            className="bg-green hover:bg-green hover:opacity-80 text-white font-bold py-2 px-4 rounded-lg"
-          >
-            Send
-          </button>
-        </div>
-        <div>
-          <h2>Người dùng đang kết nối:</h2>
-          <ul>
-            {onlineUsers.map((user) => (
-              <li
-                key={user.userId}
-                className={`${user.online ? "text-green-500" : "text-red-500"}`}
-              >
-                {user.userId} - {user.online ? "Online" : "Offline"}
-              </li>
-            ))}
-          </ul>
+            <button
+              onClick={handleSendMessage}
+              className="bg-green hover:bg-green text-white font-bold py-2 px-4 rounded-lg ml-2"
+            >
+              Gửi
+            </button>
+          </div>
         </div>
       </div>
     </div>

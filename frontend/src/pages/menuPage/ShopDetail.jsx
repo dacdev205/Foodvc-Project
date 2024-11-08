@@ -18,6 +18,7 @@ const ShopDetail = () => {
   const [favoriteUserIds, setFavoriteUserIds] = useState([]);
   const userData = useUserCurrent();
   const navigate = useNavigate();
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     const fetchShopDetails = async (page = 1) => {
@@ -75,6 +76,9 @@ const ShopDetail = () => {
       );
     }
 
+    const filteredMenuDetails = menuDetails.filter((item) =>
+      item.product.name.toLowerCase().includes(searchTerm)
+    );
     if (hasHalfStar) {
       stars.push(
         <span key="half" style={{ fontSize: "18px", color: "#ffc107" }}>
@@ -120,7 +124,12 @@ const ShopDetail = () => {
   const handleProductClick = (productId) => {
     navigate(`/product/${productId}`);
   };
-
+  const handleSearch = (e) => {
+    setSearchTerm(e.target.value.toLowerCase());
+  };
+  const filteredMenuDetails = menuDetails.filter((item) =>
+    item.product.name.toLowerCase().includes(searchTerm)
+  );
   return (
     <div className="min-h-screen flex justify-center items-center bg-gray-100 py-8">
       <div className="bg-white shadow-lg rounded-lg p-8 w-full lg:w-2/3">
@@ -218,8 +227,17 @@ const ShopDetail = () => {
               <h3 className="text-lg font-semibold text-gray-800 mb-2">
                 Thực đơn của cửa hàng:
               </h3>
+              <div className="mb-6">
+                <input
+                  type="text"
+                  className="w-[260px] border border-gray-300 rounded-lg py-2 px-4"
+                  placeholder="Tìm kiếm..."
+                  value={searchTerm}
+                  onChange={handleSearch}
+                />
+              </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                {menuDetails.map((item, index) => (
+                {filteredMenuDetails.map((item, index) => (
                   <div
                     key={index}
                     className="bg-white shadow-md rounded-lg overflow-hidden transition-transform duration-200 ease-in-out hover:scale-105 hover:bg-slate-100 cursor-pointer"

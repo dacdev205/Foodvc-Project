@@ -54,4 +54,13 @@ export default class reviewAPI {
     );
     return res.data;
   }
+  static async deleteReviewByReviewId(id) {
+    const token = getToken();
+    const res = await axios.delete(`${url}/${id}`, {
+      headers: {
+        authorization: `Bearer ${token}`,
+      },
+    });
+    return res.data;
+  }
 }

@@ -19,11 +19,11 @@ const CartPage = () => {
   const [cart, refetchCart, isLoading] = useCart();
   const userData = useUserCurrent();
   const PF = "http://localhost:3000";
-  const [originalPrices, setOriginalPrices] = useState({});
   const [selectedItems, setSelectedItems] = useState([]);
   const [selectAll, setSelectAll] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [selectedShopId, setSelectedShopId] = useState(null);
+  const [removedProducts, setRemovedProducts] = useState({});
   const toggleSelectAll = (shopId) => {
     if (selectedShopId && selectedShopId !== shopId) {
       setSelectedItems([]);
@@ -42,32 +42,31 @@ const CartPage = () => {
     setSelectAll(!selectAll);
   };
   useEffect(() => {
-    const fetchProductList = async () => {
-      try {
-        if (cart && Array.isArray(cart.products)) {
-          const updatedOriginalPrices = {};
-          await Promise.all(
-            cart.products.map(async (item) => {
-              if (item.productId && item.productId._id) {
-                const priceOriginalData = await inventoryAPI.getProductById(
-                  item.productId._id,
-                  item.productId.shopId._id
+    const checkProductAvailability = async () => {
+      if (cart && Array.isArray(cart.products)) {
+        const unavailableProducts = {};
+        await Promise.all(
+          cart.products.map(async (item) => {
+            if (item.productId && item.productId._id) {
+              try {
+                const productExists = await menuAPI.getProductById(
+                  item.productId._id
                 );
-                if (priceOriginalData && priceOriginalData.applyVoucher) {
-                  updatedOriginalPrices[item.productId._id] =
-                    priceOriginalData.price;
+
+                if (!productExists) {
+                  unavailableProducts[item.productId._id] = true;
                 }
+              } catch (error) {
+                console.error("Lỗi khi kiểm tra trạng thái sản phẩm:", error);
               }
-            })
-          );
-          setOriginalPrices(updatedOriginalPrices);
-        }
-      } catch (error) {
-        console.error("Error fetching product detail:", error);
+            }
+          })
+        );
+        setRemovedProducts(unavailableProducts);
       }
     };
 
-    fetchProductList();
+    checkProductAvailability();
   }, [cart]);
 
   const formattedPrice = (price) => {
@@ -308,161 +307,211 @@ const CartPage = () => {
         <div>
           <div>
             {Object.entries(productsByShop).map(
-              ([shopId, { shopName, shopImg, products }]) => (
-                <div key={shopId} className="mb-5">
-                  <div className="flex items-center mb-3">
-                    <div className="avatar">
-                      <div className="mask mask-squircle w-10 h-10 mr-1">
-                        <img src={PF + "/" + shopImg} alt="product" />
+              ([shopId, { shopName, shopImg, products }]) => {
+                // Kiểm tra xem có sản phẩm nào bị xóa trong cửa hàng này không
+                const isShopDisabled = products.some(
+                  (item) => removedProducts[item.productId._id]
+                );
+
+                return (
+                  <div key={shopId} className="mb-5">
+                    <div className="flex items-center mb-3">
+                      <div className="avatar">
+                        <div className="mask mask-squircle w-10 h-10 mr-1">
+                          <img src={`${PF}/${shopImg}`} alt="shop" />
+                        </div>
                       </div>
+                      <h2 className="text-xl font-semibold">{shopName}</h2>
+                      <Link
+                        to={`/shop-detail/${shopId}`}
+                        className="flex items-center ml-2 text-blue-400"
+                      >
+                        <CiShop />
+                        Xem shop
+                      </Link>
                     </div>
-                    <h2 className="text-xl font-semibold">{shopName}</h2>
-                    <Link
-                      to={`/shop-detail/${shopId}`}
-                      className="flex items-center ml-2 text-blue-400"
-                    >
-                      <CiShop />
-                      Xem shop
-                    </Link>
-                  </div>
 
-                  <table className="hidden md:table border">
-                    <thead className="bg-green text-white rounded-sm">
-                      <tr className="text-white border-style">
-                        <th>
-                          <label
-                            className="relative cursor-pointer"
-                            htmlFor={`checkbox-all-${shopId}`}
-                          >
-                            <input
-                              type="checkbox"
-                              checked={selectedItems.every((item) =>
-                                cart.products.some(
-                                  (product) =>
-                                    product.productId._id === item &&
-                                    product.productId.shopId._id === shopId
-                                )
-                              )}
-                              id={`checkbox-all-${shopId}`}
-                              onChange={() => toggleSelectAll(shopId)}
-                              className="appearance-none w-4 h-4 rounded-sm bg-white border-2 border-[#39d84A] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
-                            />
-                            {selectedItems.length > 0 &&
-                              selectedItems.every((item) =>
-                                cart.products.some(
-                                  (product) =>
-                                    product.productId._id === item &&
-                                    product.productId.shopId._id === shopId
-                                )
-                              ) && (
-                                <FaCheck className="absolute top-[-1px] left-[1px] text-green" />
-                              )}
-                            <span>Sản phẩm</span>
-                          </label>
-                        </th>
-
-                        <th>Hình ảnh</th>
-                        <th>Tên sản phẩm</th>
-                        <th className="text-center">Số lượng</th>
-                        <th>Giá</th>
-                        <th>Thao tác</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {products.map((item) => (
-                        <tr
-                          key={item.productId._id}
-                          className={styles.styleBordered}
-                        >
-                          <td>
+                    <table className="hidden md:table border">
+                      <thead className="bg-green text-white rounded-sm">
+                        <tr className="text-white border-style">
+                          <th>
                             <label
-                              htmlFor={`check-box-${item.productId._id}`}
-                              className="cursor-pointer relative"
+                              className="relative cursor-pointer"
+                              htmlFor={`checkbox-all-${shopId}`}
                             >
                               <input
                                 type="checkbox"
-                                id={`check-box-${item.productId._id}`}
-                                checked={selectedItems.includes(
-                                  item.productId._id
+                                checked={selectedItems.every((item) =>
+                                  cart.products.some(
+                                    (product) =>
+                                      product.productId._id === item &&
+                                      product.productId.shopId._id === shopId
+                                  )
                                 )}
-                                onChange={() =>
-                                  toggleItemSelection(
-                                    item.productId._id,
-                                    item.productId.shopId._id
+                                id={`checkbox-all-${shopId}`}
+                                onChange={() => toggleSelectAll(shopId)}
+                                disabled={isShopDisabled}
+                                className={`appearance-none w-4 h-4 rounded-sm bg-white border-2 ${
+                                  isShopDisabled
+                                    ? "border-gray-300 bg-gray-100 cursor-not-allowed"
+                                    : "border-[#39d84A] focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                                }`}
+                              />
+                              {selectedItems.length > 0 &&
+                                selectedItems.every((item) =>
+                                  cart.products.some(
+                                    (product) =>
+                                      product.productId._id === item &&
+                                      product.productId.shopId._id === shopId
                                   )
-                                }
-                                className="appearance-none w-4 h-4 rounded-sm bg-white border-2 border-[#39d84A] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
-                              />
-
-                              <FaCheck
-                                className={`absolute top-0 left-[1px] text-green ${
-                                  selectedItems.includes(item?.productId?._id)
-                                    ? "text-opacity-100"
-                                    : "text-opacity-0"
-                                } check-${item?.productId?._id} transition`}
-                              />
-                            </label>
-                          </td>
-                          <td>
-                            <div className="flex items-center gap-3">
-                              <div className="avatar hover:">
-                                <Link
-                                  to={`/product/${item.productId._id}`}
-                                  className="mask mask-squircle w-12 h-12"
-                                >
-                                  <img
-                                    src={PF + "/" + item.productId.image}
-                                    alt="product"
+                                ) && (
+                                  <FaCheck
+                                    className={`absolute top-[-1px] left-[1px] text-green ${
+                                      isShopDisabled
+                                        ? "opacity-50"
+                                        : "opacity-100"
+                                    } transition`}
                                   />
-                                </Link>
-                              </div>
-                            </div>
-                          </td>
-                          <td>
-                            <div>{item.productId.name.slice(0, 30)}...</div>
-                          </td>
-                          <td className="text-center">
-                            <div>
-                              <button
-                                className="btn btn-xs bg-slate-200 hover:bg-slate-300 text-black border-none"
-                                onClick={() => handleDecrease(item)}
-                              >
-                                -
-                              </button>
-                              <input
-                                type="number"
-                                value={item.quantity}
-                                onChange={(e) =>
-                                  handleQuantityChange(
-                                    item,
-                                    parseInt(e.target.value)
-                                  )
-                                }
-                                className="w-10 mx-2 text-center overflow-hidden appearance-none"
-                              />
-                              <button
-                                onClick={() => handleIncrease(item)}
-                                className="btn btn-xs bg-slate-200 hover:bg-slate-300 text-black border-none"
-                              >
-                                +
-                              </button>
-                            </div>
-                          </td>
-                          <td>
-                            <FormattedPrice price={calculatePrice(item)} />
-                          </td>
-                          <td>
-                            <FaTrash
-                              className="cursor-pointer text-red"
-                              onClick={() => handleDelete(item)}
-                            />
-                          </td>
+                                )}
+                            </label>
+                          </th>
+
+                          {/* Các tiêu đề khác */}
+                          <th>Hình ảnh</th>
+                          <th>Tên sản phẩm</th>
+                          <th className="text-center">Số lượng</th>
+                          <th>Giá</th>
+                          <th>Thao tác</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )
+                      </thead>
+                      <tbody>
+                        {products.map((item) => (
+                          <tr
+                            key={item.productId._id}
+                            className={styles.styleBordered}
+                          >
+                            <td>
+                              <label
+                                htmlFor={`check-box-${item.productId._id}`}
+                                className="cursor-pointer relative "
+                              >
+                                <input
+                                  type="checkbox"
+                                  id={`check-box-${item.productId._id}`}
+                                  checked={selectedItems.includes(
+                                    item.productId._id
+                                  )}
+                                  onChange={() =>
+                                    toggleItemSelection(
+                                      item.productId._id,
+                                      item.productId.shopId._id
+                                    )
+                                  }
+                                  disabled={removedProducts[item.productId._id]}
+                                  className={`appearance-none w-4 h-4 rounded-sm bg-white border-2 ${
+                                    removedProducts[item.productId._id]
+                                      ? "border-gray-300 bg-gray-100 cursor-not-allowed"
+                                      : "border-[#39d84A] focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                                  }`}
+                                />
+
+                                <FaCheck
+                                  className={`absolute top-0 left-[1px] text-green ${
+                                    selectedItems.includes(item.productId._id)
+                                      ? "text-opacity-100"
+                                      : "text-opacity-0"
+                                  } check-${item.productId._id} transition`}
+                                />
+                              </label>
+                            </td>
+                            {/* Các cột khác */}
+                            <td>
+                              <div className="flex items-center gap-3">
+                                <div className="avatar">
+                                  {removedProducts[item.productId._id] ? (
+                                    <div className="mask mask-squircle w-12 h-12 opacity-50 cursor-not-allowed">
+                                      <img
+                                        src={`${PF}/${item.productId.image}`}
+                                        alt="product"
+                                      />
+                                    </div>
+                                  ) : (
+                                    <Link
+                                      to={`/product/${item.productId._id}`}
+                                      className="mask mask-squircle w-12 h-12"
+                                    >
+                                      <img
+                                        src={`${PF}/${item.productId.image}`}
+                                        alt="product"
+                                      />
+                                    </Link>
+                                  )}
+                                </div>
+                              </div>
+                            </td>
+                            <td>
+                              <span
+                                className={
+                                  removedProducts[item.productId._id]
+                                    ? "line-through text-red-500"
+                                    : ""
+                                }
+                              >
+                                {item.productId.name}
+                              </span>
+                              {removedProducts[item.productId._id] && (
+                                <p className="text-sm text-red">
+                                  Sản phẩm đã được gỡ khỏi menu
+                                </p>
+                              )}
+                            </td>
+                            <td className="text-center">
+                              <div>
+                                <button
+                                  className="btn btn-xs bg-slate-200 hover:bg-slate-300 text-black border-none"
+                                  onClick={() => handleDecrease(item)}
+                                  disabled={removedProducts[item.productId._id]}
+                                >
+                                  -
+                                </button>
+                                <input
+                                  type="number"
+                                  value={item.quantity}
+                                  onChange={(e) =>
+                                    handleQuantityChange(
+                                      item,
+                                      parseInt(e.target.value)
+                                    )
+                                  }
+                                  className="w-10 mx-2 text-center overflow-hidden appearance-none"
+                                  disabled={removedProducts[item.productId._id]}
+                                />
+                                <button
+                                  onClick={() => handleIncrease(item)}
+                                  className="btn btn-xs bg-slate-200 hover:bg-slate-300 text-black border-none"
+                                  disabled={removedProducts[item.productId._id]}
+                                >
+                                  +
+                                </button>
+                              </div>
+                            </td>
+                            <td>
+                              <FormattedPrice price={calculatePrice(item)} />
+                            </td>
+                            <td>
+                              <FaTrash
+                                className="cursor-pointer text-red"
+                                onClick={() => handleDelete(item)}
+                                disabled={removedProducts[item.productId._id]}
+                              />
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                );
+              }
             )}
           </div>
           <div className="hidden md:flex my-12 flex-col md:flex-row justify-end ">

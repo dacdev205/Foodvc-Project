@@ -88,11 +88,6 @@ const CardDetails = () => {
         setProduct(response);
         const reviewsData = await reviewAPI.getProductById(id);
         setReviews(reviewsData);
-        const priceOriginalData = await inventoryAPI.getProductById(
-          id,
-          product.shopId._id
-        );
-        setPrices(priceOriginalData);
       } catch (error) {
         if (!userData?._id) {
           return;
@@ -333,11 +328,13 @@ const CardDetails = () => {
         document.getElementById("modal-login").showModal();
         return;
       }
+
       await paymentAPI.postProductToPayment({
         userId: userData?._id,
         totalAmount: product.productId.price * quantityDefault,
         products: {
           productId: product.productId._id,
+          shopId: product.productId.shopId,
           quantity: quantityDefault,
         },
       });
@@ -437,15 +434,7 @@ const CardDetails = () => {
                   {formattedPrice(product.productId.price)}
                   <span>₫</span>
                 </p>
-                {priceOrginals.applyVoucher ? (
-                  <div className="flex">
-                    <p className="text-sm flex justify-end text-gray-600 line-through">
-                      {formattedPrice(priceOrginals.price)} <span>₫</span>
-                    </p>
-                  </div>
-                ) : (
-                  ""
-                )}
+
                 {/* quantity */}
                 <div>
                   <span>Số lượng: </span>
@@ -512,19 +501,7 @@ const CardDetails = () => {
               <tr>
                 <td className="border p-2">Loại sản phẩm:</td>
                 <td className="border p-2 text-gray-500">
-                  {product.productId.category === "popular"
-                    ? "Nổi bật"
-                    : product.productId.category === "soup"
-                    ? "Mì, miến, cháo phở"
-                    : product.productId.category === "milk"
-                    ? "Sữa các loại"
-                    : product.productId.category === "vegetable"
-                    ? "Rau, củ, nấm, trái cây"
-                    : product.productId.category === "protein"
-                    ? "Thịt, cá, trứng, hải sản"
-                    : product.productId.category === "drinks"
-                    ? "Bia, nước giải khát"
-                    : product.productId.category}
+                  {product?.productId?.category}
                 </td>
               </tr>
               <tr>

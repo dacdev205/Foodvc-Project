@@ -11,6 +11,8 @@ router.post(
   voucherAPI.createVoucher
 );
 router.get("/:shopId", voucherAPI.getAllVouchers);
+router.get("/user/:shopId", voucherAPI.getVoucher4User);
+
 router.get("/:id", verifyToken, voucherAPI.getAllSingleVouchers);
 router.delete(
   "/:id",
@@ -18,11 +20,17 @@ router.delete(
   checkPermission("seller_actions"),
   voucherAPI.deleteVoucher
 );
-router.put(
+router.patch(
   "/:id",
   verifyToken,
   checkPermission("seller_actions"),
   voucherAPI.updateVoucher
+);
+router.patch(
+  "/update-quantity/:id",
+  verifyToken,
+  checkPermission("seller_actions"),
+  voucherAPI.updateQuantityVoucher
 );
 router.post(
   "/apply",

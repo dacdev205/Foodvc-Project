@@ -65,7 +65,7 @@ const EditShopModal = ({ open, onClose, shop, onUpdate }) => {
             <button
               type="button"
               onClick={onClose}
-              className="mr-2 bg-gray-500 text-white py-2 px-4 rounded"
+              className="mr-2 bg-white text-green rounded-lg border border-green py-2 px-4"
             >
               Hủy
             </button>

@@ -212,12 +212,12 @@ const ManageInventory = () => {
       handleDeleteItem(productToDelete);
     }
   };
-  // if (isLoading)
-  //   return (
-  //     <div className="fixed inset-0 flex items-center justify-center z-50">
-  //       <CircularProgress color="success" />
-  //     </div>
-  //   );
+  if (isLoading)
+    return (
+      <div className="fixed inset-0 flex items-center justify-center z-50">
+        <CircularProgress color="success" />
+      </div>
+    );
   return (
     <div className="w-full md:w-[900px] px-4 mx-auto">
       <h2 className="text-2xl font-semibold my-4 text-black">

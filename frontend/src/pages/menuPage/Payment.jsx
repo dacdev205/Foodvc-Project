@@ -111,7 +111,7 @@ const Payment = () => {
       payment.forEach((item) => {
         item.products.forEach(async (product) => {
           const shopId = product.productId.shopId;
-          const res = await voucherAPI.getAllVoucher(shopId);
+          const res = await voucherAPI.getVoucher4User(shopId);
           setVouchers(res);
         });
       });
@@ -298,18 +298,21 @@ const Payment = () => {
         bankCode: "VNPAY",
         language: "vn",
       });
-      localStorage.setItem(
-        "orderData",
-        JSON.stringify({
-          userId: userData._id,
-          products: productsWithShopId,
-          totalAmount: amount,
-          orderCode: randomId,
-          note: note,
-          addressId: addressUser._id,
-          methodId: selectedPaymentMethod,
-        })
-      );
+      for (const item of payment) {
+        localStorage.setItem(
+          "orderData",
+          JSON.stringify({
+            userId: userData._id,
+            shopId: item.products[0].productId.shopId,
+            products: productsWithShopId,
+            totalAmount: amount,
+            orderCode: randomId,
+            note: note,
+            addressId: addressUser._id,
+            methodId: selectedPaymentMethod,
+          })
+        );
+      }
       localStorage.setItem(
         "orderDataPostGHN",
         JSON.stringify({
@@ -428,6 +431,7 @@ const Payment = () => {
         for (const item of payment) {
           await orderAPI.postProductToOrder({
             userId: userData._id,
+            shopId: item.products[0].productId.shopId,
             products: productsWithShopId,
             totalAmount: amount,
             note: note,

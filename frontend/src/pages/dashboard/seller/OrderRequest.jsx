@@ -7,25 +7,28 @@ import { Bounce, toast } from "react-toastify";
 import orderRequestAPI from "../../../api/orderRequest";
 import Pagination from "@mui/material/Pagination";
 import { CircularProgress } from "@mui/material";
-
+import useUserCurrent from "../../../hooks/useUserCurrent";
 const ManageOrderRequests = () => {
   const axiosSecure = useAxiosSecure();
+  const user = useUserCurrent();
+  const shopId = user?.shops[0];
   const [orders, setOrders] = useState([]);
-  const [searchTerm, setSearchTerm] = useState("");
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [orderToDelete, setOrderToDelete] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [limit, setLimit] = useState(5);
   const [loading, setLoading] = useState(true);
 
-  const fetchOrders = async (searchTerm, page, limit) => {
+  const fetchOrders = async (searchTerm, page, limit, shopId) => {
     setLoading(true);
     try {
       const response = await orderRequestAPI.getAllCancelReq(
         searchTerm,
         page,
-        limit
+        limit,
+        shopId
       );
       if (response && response.requests) {
         setOrders(response.requests);
@@ -42,10 +45,11 @@ const ManageOrderRequests = () => {
       setLoading(false);
     }
   };
-
   useEffect(() => {
-    fetchOrders(searchTerm, page, limit);
-  }, [searchTerm, page, limit]);
+    if (shopId) {
+      fetchOrders(searchTerm, page, limit, shopId);
+    }
+  }, [searchTerm, page, limit, shopId]);
 
   const handleDeleteOrder = async (orderId) => {
     try {

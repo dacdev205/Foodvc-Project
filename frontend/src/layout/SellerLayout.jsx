@@ -27,38 +27,51 @@ import orderRequestAPI from "../api/orderRequest";
 import useUserCurrent from "../hooks/useUserCurrent";
 
 const SellerLayout = () => {
-  const { loading } = useAuth();
   const [rolePermission, isPermissionLoading] = usePermission("seller_pages");
   const [promotionsOpen, setPromotionsOpen] = useState(false);
   const [inventoryOpen, setInventoryOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [usersOpen, setUsersOpen] = useState(false);
   const [supportOpen, setSupportOpen] = useState(false);
   const [orderRequests, setOrderRequests] = useState(0);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [limit, setLimit] = useState(10);
   const location = useLocation();
   const userData = useUserCurrent();
   const shopId = userData?.shops[0];
+
   const togglePromotions = () => setPromotionsOpen(!promotionsOpen);
   const toggleInventory = () => setInventoryOpen(!inventoryOpen);
   const toggleMenu = () => setMenuOpen(!menuOpen);
   const toggleSupport = () => setSupportOpen(!supportOpen);
-  const toggleUsers = () => setUsersOpen(!usersOpen);
 
   useEffect(() => {
     const fetchOrderReq = async () => {
       try {
-        const res = await orderRequestAPI.getAllCancelReq();
-        const pendingOrders = res.requests.filter(
-          (order) => order.status === "Pending"
+        const response = await orderRequestAPI.getAllCancelReq(
+          searchTerm,
+          page,
+          limit,
+          shopId
         );
-        setOrderRequests(pendingOrders.length);
+        if (response && response.requests) {
+          const pendingOrders = response?.requests?.filter(
+            (order) => order.status === "Pending"
+          );
+          setOrderRequests(pendingOrders.length);
+          setTotalPages(response.totalPages);
+        } else {
+          setTotalPages(1);
+        }
       } catch (error) {
-        console.error("Error fetching order requests:", error);
+        console.error("Error fetching orders:", error);
+        setTotalPages(1);
       }
     };
 
     fetchOrderReq();
-  }, []);
+  }, [limit, page, searchTerm, shopId]);
 
   const handleOrderRequestsClick = () => {
     setOrderRequests(0);
@@ -110,7 +123,7 @@ const SellerLayout = () => {
                   to="/seller"
                 >
                   <MdDashboard />
-                  Dashboard
+                  Thống kê
                 </Link>
               </li>
               <li>
@@ -121,53 +134,10 @@ const SellerLayout = () => {
                   to={`/seller/shop-management/${shopId}`}
                 >
                   <FaChessBishop />
-                  Quản lý cửa hàng
+                  Quản lý thông tin cửa hàng
                 </Link>
               </li>
-              <li>
-                <div
-                  onClick={toggleUsers}
-                  className="cursor-pointer flex items-center active-link"
-                >
-                  <FaUsers />
-                  Quản lý khách hàng
-                  {usersOpen ? (
-                    <IoIosArrowUp className="ml-auto" />
-                  ) : (
-                    <IoIosArrowDown className="ml-auto" />
-                  )}
-                </div>
-                {usersOpen && (
-                  <ul className="ml-4">
-                    <li>
-                      <Link
-                        className={`active-link-2 ${
-                          location.pathname.startsWith("/seller/statistics")
-                            ? "text-green"
-                            : ""
-                        }`}
-                        to="/seller/statistics"
-                      >
-                        <FcStatistics />
-                        Thống kê đơn hàng và doanh thu
-                      </Link>
-                    </li>
-                    <li>
-                      <Link
-                        className={`active-link-2 ${
-                          location.pathname.startsWith("/seller/reviews")
-                            ? "text-green"
-                            : ""
-                        }`}
-                        to="/seller/reviews"
-                      >
-                        <FaPercentage />
-                        Tỷ lệ đánh giá sản phẩm
-                      </Link>
-                    </li>
-                  </ul>
-                )}
-              </li>
+
               <li>
                 <div
                   onClick={toggleInventory}
@@ -242,19 +212,6 @@ const SellerLayout = () => {
                         Sản phẩm trên menu
                       </Link>
                     </li>
-                    <li>
-                      <Link
-                        className={`active-link-2 ${
-                          location.pathname.startsWith("/seller/manage-menu")
-                            ? "text-green"
-                            : ""
-                        }`}
-                        to="/seller/manage-menu"
-                      >
-                        <AiOutlineMenu />
-                        Thống kê sản phẩm đã bán
-                      </Link>
-                    </li>
                   </ul>
                 )}
               </li>
@@ -277,19 +234,6 @@ const SellerLayout = () => {
                 </div>
                 {promotionsOpen && (
                   <ul className="ml-4">
-                    <li>
-                      <Link
-                        className={`active-link-2 ${
-                          location.pathname.startsWith("/seller/add-voucher")
-                            ? "text-green"
-                            : ""
-                        }`}
-                        to="/seller/add-voucher"
-                      >
-                        <IoIosAddCircle />
-                        Giảm Giá Sản Phẩm
-                      </Link>
-                    </li>
                     <li>
                       <Link
                         className={`active-link-2 ${
@@ -373,19 +317,6 @@ const SellerLayout = () => {
                             {orderRequests}
                           </span>
                         )}
-                      </Link>
-                    </li>
-                    <li>
-                      <Link
-                        className={`active-link-2 ${
-                          location.pathname.startsWith("/seller/feedbacks")
-                            ? "text-green"
-                            : ""
-                        }`}
-                        to="/seller/feedbacks"
-                      >
-                        <FaQuestionCircle />
-                        Phản hồi
                       </Link>
                     </li>
                     <li>

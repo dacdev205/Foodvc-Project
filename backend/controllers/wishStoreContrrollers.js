@@ -65,12 +65,16 @@ module.exports = class WishStoreAPI {
   }
 
   static async deleteShopInWishStore(req, res) {
-    const id = req.params.id;
+    const { userId } = req.body;
+    const shopId = req.params.id;
+
     try {
-      await WishStore.findByIdAndDelete(id);
-      res
-        .status(200)
-        .json({ message: "Product deleted successfully from wishlist" });
+      const result = await WishStore.deleteOne({ userId, shop: shopId });
+      if (result) {
+        res
+          .status(200)
+          .json({ message: "Shop deleted successfully from wishstore" });
+      }
     } catch (err) {
       res.status(500).json({ message: err.message });
     }

@@ -5,6 +5,7 @@ const Role = require("../models/roles");
 const Review = require("../models/reviews");
 const Product = require("../models/product");
 const fs = require("fs");
+const wishStore = require("../models/wishStore");
 
 module.exports = class shopAPI {
   static async createShop(req, res) {
@@ -88,6 +89,7 @@ module.exports = class shopAPI {
             menuDetails: [],
             totalPages: 0,
             currentPage: page,
+            favoriteUserIds: [],
           });
         }
 
@@ -108,11 +110,13 @@ module.exports = class shopAPI {
           menuDetails: [],
           totalPages: 0,
           currentPage: page,
+          favoriteUserIds: [],
         });
       }
 
       const totalMenus = await Menu.countDocuments(query);
       const totalPages = Math.ceil(totalMenus / limit);
+
       const menuDetails = await Promise.all(
         menus.map(async (menu) => {
           const populatedReviews = await Review.find({
@@ -127,16 +131,23 @@ module.exports = class shopAPI {
         })
       );
 
+      const favoriteUsers = await wishStore
+        .find({ shop: shop._id })
+        .select("userId");
+      const favoriteUserIds = favoriteUsers.map((wishlist) => wishlist.userId);
+
       res.status(200).json({
         shop,
         menuDetails,
         totalPages,
         currentPage: page,
+        favoriteUserIds,
       });
     } catch (error) {
       res.status(500).json({ message: error.message });
     }
   }
+
   static async getShopById(req, res) {
     try {
       const shop = await Shop.findById(req.params.shopId).populate("addresses");
@@ -146,7 +157,6 @@ module.exports = class shopAPI {
       }
 
       const { searchTerm = "", page = 1, limit = 5 } = req.query;
-
       let query = { shopId: shop._id };
 
       if (searchTerm) {
@@ -160,6 +170,7 @@ module.exports = class shopAPI {
             menuDetails: [],
             totalPages: 0,
             currentPage: page,
+            favoriteUserIds: [],
           });
         }
 
@@ -180,11 +191,13 @@ module.exports = class shopAPI {
           menuDetails: [],
           totalPages: 0,
           currentPage: page,
+          favoriteUserIds: [],
         });
       }
 
       const totalMenus = await Menu.countDocuments(query);
       const totalPages = Math.ceil(totalMenus / limit);
+
       const menuDetails = await Promise.all(
         menus.map(async (menu) => {
           const populatedReviews = await Review.find({
@@ -199,16 +212,23 @@ module.exports = class shopAPI {
         })
       );
 
+      const favoriteUsers = await wishStore
+        .find({ shopId: shop._id })
+        .select("userId");
+      const favoriteUserIds = favoriteUsers.map((entry) => entry.userId);
+
       res.status(200).json({
         shop,
         menuDetails,
         totalPages,
         currentPage: page,
+        favoriteUserIds,
       });
     } catch (error) {
       res.status(500).json({ message: error.message });
     }
   }
+
   static async updateShop(req, res) {
     const shopId = req.params.shopId;
 

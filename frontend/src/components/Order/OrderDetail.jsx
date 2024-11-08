@@ -188,7 +188,7 @@ const OrderDetail = () => {
                       </p>
                       <p className="text-gray-700">
                         <strong>Phân loại:</strong>{" "}
-                        {product.productId?.category}
+                        {product.productId?.category?.name}
                       </p>
                       <p className="text-gray-700">
                         <strong>Số lượng:</strong> {product.quantity}

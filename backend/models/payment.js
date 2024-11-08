@@ -3,6 +3,7 @@ const Schema = mongoose.Schema;
 
 const cartItemSchema = new Schema({
   productId: { type: Schema.Types.ObjectId, ref: "Product", required: true },
+  shopId: { type: mongoose.Schema.Types.ObjectId, ref: "Shop", required: true },
   quantity: { type: Number, required: true, min: 1 },
 });
 const paymentSchema = mongoose.Schema({

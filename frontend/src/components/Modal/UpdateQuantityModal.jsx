@@ -30,12 +30,12 @@ const UpdateQuantityModal = ({ open, onClose, onSubmit, initialQuantity }) => {
             </label>
             <input
               {...register("quantity", {
-                required: "Quantity is required",
+                required: "Số lượng là bắt buộc",
                 min: 1,
               })}
               id="quantity"
               type="number"
-              placeholder="Enter new quantity"
+              placeholder="Nhập số lượng cho voucher."
               className="input input-bordered w-full text-black"
             />
           </div>

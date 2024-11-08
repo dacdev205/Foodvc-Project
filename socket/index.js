@@ -1,6 +1,6 @@
 const io = require("socket.io")(8800, {
   cors: {
-    origin: "http://localhost:3001",
+    origin: "http://localhost:5173",
   },
 });
 
@@ -37,8 +37,6 @@ io.on("connection", (socket) => {
       });
     }
   });
-  
-  
 
   socket.on("disconnect", () => {
     removeUser(socket.id);

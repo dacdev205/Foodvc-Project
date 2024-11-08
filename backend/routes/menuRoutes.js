@@ -20,7 +20,12 @@ let upload = multer({
 router.post("/", upload, menuAPI.createProduct);
 router.post("/add-to-menu", upload, menuAPI.createProduct);
 router.get("/", menuAPI.fetchMenus);
-router.get("/admin", checkPermission("seller_pages"), menuAPI.fetchMenusAdmin);
+router.get(
+  "/seller",
+  verifyToken,
+  checkPermission("seller_pages"),
+  menuAPI.fetchMenusAdmin
+);
 
 router.get("/:id", menuAPI.fetchProductByID);
 router.patch("/quantity/:id", upload, menuAPI.updateProductQuantityInMenu);

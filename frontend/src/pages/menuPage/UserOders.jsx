@@ -104,7 +104,6 @@ const UserOrders = () => {
           reason: cancelReason,
         };
         const res = await orderRequestAPI.createReq(payload);
-        console.log(res);
 
         const orderRequestId = res._id;
         await orderAPI.addOrderRequest(orderId, orderRequestId);

@@ -47,6 +47,57 @@ module.exports = class voucherAPI {
   }
   static async getAllVouchers(req, res) {
     const shopId = req.params.shopId;
+    const {
+      page = 1,
+      limit = 10,
+      search = "",
+      status,
+      expiredBefore,
+      expiredAfter,
+      quantity,
+    } = req.query;
+    try {
+      let query = { shopId };
+      if (search) {
+        query.voucher_describe = { $regex: search, $options: "i" };
+      }
+      if (status !== undefined) {
+        query.voucher_status = status === "true";
+      }
+      if (expiredBefore) {
+        query.voucher_experied_date = {
+          ...query.voucher_experied_date,
+          $lt: new Date(expiredBefore),
+        };
+      }
+      if (expiredAfter) {
+        query.voucher_experied_date = {
+          ...query.voucher_experied_date,
+          $gt: new Date(expiredAfter),
+        };
+      }
+      if (quantity) {
+        query.quantity = quantity;
+      }
+      const skip = (page - 1) * limit;
+      const limitNum = parseInt(limit, 10);
+      const vouchers = await Voucher.find(query)
+        .skip(skip)
+        .limit(limitNum)
+        .exec();
+      const totalCount = await Voucher.countDocuments(query);
+      res.status(200).json({
+        totalCount,
+        totalPages: Math.ceil(totalCount / limitNum),
+        currentPage: page,
+        vouchers,
+      });
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  }
+  static async getVoucher4User(req, res) {
+    const shopId = req.params.shopId;
     try {
       const vouchers = await Voucher.find({ shopId });
       res.status(200).json(vouchers);
@@ -54,7 +105,6 @@ module.exports = class voucherAPI {
       res.status(500).json({ message: error.message });
     }
   }
-
   static async getAllSingleVouchers(req, res) {
     const id = req.params.id;
     try {
@@ -67,12 +117,47 @@ module.exports = class voucherAPI {
 
   static async updateVoucher(req, res) {
     const id = req.params.id;
-    const { voucher_discount_persent, voucher_status, voucher_experied_date } =
-      req.body;
+    const {
+      name,
+      code,
+      voucher_describe,
+      voucher_discount_persent,
+      voucher_status,
+      quantity,
+      voucher_experied_date,
+    } = req.body;
     try {
       const updatedVoucher = await Voucher.findByIdAndUpdate(
         id,
-        { voucher_discount_persent, voucher_status, voucher_experied_date },
+        {
+          name,
+          code,
+          voucher_describe,
+          voucher_discount_persent,
+          quantity,
+          voucher_status,
+          voucher_experied_date,
+        },
+        { new: true }
+      );
+
+      if (!updatedVoucher) {
+        return res.status(404).json({ message: "Voucher not found" });
+      }
+
+      res.json({ message: "Voucher updated successfully", updatedVoucher });
+    } catch (error) {
+      console.error("Error updating voucher:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  }
+  static async updateQuantityVoucher(req, res) {
+    const id = req.params.id;
+    const { quantity } = req.body;
+    try {
+      const updatedVoucher = await Voucher.findByIdAndUpdate(
+        id,
+        { quantity },
         { new: true }
       );
 

@@ -46,10 +46,19 @@ const AddVoucher = () => {
         return;
       }
 
-      const response = await axios.post(PF + "/api/foodvc/apply-voucher", {
-        productId: selectedProducts,
-        discount: parseFloat(discountPercentage),
-      });
+      const response = await axios.post(
+        PF + "/api/foodvc/apply-voucher",
+        {
+          productId: selectedProducts,
+          discount: parseFloat(discountPercentage),
+        },
+        {
+          headers: {
+            authorization: `Bearer ${localStorage.getItem("access-token")}`,
+          },
+        }
+      );
+
       await inventoryAPI.updateProduct(selectedProducts, {
         applyVoucher: true,
       });

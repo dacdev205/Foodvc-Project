@@ -18,11 +18,7 @@ const AddressSearchBar = ({
   const searchBarRef = useRef(null);
 
   useEffect(() => {
-    if (selectedCity && selectedDistrict && selectedWard && selectedStreet) {
-      setSearchTerm(`${selectedCity}, ${selectedDistrict}, ${selectedWard}`);
-    } else {
-      setSearchTerm("");
-    }
+    setSearchTerm(`${selectedCity}, ${selectedDistrict}, ${selectedWard}`);
   }, [selectedCity, selectedDistrict, selectedWard, selectedStreet]);
 
   const handleInputChange = (e) => {

@@ -15,6 +15,8 @@ const checkPermission = (requiredPermission) => {
         return permissions.concat(role.permissions || []);
       }, []);
 
+      console.log("User Permissions:", userPermissions);
+
       const hasPermission = userPermissions.includes(requiredPermission);
 
       if (!hasPermission) {

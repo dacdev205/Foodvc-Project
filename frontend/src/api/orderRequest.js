@@ -3,14 +3,14 @@ const url = "http://localhost:3000/order-request";
 const getToken = () => localStorage.getItem("access-token");
 
 export default class orderRequestAPI {
-  static async getAllCancelReq(searchTerm = "", page = 1, limit = 5) {
+  static async getAllCancelReq(searchTerm = "", page = 1, limit = 5, shopId) {
     const token = getToken();
     try {
       const response = await axios.get(`${url}/all-requests`, {
         headers: {
           authorization: `Bearer ${token}`,
         },
-        params: { searchTerm, page, limit },
+        params: { searchTerm, page, limit, shopId },
       });
       return response.data;
     } catch (error) {

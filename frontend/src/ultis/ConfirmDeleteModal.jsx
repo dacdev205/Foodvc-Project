@@ -20,7 +20,7 @@ const ConfirmDeleteModal = ({
           <div className="modal-action flex justify-end">
             <button
               onClick={onClose}
-              className="btn bg-white border-none text-black hover:bg-slate-100 mr-2 px-6"
+              className="btn bg-white border-green border text-black hover:opacity-80 hover:bg-white mr-2 px-6"
             >
               Trở lại
             </button>

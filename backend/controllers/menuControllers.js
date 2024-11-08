@@ -1,6 +1,7 @@
 const Menu = require("../models/menu");
 const fs = require("fs");
 const Product = require("../models/product");
+const User = require("../models/user");
 const Category = require("../models/category");
 module.exports = class menuAPI {
   static async fetchMenus(req, res) {
@@ -19,7 +20,6 @@ module.exports = class menuAPI {
 
       let query = {};
 
-      // Filter by category if a specific category is selected
       if (category && category !== "all") {
         const categoryDoc = await Category.findOne({
           name: { $regex: category, $options: "i" },
@@ -92,7 +92,12 @@ module.exports = class menuAPI {
       const totalPages = Math.ceil(totalMenus / limit);
 
       const menus = await Menu.find(query)
-        .populate("productId")
+        .populate({
+          path: "productId",
+          populate: {
+            path: "category",
+          },
+        })
         .skip((page - 1) * limit)
         .limit(Number(limit))
         .exec();
@@ -208,9 +213,9 @@ module.exports = class menuAPI {
   static async fetchProductByID(req, res) {
     const id = req.params.id;
     try {
-      const product = await Menu.findOne({ productId: id }).populate(
-        "productId"
-      );
+      const product = await Menu.findOne({ productId: id })
+        .populate("productId")
+        .populate("shopId");
       res.status(200).json(product);
     } catch (err) {
       res.status(500).json({ message: err.message });

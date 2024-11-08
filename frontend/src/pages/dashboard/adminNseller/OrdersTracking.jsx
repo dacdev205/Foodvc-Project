@@ -44,8 +44,9 @@ const OrdersTracking = () => {
         setLoading(false);
       }
     };
-
-    fetchAllOrders();
+    if (shopId) {
+      fetchAllOrders();
+    }
   }, [searchTerm, searchStatus, page, shopId, isAdmin]);
 
   useEffect(() => {

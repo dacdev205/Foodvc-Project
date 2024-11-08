@@ -113,6 +113,7 @@ const VNPayReturn = () => {
       const payload = localStorage.getItem("orderDataPostGHN");
       const res = {
         userId: orderData.userId,
+        shopId: orderData.shopId,
         products: orderData.products,
         totalAmount: orderData.totalAmount,
         note: orderData.note,

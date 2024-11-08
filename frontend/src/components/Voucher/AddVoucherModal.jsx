@@ -4,7 +4,7 @@ import { Bounce, toast } from "react-toastify";
 import voucherAPI from "../../api/voucherAPI";
 import useUserCurrent from "../../hooks/useUserCurrent";
 
-const AddVoucherModal = ({ isModalOpen, setIsModalOpen }) => {
+const AddVoucherModal = ({ isModalOpen, setIsModalOpen, addVoucher }) => {
   const [voucherName, setVoucherName] = useState("");
   const [voucherDescribe, setVoucherDescribe] = useState("");
   const [voucherDiscountPercent, setVoucherDiscountPercent] = useState("");
@@ -32,7 +32,8 @@ const AddVoucherModal = ({ isModalOpen, setIsModalOpen }) => {
         voucher_status: voucherStatus,
         voucher_experied_date: voucherExpiredDate,
       };
-      await voucherAPI.createVoucher(newVoucher);
+      const createdVoucher = await voucherAPI.createVoucher(newVoucher);
+      addVoucher(createdVoucher);
       toast.success("Cập nhật thành công!", {
         position: "bottom-right",
         autoClose: 2000,

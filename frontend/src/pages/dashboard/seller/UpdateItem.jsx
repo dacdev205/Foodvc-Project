@@ -22,8 +22,6 @@ const UpdateItem = () => {
     const fetchProductDetail = async () => {
       try {
         const response = await inventoryAPI.getProductById(id, shopId);
-        console.log(response);
-
         setProduct(response);
       } catch (error) {
         console.error("Error fetching product detail:", error);
@@ -82,7 +80,7 @@ const UpdateItem = () => {
 
       const menuUpdateData = {
         name: updatedProduct.name,
-        category: updatedProduct.category,
+        category: updatedProduct.category._id,
         price: updatedProduct.price,
         recipe: updatedProduct.recipe,
         image: updatedProduct.image,

@@ -1,15 +1,65 @@
 const Review = require("../models/reviews");
 const Menu = require("../models/menu");
 const Shop = require("../models/shop");
+const Product = require("../models/product");
 module.exports = class reviewAPI {
   static async getAllReviews(req, res) {
+    const {
+      page = 1,
+      limit = 5,
+      shopId,
+      searchTerm = "",
+      sentiment = "",
+    } = req.query;
+
+    if (!shopId) {
+      return res.status(400).json({ message: "shopId is required" });
+    }
+
+    const skip = (page - 1) * limit;
+
     try {
-      const reviews = await Review.find({});
-      res.status(200).json(reviews);
+      const products = await Product.find({ shopId }, "_id");
+      const productIds = products.map((product) => product._id);
+
+      const filter = { productId: { $in: productIds } };
+
+      if (searchTerm) {
+        filter.comment = { $regex: searchTerm, $options: "i" };
+      }
+
+      if (sentiment) {
+        filter.sentiment = sentiment;
+      }
+
+      const reviews = await Review.find(filter).skip(skip).limit(Number(limit));
+
+      const totalReviews = await Review.countDocuments(filter);
+      const totalPages = Math.ceil(totalReviews / limit);
+
+      const positiveReviews = reviews.filter(
+        (review) => review.sentiment === "positive"
+      ).length;
+      const negativeReviews = reviews.filter(
+        (review) => review.sentiment === "negative"
+      ).length;
+      const positivePercentage = (positiveReviews / totalReviews) * 100 || 0;
+      const negativePercentage = (negativeReviews / totalReviews) * 100 || 0;
+
+      res.status(200).json({
+        reviews,
+        totalReviews,
+        positiveReviews,
+        negativeReviews,
+        positivePercentage,
+        negativePercentage,
+        totalPages,
+      });
     } catch (error) {
       res.status(500).json({ message: error.message });
     }
   }
+
   static async addReview(req, res) {
     try {
       const { productId, userId, rating, comment } = req.body;
@@ -120,6 +170,25 @@ module.exports = class reviewAPI {
     } catch (error) {
       console.error("Error updating review:", error);
       res.status(500).json({ message: "Internal server error" });
+    }
+  }
+  static async updateSentimentByReviewId(req, res) {
+    const { reviewId, sentiment } = req.body;
+
+    try {
+      const review = await Review.findById(reviewId);
+      if (!review) {
+        return res.status(404).json({ message: "Review not found" });
+      }
+
+      review.sentiment = sentiment;
+      await review.save();
+
+      res
+        .status(200)
+        .json({ message: "Sentiment updated successfully", review });
+    } catch (error) {
+      res.status(500).json({ message: "Error updating sentiment", error });
     }
   }
 };

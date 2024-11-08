@@ -28,10 +28,5 @@ router.post(
 router.get("/get-shop/:shopId", shopAPI.fetchShopById);
 router.get("/get-shop-detail/:shopId", shopAPI.getShopById);
 router.patch("/update/:shopId", upload, shopAPI.updateShop);
-// router.patch(
-//   "/update-image/:shopId",
-//   upload,
-//   verifyToken,
-//   shopAPI.updateShopImage
-// );
+
 module.exports = router;

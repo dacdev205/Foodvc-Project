@@ -1,5 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { FaRegStar, FaStar, FaStarHalf, FaUtensils } from "react-icons/fa";
+import {
+  FaCamera,
+  FaRegStar,
+  FaStar,
+  FaStarHalf,
+  FaUtensils,
+} from "react-icons/fa";
 import { useParams, useNavigate } from "react-router-dom";
 import reviewAPI from "../../../api/reviewAPI";
 import { Pagination, CircularProgress, Button, styled } from "@mui/material";
@@ -188,43 +194,33 @@ const ShopManagement = () => {
         <div className="text-center">
           {loading && <CircularProgress size={24} color="success" />}
 
-          <img
-            src={
-              photo ? URL.createObjectURL(photo) : PF + "/" + shop.shop_image
-            }
-            alt="Profile Image"
-            className={`w-40 h-40 object-cover rounded-full border-4 border-gray-200 shadow-lg ${
-              loading ? "hidden" : "block"
-            }`}
-            onLoad={() => setLoading(false)}
-          />
-
+          <div className="relative">
+            <img
+              src={
+                photo ? URL.createObjectURL(photo) : PF + "/" + shop.shop_image
+              }
+              alt="Profile Image"
+              className={`w-40 h-40 object-cover rounded-full border-4 border-gray-200 shadow-lg ${
+                loading ? "hidden" : "block"
+              }`}
+              onLoad={() => setLoading(false)}
+            />
+            <label
+              htmlFor="shopImage"
+              className="absolute top-2 left-2 bg-white p-2 rounded-full shadow-md cursor-pointer"
+            >
+              <FaCamera size={24} color="gray" />
+            </label>
+            <input
+              id="shopImage"
+              accept="image/*"
+              type="file"
+              {...register("image")}
+              onChange={handlePhotoChange}
+              className="hidden"
+            />
+          </div>
           <form onSubmit={handleSubmit(onSubmit)}>
-            <div className="form-control w-40 mb-3">
-              <Button
-                component="label"
-                variant="contained"
-                startIcon={<CloudUploadIcon />}
-                sx={{
-                  backgroundColor: "#4caf50",
-                  color: "white",
-                  "&:hover": {
-                    backgroundColor: "#388e3c",
-                  },
-                  borderRadius: "5px",
-                  padding: "10px 20px",
-                  marginRight: "10px",
-                  textTransform: "none",
-                }}
-              >
-                Chọn ảnh
-                <VisuallyHiddenInput
-                  type="file"
-                  {...register("image")}
-                  onChange={handlePhotoChange}
-                />
-              </Button>
-            </div>
             <button className="btn bg-green text-white px-6 border-none hover:bg-green hover:opacity-80">
               Cập nhật <FaUtensils />
             </button>
@@ -272,9 +268,11 @@ const ShopManagement = () => {
               className="text-gray-600 bg-gray-100 p-2 rounded-md"
             >
               <div>
-                <span className="font-semibold">Thành phố: </span>
+                <span className="font-semibold">Địa chỉ: </span>
+                {addr.street},{addr.ward.wardName},{addr.district.districtName},
                 {addr.city.cityName}
               </div>
+
               <div>
                 <span className="font-semibold">Số điện thoại: </span>
                 {addr.phone}

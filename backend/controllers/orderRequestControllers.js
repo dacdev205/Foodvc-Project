@@ -6,10 +6,16 @@ module.exports = class orderRequestAPI {
   static async createCancelRequest(req, res) {
     try {
       const { orderId, userId, reason } = req.body;
-
+      const order = await Order.findOne({ _id: orderId, userId }).populate(
+        "shopId"
+      );
+      if (!order) {
+        return res.status(404).json({ message: "Order not found" });
+      }
       const newRequest = new OrderRequest({
         orderId,
         userId,
+        shopId: order.shopId._id,
         requestType: "Cancel",
         reason,
       });
@@ -23,9 +29,13 @@ module.exports = class orderRequestAPI {
   }
   static async getAllRequests(req, res) {
     try {
-      const { searchTerm = "", page = 1, limit = 5 } = req.query;
+      const { searchTerm = "", page = 1, limit = 5, shopId } = req.query;
 
-      let requests = await OrderRequest.find({})
+      if (!shopId) {
+        return res.status(400).json({ message: "Vui lòng cung cấp shopId." });
+      }
+
+      let requests = await OrderRequest.find({ shopId })
         .skip((page - 1) * limit)
         .limit(Number(limit))
         .populate("orderId")
@@ -38,7 +48,7 @@ module.exports = class orderRequestAPI {
         );
       }
 
-      const totalRequest = await OrderRequest.countDocuments();
+      const totalRequest = await OrderRequest.countDocuments({ shopId });
       const totalPages = Math.ceil(totalRequest / limit);
 
       res.status(200).json({ requests, totalPages });

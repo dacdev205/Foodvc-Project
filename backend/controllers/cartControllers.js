@@ -139,37 +139,27 @@ module.exports = class cartAPI {
     const productId = req.params.productId;
 
     if (!cartId || !mongoose.Types.ObjectId.isValid(cartId)) {
-      return res
-        .status(200)
-        .json({ message: "Cart ID is invalid, but proceeding..." });
+      return res.status(400).json({ message: "Invalid cart ID" });
     }
-
     if (!productId || !mongoose.Types.ObjectId.isValid(productId)) {
       return res.status(400).json({ message: "Invalid product ID" });
     }
 
     try {
-      const cart = await Cart.findById(cartId);
-      if (!cart) {
-        return res.status(404).json({ message: "Cart not found" });
-      }
-
-      const productIndex = cart.products.findIndex(
-        (product) => product.productId.toString() === productId
+      const updateResult = await Cart.findByIdAndUpdate(
+        cartId,
+        { $pull: { products: { productId } } },
+        { new: true, useFindAndModify: false }
       );
 
-      if (productIndex === -1) {
-        return res.status(404).json({ message: "Product not found in cart" });
+      if (!updateResult) {
+        return res.status(404).json({ message: "Cart or product not found" });
       }
 
-      cart.products.splice(productIndex, 1);
-
-      if (cart.products.length === 0) {
+      if (updateResult.products.length === 0) {
         await Cart.findByIdAndDelete(cartId);
         return res.status(200).json({ message: "Cart deleted successfully" });
       }
-
-      await cart.save();
 
       res
         .status(200)

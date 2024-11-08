@@ -9,6 +9,7 @@ module.exports = class orderAPI {
   static async createOrder(req, res) {
     const {
       userId,
+      shopId,
       orderCode,
       products,
       totalAmount,
@@ -33,6 +34,7 @@ module.exports = class orderAPI {
     try {
       const order = await Order.create({
         userId,
+        shopId,
         orderCode,
         products,
         orderRequestId,
@@ -69,7 +71,9 @@ module.exports = class orderAPI {
       const user = await User.findOne({ email });
       const userId = user._id;
 
-      const order = await Order.findOne({ _id: orderId, userId });
+      const order = await Order.findOne({ _id: orderId, userId }).populate(
+        "shopId"
+      );
       if (!order) {
         return res.status(404).json({ message: "Order not found" });
       }
@@ -84,12 +88,12 @@ module.exports = class orderAPI {
 
       order.statusId = cancelledStatus._id;
       order.updatedAt = new Date();
-
       await order.save();
 
       const newRequest = new OrderRequest({
         orderId,
         userId,
+        shopId: order.shopId._id,
         requestType: "Cancel",
         reason,
         status: "Approved",
@@ -235,8 +239,12 @@ module.exports = class orderAPI {
       const order = await Order.findById(id)
         .populate("userId")
         .populate("statusId")
-        .populate("products.productId")
+        .populate({
+          path: "productId",
+          populate: [{ path: "category" }],
+        })
         .populate("addressId");
+
       if (order) {
         res.status(200).json(order);
       } else {

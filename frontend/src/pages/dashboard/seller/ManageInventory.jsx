@@ -95,14 +95,14 @@ const ManageInventory = () => {
 
   const handleSubmitTransfer = async (data) => {
     try {
-      const response = await axiosSecure.post("/inventory/transfer-to-menu", {
+      const response = await axiosSecure.post("/transfer-req", {
         productId: selectedProduct._id,
         quantity: data.quantity,
         shopId: shopId,
       });
 
-      if (response.data.message === "Product transferred successfully") {
-        toast.success("Sản phẩm đã được đưa lên menu", {
+      if (response) {
+        toast.success("Đã gửi yêu cầu đưa sản phẩm lên menu", {
           position: "bottom-right",
           autoClose: 5000,
           hideProgressBar: false,
@@ -118,6 +118,20 @@ const ManageInventory = () => {
 
       handleCloseModal();
     } catch (error) {
+      const errorMessage =
+        error.response?.data?.message || "Có lỗi xảy ra khi gửi yêu cầu";
+      toast.error(errorMessage, {
+        position: "bottom-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+        transition: Bounce,
+      });
+      handleCloseModal();
       console.error("Error transferring item:", error);
     }
   };

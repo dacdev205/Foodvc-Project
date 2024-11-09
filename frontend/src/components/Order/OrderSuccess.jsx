@@ -35,10 +35,10 @@ const OrderSuccess = () => {
           Bạn sẽ được chuyển hướng về trang chủ sau {countdown} giây.
         </p>
         <Link
-          to="/"
+          to="/user/orders"
           className="inline-block bg-green text-white font-semibold py-3 px-6 rounded-full hover:bg-green"
         >
-          Quay lại trang chủ
+          Về trang mua
         </Link>
       </div>
     </div>

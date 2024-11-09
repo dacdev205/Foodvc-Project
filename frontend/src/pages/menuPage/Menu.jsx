@@ -5,7 +5,6 @@ import { Pagination } from "@mui/material";
 import useMenu from "../../hooks/useMenu";
 import CircularProgress from "@mui/material/CircularProgress";
 import SidebarFilter from "../../components/LayoutDisplay/SidebarFilter";
-
 const Menu = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterType, setFilterType] = useState("name");

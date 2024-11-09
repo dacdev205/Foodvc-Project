@@ -107,7 +107,14 @@ const UserOrders = () => {
 
         const orderRequestId = res._id;
         await orderAPI.addOrderRequest(orderId, orderRequestId);
-
+        await ghnAPI.cancelOrder(
+          { order_codes: [orderDetailGHN] },
+          {
+            headers: {
+              ShopId: shopData?._id,
+            },
+          }
+        );
         toast.success("Yêu cầu hủy đơn hàng đã được gửi thành công.", {
           position: "bottom-right",
           autoClose: 5000,

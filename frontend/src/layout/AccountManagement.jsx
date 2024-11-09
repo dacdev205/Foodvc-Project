@@ -5,7 +5,7 @@ import useAuth from "../hooks/useAuth";
 import { Avatar } from "@mui/material";
 import { FaPen } from "react-icons/fa";
 import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
-import { CiShop, CiShoppingCart, CiUser, CiWallet } from "react-icons/ci";
+import { CiShop, CiShoppingCart, CiUser } from "react-icons/ci";
 import { BiNotepad } from "react-icons/bi";
 import { useActiveLink } from "../context/ActiveLinkProvider";
 import useUserCurrent from "../hooks/useUserCurrent";
@@ -225,17 +225,7 @@ const AccountManagement = () => {
               Cửa hàng yêu thích
             </Link>
           </li>
-          <li>
-            <Link
-              to="wallet"
-              className={`active-link-2 ${
-                isActive("/user/wallet") ? "text-green" : ""
-              }`}
-            >
-              <CiWallet />
-              Ví của tôi
-            </Link>
-          </li>
+
           {userData?.isSeller === true ? (
             <li>
               <Link

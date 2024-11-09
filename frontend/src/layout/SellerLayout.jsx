@@ -16,6 +16,7 @@ import {
   FaPercentage,
   FaShoppingBag,
   FaChessBishop,
+  FaRegMoneyBillAlt,
 } from "react-icons/fa";
 import { RiMoneyCnyCircleLine } from "react-icons/ri";
 import { IoIosAddCircle, IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
@@ -137,7 +138,17 @@ const SellerLayout = () => {
                   Quản lý thông tin cửa hàng
                 </Link>
               </li>
-
+              <li>
+                <Link
+                  className={`active-link-2 ${
+                    location.pathname === "/transaction" ? "text-green" : ""
+                  }`}
+                  to={`/seller/transaction`}
+                >
+                  <FaRegMoneyBillAlt />
+                  Quản lý giao dịch
+                </Link>
+              </li>
               <li>
                 <div
                   onClick={toggleInventory}
@@ -210,6 +221,21 @@ const SellerLayout = () => {
                       >
                         <AiOutlineMenu />
                         Sản phẩm trên menu
+                      </Link>
+                    </li>
+                    <li>
+                      <Link
+                        className={`active-link-2 ${
+                          location.pathname.startsWith(
+                            "/seller/request-send-to-menu"
+                          )
+                            ? "text-green"
+                            : ""
+                        }`}
+                        to="/seller/request-send-to-menu"
+                      >
+                        <AiOutlineMenu />
+                        Sản phẩm yêu cầu đưa lên menu
                       </Link>
                     </li>
                   </ul>

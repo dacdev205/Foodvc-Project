@@ -156,6 +156,10 @@ const OrderDetail = () => {
                 <FormattedPrice price={order.totalAmount} />
               </p>
               <p className="text-gray-700">
+                <strong>Trạng thái thanh toán:</strong>{" "}
+                {order.paymentStatus ? "Đã thanh toán" : "Chưa thanh toán"}
+              </p>
+              <p className="text-gray-700">
                 <strong>Ngày đặt hàng:</strong>{" "}
                 {formatDateTime(order.createdAt)}
               </p>

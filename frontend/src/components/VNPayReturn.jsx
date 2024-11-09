@@ -5,44 +5,62 @@ import axios from "axios";
 import orderAPI from "../api/orderAPI";
 import cartAPI from "../api/cartAPI";
 import useCart from "../hooks/useCart";
-import useAuth from "../hooks/useAuth";
-import { AuthContext } from "../context/AuthProvider";
 import LoadingSpinner from "../ultis/LoadingSpinner";
 import ghnAPI from "../api/ghnAPI";
+import useUserCurrent from "../hooks/useUserCurrent";
 
 const VNPayReturn = () => {
   const [searchParams] = useSearchParams();
   const [paymentResult, setPaymentResult] = useState({});
   const navigate = useNavigate();
   const [cart, refetchCart] = useCart();
-  const { user } = useAuth(AuthContext);
+  const user = useUserCurrent();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const orderData = JSON.parse(localStorage.getItem("orderData"));
+  const shopId = orderData.shopId;
 
-  // Format date only if payDate exists
   const formattedDate = paymentResult.payDate
     ? moment(paymentResult.payDate, "YYYYMMDDHHmmss").format(
         "DD/MM/YYYY HH:mm:ss"
       )
     : "";
+  const saveTransaction = async (transactionData) => {
+    try {
+      await axios.post("http://localhost:3000/transactions", transactionData);
+      console.log("Thông tin giao dịch đã được lưu.");
+    } catch (error) {
+      console.error("Lỗi khi lưu giao dịch:", error);
+    }
+  };
 
   useEffect(() => {
-    const result = {
-      amount: searchParams.get("vnp_Amount"),
-      bankCode: searchParams.get("vnp_BankCode"),
-      bankTranNo: searchParams.get("vnp_BankTranNo"),
-      cardType: searchParams.get("vnp_CardType"),
-      orderInfo: searchParams.get("vnp_OrderInfo"),
-      payDate: searchParams.get("vnp_PayDate"),
-      responseCode: searchParams.get("vnp_ResponseCode"),
-      transactionNo: searchParams.get("vnp_TransactionNo"),
-      transactionStatus: searchParams.get("vnp_TransactionStatus"),
-      txnRef: searchParams.get("vnp_TxnRef"),
-      tmnCode: searchParams.get("vnp_TmnCode"),
-      secureHash: searchParams.get("vnp_SecureHash"),
-    };
+    if (user?._id) {
+      const amount = searchParams.get("vnp_Amount");
+      const result = {
+        amount: amount / 100,
+        bankCode: searchParams.get("vnp_BankCode"),
+        bankTranNo: searchParams.get("vnp_BankTranNo"),
+        cardType: searchParams.get("vnp_CardType"),
+        orderInfo: searchParams.get("vnp_OrderInfo"),
+        payDate: searchParams.get("vnp_PayDate"),
+        responseCode: searchParams.get("vnp_ResponseCode"),
+        transactionNo: searchParams.get("vnp_TransactionNo"),
+        transactionStatus: searchParams.get("vnp_TransactionStatus"),
+        txnRef: searchParams.get("vnp_TxnRef"),
+        tmnCode: searchParams.get("vnp_TmnCode"),
+        secureHash: searchParams.get("vnp_SecureHash"),
+        userId: user?._id,
+        shopId: shopId,
+        orderCode: orderData?.orderCode,
+      };
 
-    setPaymentResult(result);
-  }, [searchParams]);
+      setPaymentResult(result);
+
+      if (result.transactionNo) {
+        saveTransaction(result);
+      }
+    }
+  }, [orderData.orderCode, searchParams, shopId, user?._id]);
 
   const isPaymentSuccessful = paymentResult.responseCode === "00";
   const sendEmailToUser = async (email, orderCode) => {
@@ -89,10 +107,14 @@ const VNPayReturn = () => {
           vnp_TxnRef: searchParams.get("vnp_TxnRef"),
           vnp_SecureHash: searchParams.get("vnp_SecureHash"),
         };
+        console.log(result);
+
         const response = await axios.get(
           "http://localhost:3000/method-deli/vnpay_ipn",
           { params: result }
         );
+        console.log(response);
+
         if (response.data.RspCode === "00") {
           localStorage.setItem("RspCode", response.data.RspCode);
         } else {
@@ -104,39 +126,56 @@ const VNPayReturn = () => {
     };
     sendParamsToIPN();
   }, [searchParams]);
-
+  const formatAmount = (amount) => {
+    return new Intl.NumberFormat("vi-VN").format(amount) + " VND";
+  };
   const handleReturnHome = async () => {
     setIsSubmitting(true);
     try {
       const orderData = JSON.parse(localStorage.getItem("orderData"));
       const rspCode = localStorage.getItem("RspCode");
       const payload = localStorage.getItem("orderDataPostGHN");
-      const res = {
-        userId: orderData.userId,
-        shopId: orderData.shopId,
-        products: orderData.products,
-        totalAmount: orderData.totalAmount,
-        note: orderData.note,
-        orderCode: orderData.orderCode,
-        addressId: orderData.addressId,
-        methodId: orderData.methodId,
-      };
+
       if (orderData && rspCode === "00") {
+        const res = {
+          userId: orderData.userId,
+          shopId: orderData.shopId,
+          products: orderData.products,
+          totalAmount: orderData.totalAmount,
+          note: orderData.note,
+          orderCode: orderData.orderCode,
+          addressId: orderData.addressId,
+          methodId: orderData.methodId,
+        };
+
+        await sendEmailToUser(user.email, orderData.orderCode);
+
         await orderAPI.postProductToOrder(res);
+
         await Promise.all(
           orderData.products.map(async (product) => {
-            await cartAPI.deleteProduct(cart._id, product.productId._id);
+            if (product) {
+              try {
+                await cartAPI.deleteProduct(cart._id, product.productId._id);
+              } catch (error) {
+                console.warn(
+                  `Failed to delete product ${product.productId._id} from cart. Continuing...`
+                );
+              }
+            }
           })
         );
-        await sendEmailToUser(user.email, orderData.orderCode);
+
         const createOrderGhn = await ghnAPI.createOrder(payload);
-        if (!createOrderGhn.status === 200) {
+        if (createOrderGhn.status !== 200) {
           console.error("Lỗi tạo đơn hàng GHN:", createOrderGhn.message);
           return;
         }
       }
-      localStorage.removeItem("RspCode");
+
       localStorage.removeItem("orderData");
+      localStorage.removeItem("RspCode");
+      localStorage.removeItem("orderDataPostGHN");
     } catch (error) {
       console.error("Error processing payment:", error);
     } finally {
@@ -146,6 +185,7 @@ const VNPayReturn = () => {
     }
   };
 
+  if (!user) return <LoadingSpinner />;
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       {isSubmitting && (
@@ -170,7 +210,9 @@ const VNPayReturn = () => {
             </p>
             <p className="text-lg mb-2">
               Số tiền:{" "}
-              <span className="font-semibold">{paymentResult.amount} VND</span>
+              <span className="font-semibold">
+                {formatAmount(paymentResult.amount)}
+              </span>
             </p>
             <p className="text-lg mb-4">
               Ngày thanh toán:{" "}

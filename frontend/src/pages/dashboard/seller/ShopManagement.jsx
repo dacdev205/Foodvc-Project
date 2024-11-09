@@ -74,7 +74,7 @@ const ShopManagement = () => {
   };
 
   const filteredMenuDetails = menuDetails.filter((item) =>
-    item.product.name.toLowerCase().includes(searchTerm)
+    item?.product?.name.toLowerCase().includes(searchTerm)
   );
 
   const calculateAverageRating = (reviews) => {
@@ -302,11 +302,11 @@ const ShopManagement = () => {
             >
               <img
                 src={PF + "/" + item.product.image}
-                alt={item.product.name}
+                alt={item?.product?.name}
                 className="w-full h-40 object-cover"
               />
               <div className="p-4">
-                <h4 className="font-semibold text-md">{item.product.name}</h4>
+                <h4 className="font-semibold text-md">{item?.product?.name}</h4>
                 <p className="text-gray-600 mt-2">
                   Giá: {item.product.price.toLocaleString()} đ
                 </p>

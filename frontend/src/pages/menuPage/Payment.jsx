@@ -294,7 +294,7 @@ const Payment = () => {
     setIsSubmitting(true);
     try {
       const res = await axios.post("http://localhost:3000/method-deli/vn_pay", {
-        amount: amount,
+        amount: amount * 100,
         bankCode: "VNPAY",
         language: "vn",
       });
@@ -441,7 +441,15 @@ const Payment = () => {
           });
           await Promise.all(
             item.products.map(async (product) => {
-              await cartAPI.deleteProduct(cart._id, product.productId._id);
+              if (product) {
+                try {
+                  await cartAPI.deleteProduct(cart._id, product.productId._id);
+                } catch (error) {
+                  console.warn(
+                    `Failed to delete product ${product.productId._id} from cart. Continuing...`
+                  );
+                }
+              }
             })
           );
           refetchCart();

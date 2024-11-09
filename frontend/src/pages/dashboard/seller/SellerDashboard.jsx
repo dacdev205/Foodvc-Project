@@ -172,7 +172,6 @@ const SellerDashboard = () => {
             <select value={selectedYear} onChange={handleYearChange}>
               <option value={new Date().getFullYear()}>Năm hiện tại</option>
               <option value="2023">Năm 2023</option>
-              {/* Add more years dynamically if needed */}
             </select>
             <ChartMonthlyRevenue
               data={monthlyRevenueData}

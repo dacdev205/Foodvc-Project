@@ -19,7 +19,8 @@ let upload = multer({
 
 router.post("/", upload, verifyToken, inventoryAPI.createProductInInventory);
 router.get("/", inventoryAPI.fetchInventorys);
-router.post("/transfer-to-menu", inventoryAPI.postProductToMenu);
+router.post("/approve-transfer-to-menu/:id", inventoryAPI.postProductToMenu);
+router.put("/reject-transfer-to-menu/:id", inventoryAPI.rejectTransferToMenu);
 router.post("/remove-from-menu", inventoryAPI.removeProductFromMenu);
 router.delete(
   "/:id/:shopId",

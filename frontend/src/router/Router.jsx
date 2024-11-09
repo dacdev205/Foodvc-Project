@@ -80,7 +80,6 @@ const VerifyPasswordLazyLoading = lazy(() =>
 const ChangePasswordLazyLoading = lazy(() =>
   import("../components/Account/ChangePassword")
 );
-const WalletLazyLoading = lazy(() => import("../pages/menuPage/Wallet"));
 const ForgetPasswordLazyLoading = lazy(() =>
   import("../components/Account/ForgetPassword")
 );
@@ -112,6 +111,8 @@ import EditCategory from "../pages/dashboard/admin/EditCategory";
 import ShopManagement from "../pages/dashboard/seller/ShopManagement";
 import ShopDetail from "../pages/menuPage/ShopDetail";
 import WishStorePage from "../pages/menuPage/WishStore";
+import Transactions from "../pages/dashboard/seller/Transactions";
+import RequestSend2Menu from "../pages/dashboard/seller/RequestSend2Menu";
 const CreateVoucherLazyLoading = lazy(() =>
   import("../pages/dashboard/seller/CreateVoucher")
 );
@@ -277,14 +278,7 @@ const router = createBrowserRouter([
               </Suspense>
             ),
           },
-          {
-            path: "wallet",
-            element: (
-              <Suspense fallback={<LoadingSpinner />}>
-                <WalletLazyLoading />
-              </Suspense>
-            ),
-          },
+
           {
             path: "change-password",
             element: (
@@ -431,6 +425,7 @@ const router = createBrowserRouter([
           </Suspense>
         ),
       },
+
       {
         path: "update-item/:id",
         element: (
@@ -557,6 +552,15 @@ const router = createBrowserRouter([
         ),
       },
       {
+        path: "transaction",
+        element: (
+          <Suspense>
+            <Transactions />
+          </Suspense>
+        ),
+      },
+
+      {
         path: "manage-inventory",
         element: (
           <Suspense>
@@ -569,6 +573,14 @@ const router = createBrowserRouter([
         element: (
           <Suspense>
             <ManageMenuLazyLoading />
+          </Suspense>
+        ),
+      },
+      {
+        path: "request-send-to-menu",
+        element: (
+          <Suspense>
+            <RequestSend2Menu />
           </Suspense>
         ),
       },

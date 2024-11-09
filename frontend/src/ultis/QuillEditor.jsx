@@ -4,9 +4,23 @@ import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import styles from "../CssModule/ReactQuill.module.css";
 const QuillEditor = ({ defaultValue, onChange }) => {
+  const modules = {
+    toolbar: [
+      [{ header: "1" }, { header: "2" }, { font: [] }],
+      [{ list: "ordered" }, { list: "bullet" }],
+      [{ align: [] }],
+      ["bold", "italic", "underline"],
+      ["link"],
+      ["image"],
+    ],
+  };
   return (
     <div className={styles.ql}>
-      <ReactQuill defaultValue={defaultValue} onChange={onChange} />
+      <ReactQuill
+        modules={modules}
+        defaultValue={defaultValue}
+        onChange={onChange}
+      />
     </div>
   );
 };

@@ -1,5 +1,20 @@
 const moment = require("moment");
-
+const {
+  VNPay,
+  RefundResponse,
+  VnpTransactionType,
+  dateFormat,
+  getDateInGMT7,
+} = require("vnpay");
+const Transaction = require("../models/transactions");
+const vnpay = new VNPay({
+  vnpayHost: "https://sandbox.vnpayment.vn",
+  tmnCode: "ESECYRQL",
+  secureSecret: "LAQQ75LX1WIGIABTW3FJ41AC8CYEQN72",
+  testMode: true,
+  hashAlgorithm: "SHA512",
+  paymentEndpoint: "paymentv2/vpcpay.html",
+});
 module.exports = class vnpayAPI {
   static async createPaymentUrl(req, res) {
     let ipAddr =
@@ -35,7 +50,7 @@ module.exports = class vnpayAPI {
       vnp_TxnRef: orderId,
       vnp_OrderInfo: "Thanh toan cho ma GD:" + orderId,
       vnp_OrderType: "other",
-      vnp_Amount: amount * 100,
+      vnp_Amount: amount,
       vnp_ReturnUrl: returnUrl,
       vnp_IpAddr: ipAddr,
       vnp_CreateDate: createDate,
@@ -50,10 +65,68 @@ module.exports = class vnpayAPI {
     var signData = querystring.stringify(vnp_Params, { encode: false });
     var crypto = require("crypto");
     var hmac = crypto.createHmac("sha512", secretKey);
-    var signed = hmac.update(new Buffer(signData, "utf-8")).digest("hex");
+    var signed = hmac.update(Buffer.from(signData, "utf-8")).digest("hex");
+
     vnp_Params["vnp_SecureHash"] = signed;
     vnpUrl += "?" + querystring.stringify(vnp_Params, { encode: false });
     res.json({ paymentUrl: vnpUrl });
+  }
+  static async createRefundRequest(req, res) {
+    try {
+      const {
+        amount,
+        createdBy,
+        orderInfo,
+        txnRef,
+        transactionDate,
+        transactionId,
+        reason,
+      } = req.body;
+
+      const locale = req.body.language || "vn";
+      const refundRequestDate = dateFormat(getDateInGMT7(new Date()));
+      const formattedTransactionDate = `${transactionDate.slice(
+        0,
+        4
+      )}/${transactionDate.slice(4, 6)}/${transactionDate.slice(6, 8)}`;
+      const orderCreatedAt = dateFormat(
+        getDateInGMT7(new Date(formattedTransactionDate))
+      );
+
+      const refundData = {
+        vnp_Amount: amount,
+        vnp_CreateBy: createdBy,
+        vnp_CreateDate: refundRequestDate,
+        vnp_IpAddr: "127.0.0.1",
+        vnp_OrderInfo: `Hoan tien cho${orderInfo}, Ly do:${reason}`,
+        vnp_RequestId: transactionId,
+        vnp_TransactionDate: orderCreatedAt,
+        vnp_TransactionType: VnpTransactionType.FULL_REFUND,
+        vnp_TxnRef: txnRef,
+        vnp_Locale: locale,
+        vnp_TransactionNo: transactionId,
+      };
+
+      const response = await vnpay.refund(refundData);
+      if (response.vnp_ResponseCode === "00") {
+        await Transaction.findOneAndUpdate({ refund: true }, { new: true });
+        res.json({
+          success: true,
+          message: "Refund successful",
+          data: response,
+        });
+      } else {
+        res.status(400).json({
+          success: false,
+          message: "Refund failed",
+          data: response,
+        });
+      }
+      res.json(response);
+    } catch (error) {
+      console.error("Refund Error:", error);
+      res.status(500).json({ error: "Refund failed", details: error.message });
+    }
   }
 
   static async vnPayIPN(req, res, next) {

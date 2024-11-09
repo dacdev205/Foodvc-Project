@@ -142,12 +142,12 @@ module.exports = class voucherAPI {
       );
 
       if (!updatedVoucher) {
-        return res.status(404).json({ message: "Voucher not found" });
+        return res.status(404).json({ message: "Voucher không tìm thấy" });
       }
 
-      res.json({ message: "Voucher updated successfully", updatedVoucher });
+      res.json({ message: "Voucher cập nhật thành công", updatedVoucher });
     } catch (error) {
-      console.error("Error updating voucher:", error);
+      console.error("Lỗi khi cập nhật voucher", error);
       res.status(500).json({ message: "Internal server error" });
     }
   }
@@ -162,12 +162,12 @@ module.exports = class voucherAPI {
       );
 
       if (!updatedVoucher) {
-        return res.status(404).json({ message: "Voucher not found" });
+        return res.status(404).json({ message: "Voucher không tìm thấy" });
       }
 
-      res.json({ message: "Voucher updated successfully", updatedVoucher });
+      res.json({ message: "Voucher cập nhật thành công", updatedVoucher });
     } catch (error) {
-      console.error("Error updating voucher:", error);
+      console.error("Xảy ra lỗi khi cập nhật voucher", error);
       res.status(500).json({ message: "Internal server error" });
     }
   }
@@ -176,7 +176,7 @@ module.exports = class voucherAPI {
     const id = req.params.id;
     try {
       await Voucher.findByIdAndDelete(id);
-      res.status(200).json({ message: "Voucher deleted successfully" });
+      res.status(200).json({ message: "Voucher được xóa thành công" });
     } catch (error) {
       res.status(500).json({ message: error.message });
     }
@@ -188,17 +188,19 @@ module.exports = class voucherAPI {
     try {
       const voucher = await Voucher.findOne({ code: voucherCode });
       if (!voucher) {
-        return res.status(404).json({ message: "Voucher not found" });
+        return res.status(404).json({ message: "Voucher không tìm thấy" });
       }
 
       const now = new Date();
       if (voucher.voucher_experied_date < now) {
-        return res.status(400).json({ message: "Voucher has expired" });
+        return res.status(400).json({ message: "Voucher đã hết hạn" });
       }
 
       const payment = await Payment.findById(paymentId);
       if (!payment) {
-        return res.status(404).json({ message: "Payment not found" });
+        return res
+          .status(404)
+          .json({ message: "Trang thanh toán không tìm thấy" });
       }
 
       const discount =
@@ -206,7 +208,7 @@ module.exports = class voucherAPI {
       const newTotalAmount = payment.totalAmount - discount;
 
       res.status(200).json({
-        message: "Voucher applied successfully",
+        message: "Voucher áp dụng thành công",
         discountedAmount: Math.max(newTotalAmount, 0),
       });
     } catch (error) {

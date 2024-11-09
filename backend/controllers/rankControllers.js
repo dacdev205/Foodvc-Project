@@ -31,9 +31,9 @@ module.exports = class rankAPI {
       await user.save();
       return res
         .status(200)
-        .json({ message: "Points added successfully", points: user.points });
+        .json({ message: "Điểm được cộng thành công", points: user.points });
     } else {
-      return res.status(404).json({ message: "User not found" });
+      return res.status(404).json({ message: "Người dùng không tìm thấy" });
     }
   }
 };

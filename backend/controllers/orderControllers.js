@@ -75,7 +75,7 @@ module.exports = class orderAPI {
         "shopId"
       );
       if (!order) {
-        return res.status(404).json({ message: "Order not found" });
+        return res.status(404).json({ message: "Order không tìm thấy" });
       }
 
       const cancelledStatus = await OrderStatus.findOne({ name: "Cancelled" });
@@ -160,7 +160,7 @@ module.exports = class orderAPI {
         totalPages,
       });
     } catch (error) {
-      console.error("Error fetching user orders:", error);
+      console.error("Lỗi khi lấy đơn đặt hàng của người dùng:", error);
       res.status(500).json({ message: error.message });
     }
   }
@@ -240,11 +240,10 @@ module.exports = class orderAPI {
         .populate("userId")
         .populate("statusId")
         .populate({
-          path: "productId",
+          path: "products.productId",
           populate: [{ path: "category" }],
         })
         .populate("addressId");
-
       if (order) {
         res.status(200).json(order);
       } else {
@@ -270,7 +269,7 @@ module.exports = class orderAPI {
       if (order) {
         res.status(200).json(order);
       } else {
-        res.status(404).json({ message: "Order not found" });
+        res.status(404).json({ message: "Order không tìm thấy" });
       }
     } catch (error) {
       res.status(500).json({ message: error.message });

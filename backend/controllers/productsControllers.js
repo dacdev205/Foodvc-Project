@@ -21,7 +21,7 @@ module.exports = class productAPI {
       const existingProduct = await Product.findOne({ _id: id, shopId });
 
       if (!existingProduct) {
-        return res.status(404).json({ message: "Product not found" });
+        return res.status(404).json({ message: "Sản phẩm không tìm thấy" });
       }
 
       if (req.file) {
@@ -44,9 +44,9 @@ module.exports = class productAPI {
       await existingProduct.set(updatedProduct);
       await existingProduct.save();
 
-      res.status(200).json({ message: "Product updated successfully" });
+      res.status(200).json({ message: "Cập nhật sản phẩm thành công" });
     } catch (err) {
-      console.error("Error updating product:", err);
+      console.error("Lỗi khi cập nhật sản phẩm", err);
       res.status(500).json({ message: "Internal server error" });
     }
   }

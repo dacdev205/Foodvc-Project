@@ -58,11 +58,13 @@ module.exports = class usersAPI {
       const user = await User.findById(userId).populate("rank");
 
       if (!user) {
-        return res.status(404).json({ message: "User not found" });
+        return res.status(404).json({ message: "Người dùng không tìm thấy" });
       }
 
       if (!user.rank) {
-        return res.status(404).json({ message: "User rank not assigned" });
+        return res
+          .status(404)
+          .json({ message: "Hạng người dùng không tìm thấy" });
       }
 
       res.status(200).json({ rank: user.rank });
@@ -107,11 +109,14 @@ module.exports = class usersAPI {
       };
 
       if (users.length > 0 || shops.length > 0) {
-        res
-          .status(200)
-          .json({ message: "Users and/or shops found", data: results });
+        res.status(200).json({
+          message: "Đã tìm thấy người dùng và/hoặc cửa hàng",
+          data: results,
+        });
       } else {
-        res.status(404).json({ message: "No users or shops found" });
+        res
+          .status(404)
+          .json({ message: "Không tìm thấy người dùng hoặc cửa hàng" });
       }
     } catch (error) {
       res.status(500).json({ message: error.message });
@@ -126,11 +131,11 @@ module.exports = class usersAPI {
       const existingUser = await User.findOne(query);
       const bronzeRank = await UserRank.findOne({ user_rank_name: "Bronze" });
       if (existingUser) {
-        return res.status(302).json({ message: "User already exists!" });
+        return res.status(302).json({ message: "Người dùng đã tồn tại!" });
       }
       const userRole = await Role.findOne({ name: role });
       if (!userRole) {
-        return res.status(400).json({ message: "Role does not exist!" });
+        return res.status(400).json({ message: "Vai trò không tồn tại!" });
       }
 
       const newUser = new User({
@@ -155,12 +160,12 @@ module.exports = class usersAPI {
     try {
       const existingUser = await User.findOne(query);
       if (existingUser) {
-        return res.status(302).json({ message: "User already exists!" });
+        return res.status(302).json({ message: "Người dùng đã tồn tại!" });
       }
 
       const userRole = await Role.findOne({ _id: roles });
       if (!userRole) {
-        return res.status(400).json({ message: "Role does not exist!" });
+        return res.status(400).json({ message: "Vai trò không tồn tại!" });
       }
 
       const newUser = new User({
@@ -182,7 +187,7 @@ module.exports = class usersAPI {
       const existingUser = await User.findById(userId);
 
       if (!existingUser) {
-        return res.status(404).json({ message: "User not found" });
+        return res.status(404).json({ message: "Không tìm thấy người dùng" });
       }
 
       if (req.file) {
@@ -206,12 +211,12 @@ module.exports = class usersAPI {
       );
 
       if (!updatedUser) {
-        return res.status(404).json({ message: "User not found" });
+        return res.status(404).json({ message: "Không tìm thấy người dùng" });
       }
 
       res.status(200).json(updatedUser);
     } catch (error) {
-      console.error("Error updating user:", error);
+      console.error("Lỗi khi cập nhật người dùng", error);
       res.status(500).json({ message: "Internal server error" });
     }
   }
@@ -222,9 +227,9 @@ module.exports = class usersAPI {
       const deletedUser = await User.findByIdAndDelete(userId);
       // if user not found
       if (!deletedUser) {
-        return res.status(404).json({ message: "User not found!" });
+        return res.status(404).json({ message: "Không tìm thấy người dùng" });
       }
-      res.status(200).json({ message: "User deleted successfully!" });
+      res.status(200).json({ message: "Người dùng được xóa thành công" });
     } catch (error) {
       res.status(500).json({ message: error.message });
     }
@@ -235,7 +240,7 @@ module.exports = class usersAPI {
     try {
       const user = await User.findOne({ email: email }).populate("roles");
       if (!user) {
-        return res.status(404).json({ message: "User not found" });
+        return res.status(404).json({ message: "Không tìm thấy người dùng" });
       }
       const permissions = await Promise.all(
         user.roles.map(async (roleId) => {
@@ -274,12 +279,12 @@ module.exports = class usersAPI {
     try {
       const user = await User.findById(userId);
       if (!user) {
-        return res.status(404).json({ message: "User not found" });
+        return res.status(404).json({ message: "Không tìm thấy người dùng" });
       }
 
       const role = await Role.findById(roleId);
       if (!role) {
-        return res.status(404).json({ message: "Role not found" });
+        return res.status(404).json({ message: "Không tìm thấy vai trò" });
       }
 
       // Update the user's roles

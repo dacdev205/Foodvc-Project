@@ -8,9 +8,9 @@ module.exports = class FavoritePdAPI {
       if (wishList.length > 0) {
         res.status(200).json(wishList);
       } else {
-        res
-          .status(404)
-          .json({ message: "No products found in the wishlist for this user" });
+        res.status(404).json({
+          message: "Không tìm thấy sản phẩm yêu thích của người dùng",
+        });
       }
     } catch (err) {
       res.status(500).json({ message: err.message });
@@ -39,7 +39,9 @@ module.exports = class FavoritePdAPI {
       if (wishItem) {
         res.status(200).json(wishItem);
       } else {
-        res.status(404).json({ message: "Product not found in wishlist" });
+        res
+          .status(404)
+          .json({ message: "Sản phẩm không tìm thấy trong wishList" });
       }
     } catch (err) {
       res.status(500).json({ message: err.message });
@@ -55,7 +57,7 @@ module.exports = class FavoritePdAPI {
       if (!existingWishItem) {
         return res
           .status(404)
-          .json({ message: "Product not found in wishlist" });
+          .json({ message: "Sản phẩm không tìm thấy trong wishList" });
       }
       existingWishItem.set(updateData);
       await existingWishItem.save();
@@ -63,7 +65,10 @@ module.exports = class FavoritePdAPI {
     } catch (err) {
       res
         .status(500)
-        .json({ message: "Error updating wishlist product", error: err });
+        .json({
+          message: "Lỗi khi cập nhật sản phẩm trong wishList",
+          error: err,
+        });
     }
   }
 
@@ -72,9 +77,7 @@ module.exports = class FavoritePdAPI {
     const id = req.params.id;
     try {
       await WishList.findByIdAndDelete(id);
-      res
-        .status(200)
-        .json({ message: "Product deleted successfully from wishlist" });
+      res.status(200).json({ message: "Sản phẩm đã được xóa khỏi wishList" });
     } catch (err) {
       res.status(500).json({ message: err.message });
     }

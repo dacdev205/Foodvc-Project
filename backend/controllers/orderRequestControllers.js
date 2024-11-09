@@ -10,7 +10,7 @@ module.exports = class orderRequestAPI {
         "shopId"
       );
       if (!order) {
-        return res.status(404).json({ message: "Order not found" });
+        return res.status(404).json({ message: "Order không tìm thấy" });
       }
       const newRequest = new OrderRequest({
         orderId,

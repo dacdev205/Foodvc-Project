@@ -28,7 +28,7 @@ module.exports = class statusesAPI {
         );
       }
     } catch (err) {
-      console.error("Error initializing order statuses:", err);
+      console.error("Lỗi khởi tạo trạng thái đơn hàng", err);
     }
   }
 
@@ -38,10 +38,10 @@ module.exports = class statusesAPI {
       if (status) {
         return status._id;
       } else {
-        throw new Error("Status not found");
+        throw new Error("Status không tìm thấy");
       }
     } catch (err) {
-      throw new Error("Error retrieving status ID: " + err.message);
+      throw new Error("Lỗi truy xuất ID Status: " + err.message);
     }
   }
 };

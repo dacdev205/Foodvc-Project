@@ -41,7 +41,7 @@ module.exports = class categoryAPI {
       if (!category) {
         return res
           .status(404)
-          .json({ success: false, message: "Category not found" });
+          .json({ success: false, message: "Danh mục không tìm thấy" });
       }
       res.status(200).json(category);
     } catch (error) {
@@ -60,7 +60,7 @@ module.exports = class categoryAPI {
       if (!category) {
         return res
           .status(404)
-          .json({ success: false, message: "Category not found" });
+          .json({ success: false, message: "Danh mục không tìm thấy" });
       }
       res.status(200).json(category);
     } catch (error) {
@@ -74,11 +74,11 @@ module.exports = class categoryAPI {
       if (!category) {
         return res
           .status(404)
-          .json({ success: false, message: "Category not found" });
+          .json({ success: false, message: "Danh mục không tìm thấy" });
       }
       res
         .status(200)
-        .json({ success: true, message: "Category deleted successfully" });
+        .json({ success: true, message: "Danh mục được xóa thành công" });
     } catch (error) {
       res.status(500).json({ message: error.message });
     }

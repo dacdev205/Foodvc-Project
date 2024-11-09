@@ -13,7 +13,7 @@ module.exports = class reviewAPI {
     } = req.query;
 
     if (!shopId) {
-      return res.status(400).json({ message: "shopId is required" });
+      return res.status(400).json({ message: "shopId là bắt buộc" });
     }
 
     const skip = (page - 1) * limit;
@@ -66,7 +66,7 @@ module.exports = class reviewAPI {
 
       const menu = await Menu.findOne({ _id: productId });
       if (!menu) {
-        return res.status(404).json({ message: "Menu item not found" });
+        return res.status(404).json({ message: "Sản phẩm không tìm thấy" });
       }
 
       const newReview = await Review.create({
@@ -81,7 +81,7 @@ module.exports = class reviewAPI {
 
       const shop = await Shop.findById(menu.shopId);
       if (!shop) {
-        return res.status(404).json({ message: "Shop not found" });
+        return res.status(404).json({ message: "Shop không tìm thấy" });
       }
 
       const menus = await Menu.find({ shopId: shop._id });
@@ -104,7 +104,7 @@ module.exports = class reviewAPI {
       await shop.save();
 
       res.status(201).json({
-        message: "Review added successfully",
+        message: "Tạo đánh giá thành công",
         review: newReview,
       });
     } catch (error) {
@@ -118,7 +118,7 @@ module.exports = class reviewAPI {
       const reviews = await Review.find({ productId }).populate("userId");
       res.json(reviews);
     } catch (error) {
-      console.error("Error getting reviews:", error);
+      console.error("Lỗi khi lấy dữ liệu:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   }
@@ -128,7 +128,7 @@ module.exports = class reviewAPI {
       const reviews = await Review.findById(reviewId);
       res.json(reviews);
     } catch (error) {
-      console.error("Error getting reviews:", error);
+      console.error("Lỗi khi lấy dữ liệu", error);
       res.status(500).json({ message: "Internal server error" });
     }
   }
@@ -138,7 +138,7 @@ module.exports = class reviewAPI {
     try {
       const deletedReview = await Review.findByIdAndDelete(reviewId);
       if (!deletedReview) {
-        return res.status(404).json({ message: "Review not found" });
+        return res.status(404).json({ message: "Không tìm thấy đánh giá" });
       }
 
       const menu = await Menu.findOne({ reviews: deletedReview._id });
@@ -146,9 +146,9 @@ module.exports = class reviewAPI {
         menu.reviews.pull(deletedReview._id);
         await menu.save();
       }
-      res.json({ message: "Review deleted successfully" });
+      res.json({ message: "Đánh giá đã được xóa" });
     } catch (error) {
-      console.error("Error deleting review:", error);
+      console.error("Lỗi khi xóa đánh giá", error);
       res.status(500).json({ message: "Internal server error" });
     }
   }
@@ -163,12 +163,12 @@ module.exports = class reviewAPI {
       );
 
       if (!updatedReview) {
-        return res.status(404).json({ message: "Review not found" });
+        return res.status(404).json({ message: "Đánh giá không tìm thấy" });
       }
 
-      res.json({ message: "Review updated successfully", updatedReview });
+      res.json({ message: "Cập nhật đánh giá thất bại", updatedReview });
     } catch (error) {
-      console.error("Error updating review:", error);
+      console.error("Cập nhật thất bại", error);
       res.status(500).json({ message: "Internal server error" });
     }
   }
@@ -178,7 +178,7 @@ module.exports = class reviewAPI {
     try {
       const review = await Review.findById(reviewId);
       if (!review) {
-        return res.status(404).json({ message: "Review not found" });
+        return res.status(404).json({ message: "Đánh giá không tìm th" });
       }
 
       review.sentiment = sentiment;
@@ -186,7 +186,7 @@ module.exports = class reviewAPI {
 
       res
         .status(200)
-        .json({ message: "Sentiment updated successfully", review });
+        .json({ message: "Dự đoán cảm tìm đã được cập nhật", review });
     } catch (error) {
       res.status(500).json({ message: "Error updating sentiment", error });
     }

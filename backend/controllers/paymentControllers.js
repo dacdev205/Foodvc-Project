@@ -14,14 +14,16 @@ module.exports = class PaymentAPI {
         });
         return res
           .status(201)
-          .json({ message: "Payment created successfully" });
+          .json({ message: "Trang thanh toán được tạo thành công" });
       }
 
       payment.products = products;
       payment.totalAmount = totalAmount;
       await payment.save();
 
-      res.status(200).json({ message: "Payment updated successfully" });
+      res
+        .status(200)
+        .json({ message: "Trang thanh toán được cập nhật thành công" });
     } catch (error) {
       res.status(500).json({ message: error.message });
     }
@@ -35,7 +37,7 @@ module.exports = class PaymentAPI {
       if (payments.length > 0) {
         res.status(200).json(payments);
       } else {
-        res.status(404).json({ message: "Payments not found" });
+        res.status(404).json({ message: "Trang thanh toán không tìm thấy" });
       }
     } catch (err) {
       res.status(500).json({ message: err.message });
@@ -53,9 +55,11 @@ module.exports = class PaymentAPI {
       );
 
       if (payment) {
-        res.status(200).json({ message: "Quantity updated successfully" });
+        res.status(200).json({ message: "Cập nhật số lượng thành công" });
       } else {
-        res.status(404).json({ message: "Payment or product not found" });
+        res
+          .status(404)
+          .json({ message: "Trang thanh toán hoặc sản phẩm không tìm thấy" });
       }
     } catch (error) {
       res.status(500).json({ message: error.message });
@@ -72,7 +76,9 @@ module.exports = class PaymentAPI {
       if (payments.length > 0) {
         res.status(200).json(payments);
       } else {
-        res.status(404).json({ message: "No payments found for this user" });
+        res
+          .status(404)
+          .json({ message: "Người dùng không có trang thanh toán nào" });
       }
     } catch (err) {
       res.status(500).json({ message: err.message });

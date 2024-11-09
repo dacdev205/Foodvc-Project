@@ -6,7 +6,9 @@ module.exports = class methodDeliAPI {
       await newMethod.save();
       res.status(201).json(newMethod);
     } catch (error) {
-      res.status(400).json({ message: "Error creating method", error });
+      res
+        .status(400)
+        .json({ message: "Xảy ra lỗi khi tạo phương thức", error });
     }
   }
   static async getAllMethods(req, res) {
@@ -14,7 +16,9 @@ module.exports = class methodDeliAPI {
       const methods = await MethodDelivery.find({});
       res.json(methods);
     } catch (error) {
-      res.status(500).json({ message: "Error fetching methods", error });
+      res
+        .status(500)
+        .json({ message: "Xảy ra lỗi khi lấy phương thức", error });
     }
   }
   static async getMethodIdByMethodId(methodId) {
@@ -23,10 +27,10 @@ module.exports = class methodDeliAPI {
       if (method) {
         return method;
       } else {
-        throw new Error("Method not found");
+        throw new Error("Phương thức không tìm thấy");
       }
     } catch (err) {
-      throw new Error("Error retrieving method ID: " + err.message);
+      throw new Error("Lỗi truy xuất ID phương thức: " + err.message);
     }
   }
 };

@@ -18,7 +18,7 @@ module.exports = class messageAPI {
       const savedMessage = await newMessage.save();
       res.status(200).json({ message: savedMessage });
     } catch (error) {
-      console.error("Error sending message:", error);
+      console.error("Xảy ra lỗi khi gửi tin nhắn:", error);
       res.status(500).json({ error: "Internal Server Error" });
     }
   }

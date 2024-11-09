@@ -5,7 +5,7 @@ const axios = require("axios");
 const Menu = require("../models/menu");
 const Category = require("../models/category");
 const Shop = require("../models/shop");
-
+const TransferRequest = require("../models/transferRequest");
 module.exports = class inventoryAPI {
   static async fetchInventorys(req, res) {
     try {
@@ -20,7 +20,7 @@ module.exports = class inventoryAPI {
       } = req.query;
 
       if (!shopId) {
-        return res.status(400).json({ message: "shopId is required" });
+        return res.status(400).json({ message: "shopId là bắt buộc" });
       }
 
       const query = { shopId };
@@ -84,7 +84,7 @@ module.exports = class inventoryAPI {
       if (!product) {
         return res
           .status(404)
-          .json({ message: "Product not found in this shop" });
+          .json({ message: "Sản phẩm không tìm thấy trong shop" });
       }
       res.status(200).json(product);
     } catch (err) {
@@ -106,7 +106,7 @@ module.exports = class inventoryAPI {
       });
       const shop = await Shop.findById(shopId);
       if (!shop) {
-        return res.status(404).json({ message: "Shop not found" });
+        return res.status(404).json({ message: "Không tìm thấy shop" });
       }
       shop.inventories.push(inventoryItem._id);
       await shop.save();
@@ -120,16 +120,29 @@ module.exports = class inventoryAPI {
   // Post product to menu
   static async postProductToMenu(req, res) {
     try {
-      const { productId, quantity, shopId } = req.body;
+      const { id } = req.params;
+      const transferRequest = await TransferRequest.findById(id);
+      if (!transferRequest) {
+        return res
+          .status(404)
+          .json({ message: "Yêu cầu chuyển không tìm thấy" });
+      }
+
+      const { productId, quantity, shopId } = transferRequest;
+
       const productInInventory = await Product.findOne({
         _id: productId,
-        shopId,
+        shopId: shopId,
       });
 
       if (!productInInventory) {
         return res
           .status(404)
-          .json({ message: "Product not found in this shop" });
+          .json({ message: "Sản phẩm không tìm thấy trong shop" });
+      }
+
+      if (productInInventory.quantity < quantity) {
+        return res.status(400).json({ message: "Số lượng sản phẩm không đủ" });
       }
 
       productInInventory.quantity -= quantity;
@@ -143,13 +156,32 @@ module.exports = class inventoryAPI {
 
       productInInventory.transferredToMenu = true;
       await productInInventory.save();
+
+      transferRequest.status = "approved";
+      await transferRequest.save();
+
       res.status(200).json({ message: "Product transferred successfully" });
     } catch (error) {
-      console.error("Error transferring product:", error);
+      console.error("Lỗi khi chuyển sản phẩm", error);
       res.status(500).json({ error: "Internal Server Error" });
     }
   }
+  static async rejectTransferToMenu(req, res) {
+    try {
+      const { id } = req.params;
+      const request = await TransferRequest.findById(id);
+      if (!request)
+        return res.status(404).json({ message: "Yêu cầu không tồn tại" });
 
+      // Từ chối yêu cầu
+      request.status = "rejected";
+      await request.save();
+
+      res.status(200).json({ message: "Yêu cầu đã bị từ chối" });
+    } catch (error) {
+      res.status(500).json({ message: "Lỗi khi từ chối yêu cầu" });
+    }
+  }
   // Update product in inventory
   static async updateProductInInventory(req, res) {
     const { id, shopId } = req.params;
@@ -161,7 +193,7 @@ module.exports = class inventoryAPI {
       if (!existingProduct) {
         return res
           .status(404)
-          .json({ message: "Product not found in this shop" });
+          .json({ message: "Sản phẩm không tìm thấy trong shop" });
       }
 
       if (req.file) {
@@ -183,9 +215,9 @@ module.exports = class inventoryAPI {
       await existingProduct.set(updatedProduct);
       await existingProduct.save();
 
-      res.status(200).json({ message: "Product updated successfully" });
+      res.status(200).json({ message: "Cập nhật sản phẩm thành công" });
     } catch (err) {
-      console.error("Error updating product:", err);
+      console.error("Lỗi khi cập nhật sản phẩm", err);
       res.status(500).json({ message: "Internal server error" });
     }
   }
@@ -195,14 +227,13 @@ module.exports = class inventoryAPI {
     try {
       const { productId, shopId } = req.body;
 
-      // Find the menu item associated with the given product ID
       const menuItem = await Menu.findOne({ product: productId, shopId });
 
       if (!menuItem) {
-        console.log("Menu item not found for product ID:", productId);
+        console.log("Không tìm thấy mục menu cho ID sản phẩm:", productId);
         return res
           .status(404)
-          .json({ message: "Menu item not found for the product" });
+          .json({ message: "Không tìm thấy mục menu cho sản phẩm" });
       }
 
       const productInInventory = await Product.findOne({
@@ -212,7 +243,7 @@ module.exports = class inventoryAPI {
       if (!productInInventory) {
         return res
           .status(404)
-          .json({ message: "Product not found in inventory" });
+          .json({ message: "Sản phẩm không tìm thấy trong kho" });
       }
 
       // Update the product quantity in inventory
@@ -223,11 +254,9 @@ module.exports = class inventoryAPI {
       // Remove the product from the menu
       await menuItem.remove();
 
-      res
-        .status(200)
-        .json({ message: "Product removed from menu successfully" });
+      res.status(200).json({ message: "Sản phẩm đã được gỡ bỏ khỏi menu" });
     } catch (error) {
-      console.error("Error removing product from menu:", error);
+      console.error("Lỗi khi gỡ sản phẩm khỏi menu", error);
       res.status(500).json({ error: "Internal Server Error" });
     }
   }
@@ -263,7 +292,7 @@ module.exports = class inventoryAPI {
           }
         }
       }
-      res.status(200).json({ message: "Product deleted successfully" });
+      res.status(200).json({ message: "Sản phẩm đã xóa thành công" });
     } catch (err) {
       res.status(500).json({ message: err.message });
     }

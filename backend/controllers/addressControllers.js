@@ -44,7 +44,7 @@ module.exports = class AddressAPI {
 
       return res
         .status(201)
-        .json({ message: "Address added successfully", address });
+        .json({ message: "Thêm địa chỉ thành công", address });
     } catch (error) {
       return res.status(500).json({ message: error.message });
     }
@@ -67,7 +67,7 @@ module.exports = class AddressAPI {
           totalPages: Math.ceil(totalAddresses / limit),
         });
       } else {
-        res.status(404).json({ message: "Address not found" });
+        res.status(404).json({ message: "Địa chỉ không tồn tại" });
       }
     } catch (err) {
       res.status(500).json({ message: err.message });
@@ -82,7 +82,7 @@ module.exports = class AddressAPI {
       address.set(updatedAddress);
       await address.save();
       if (!updatedAddress) {
-        return res.status(404).json({ message: "Address not found" });
+        return res.status(404).json({ message: "Địa chỉ không tồn tại" });
       }
       return res.status(200).json(updatedAddress);
     } catch (error) {
@@ -97,7 +97,7 @@ module.exports = class AddressAPI {
       const address = await Address.findById(id);
 
       if (!address) {
-        return res.status(404).json({ message: "Address not found" });
+        return res.status(404).json({ message: "Địa chỉ không tồn tại" });
       }
 
       if (updatedAddress.isDefault) {
@@ -120,7 +120,7 @@ module.exports = class AddressAPI {
     try {
       const address = await Address.findById(id);
       if (!address) {
-        return res.status(404).json({ message: "Address not found" });
+        return res.status(404).json({ message: "Địa chỉ không tồn tại" });
       }
       await Address.updateMany(
         { isDefault: true },
@@ -150,7 +150,7 @@ module.exports = class AddressAPI {
     try {
       const address = await Address.findById(addressId);
       if (!address) {
-        return res.status(404).json({ message: "Address not found" });
+        return res.status(404).json({ message: "Địa chỉ không tồn tại" });
       }
       const user = await User.findOne({ addresses: addressId });
 
@@ -161,7 +161,7 @@ module.exports = class AddressAPI {
         await user.save();
       }
       await Address.findByIdAndDelete(addressId);
-      res.status(200).json({ message: "Address deleted successfully" });
+      res.status(200).json({ message: "Địa chỉ được xóa thành công" });
     } catch (err) {
       res.status(500).json({ message: err.message });
     }

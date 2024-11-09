@@ -16,7 +16,7 @@ module.exports = class cartAPI {
       if (cart) {
         res.status(200).json(cart);
       } else {
-        res.status(404).json({ message: "Cart not found" });
+        res.status(404).json({ message: "Không tìm thấy giỏ hàng" });
       }
     } catch (err) {
       res.status(500).json({ message: err.message });
@@ -75,7 +75,7 @@ module.exports = class cartAPI {
       const cart = await Cart.findOne({ userId });
 
       if (!cart) {
-        return res.status(404).json({ message: "Cart not found" });
+        return res.status(404).json({ message: "Không tìm thấy giỏ hàng" });
       }
 
       const product = cart.products.find(
@@ -83,7 +83,9 @@ module.exports = class cartAPI {
       );
 
       if (!product) {
-        return res.status(404).json({ message: "Product not found in cart" });
+        return res
+          .status(404)
+          .json({ message: "Sản phẩm không có trong giỏ hàng" });
       }
 
       res.status(200).json(product);
@@ -102,7 +104,7 @@ module.exports = class cartAPI {
       const cart = await Cart.findById(cartId);
 
       if (!cart) {
-        return res.status(404).json({ message: "Cart not found" });
+        return res.status(404).json({ message: "Không tìm thấy giỏ hàng" });
       }
 
       const productIndex = cart.products.findIndex(
@@ -110,7 +112,9 @@ module.exports = class cartAPI {
       );
 
       if (productIndex === -1) {
-        return res.status(404).json({ message: "Product not found in cart" });
+        return res
+          .status(404)
+          .json({ message: "Sản phẩm không có trong giỏ hàng" });
       }
 
       if (updateData.quantity) {
@@ -121,7 +125,9 @@ module.exports = class cartAPI {
 
       res.json(cart);
     } catch (error) {
-      res.status(500).json({ message: "Error updating product in cart" });
+      res
+        .status(500)
+        .json({ message: "Lỗi khi cập nhật sản phẩm trong giỏ hàng" });
     }
   }
   static async clearCart(req, res) {
@@ -153,17 +159,19 @@ module.exports = class cartAPI {
       );
 
       if (!updateResult) {
-        return res.status(404).json({ message: "Cart or product not found" });
+        return res
+          .status(404)
+          .json({ message: "Giỏ hàng hoặc sản phẩm không tìm thấy" });
       }
 
       if (updateResult.products.length === 0) {
         await Cart.findByIdAndDelete(cartId);
-        return res.status(200).json({ message: "Cart deleted successfully" });
+        return res
+          .status(200)
+          .json({ message: "Giỏ hàng được xóa thành công" });
       }
 
-      res
-        .status(200)
-        .json({ message: "Product removed from cart successfully" });
+      res.status(200).json({ message: "Sản phẩm đã được xóa khỏi giỏ hàng" });
     } catch (err) {
       res.status(500).json({ message: err.message });
     }

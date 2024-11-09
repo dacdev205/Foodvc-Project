@@ -40,7 +40,6 @@ module.exports = class menuAPI {
         }
       }
 
-      // Filter by product name if searchTerm is provided
       if (searchTerm && filterType === "name") {
         const productIdsByName = await Product.find({
           name: { $regex: searchTerm, $options: "i" },
@@ -55,7 +54,6 @@ module.exports = class menuAPI {
         }
       }
 
-      // Filter by price range
       const productIdsByPrice = await Product.find({
         price: { $gte: Number(minPrice), $lte: Number(maxPrice) },
       }).select("_id");
@@ -68,7 +66,6 @@ module.exports = class menuAPI {
         query["productId"] = { $in: productIdsByPrice.map((p) => p._id) };
       }
 
-      // Filter by rating range
       const menusByRating = await Menu.find(query)
         .populate({
           path: "reviews",
@@ -174,7 +171,6 @@ module.exports = class menuAPI {
         query["productId"] = { $in: productIdsByPrice.map((p) => p._id) };
       }
 
-      // Filter by rating range
       const menusByRating = await Menu.find(query)
         .populate({
           path: "reviews",
@@ -244,7 +240,9 @@ module.exports = class menuAPI {
         await newMenuProduct.save();
       }
 
-      res.status(201).json({ message: "Product added to menu successfully" });
+      res
+        .status(201)
+        .json({ message: "Sản phẩm được thêm vào menu thành công" });
     } catch (err) {
       res.status(500).json({ message: err.message });
     }

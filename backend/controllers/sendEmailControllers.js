@@ -28,7 +28,7 @@ module.exports = class sendEmailAPI {
       });
       return message;
     } catch (error) {
-      console.error("Error sending email:", error);
+      console.error("Lỗi khi gửi mail", error);
       throw error;
     }
   }

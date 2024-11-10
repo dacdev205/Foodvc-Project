@@ -24,9 +24,14 @@ router.get(
   "/seller",
   verifyToken,
   checkPermission("seller_pages"),
+  menuAPI.fetchMenusSeller
+);
+router.get(
+  "/admin",
+  verifyToken,
+  checkPermission("admin_pages"),
   menuAPI.fetchMenusAdmin
 );
-
 router.get("/:id", menuAPI.fetchProductByID);
 router.patch("/quantity/:id", upload, menuAPI.updateProductQuantityInMenu);
 router.patch("/:id", upload, menuAPI.updateProductInMenu);

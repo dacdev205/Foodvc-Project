@@ -11,5 +11,6 @@ router.post(
   transferRequestAPI.requestTransferToMenu
 );
 router.get("/:shopId", transferRequestAPI.getShopRequestTransferToMenu);
+router.get("/", transferRequestAPI.getRequestTransferToMenuAdmin);
 
 module.exports = router;

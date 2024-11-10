@@ -26,6 +26,7 @@ router.post(
 );
 router.put("/reject-transfer-to-menu/:id", inventoryAPI.rejectTransferToMenu);
 router.post("/remove-from-menu", inventoryAPI.removeProductFromMenu);
+router.post("/remove-from-menu-admin", inventoryAPI.removeProductFromMenuAdmin);
 router.delete(
   "/:id/:shopId",
   // checkPermission("dashboard_actions"),

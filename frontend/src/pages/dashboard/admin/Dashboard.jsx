@@ -3,7 +3,7 @@ import useAuth from "../../../hooks/useAuth";
 import { useQuery } from "@tanstack/react-query";
 import useAxiosSecure from "../../../hooks/useAxiosSecure";
 import { MdGroups } from "react-icons/md";
-import { CiDollar } from "react-icons/ci";
+import { CiDollar, CiShop } from "react-icons/ci";
 import { FaBook, FaShoppingCart } from "react-icons/fa";
 import FormattedPrice from "../../../ultis/FormatedPriece";
 import ChartMonthlyRevenue from "../../../components/Chart/ChartMonthlyRevenue";
@@ -163,16 +163,20 @@ const Dashboard = () => {
             </div>
             <div className="stat-title text-black">Người dùng</div>
             <div className="stat-value flex text-black">{stats.users}</div>
-            <div className="stat-desc">↗︎ 400 (22%)</div>
           </div>
-
+          <div className="stat">
+            <div className="stat-figure text-secondary text-3xl">
+              <CiShop />
+            </div>
+            <div className="stat-title text-black">Cửa hàng</div>
+            <div className="stat-value">{stats.shops}</div>
+          </div>
           <div className="stat">
             <div className="stat-figure text-secondary text-3xl">
               <FaBook />
             </div>
             <div className="stat-title text-black">Mặt hàng hiện có</div>
             <div className="stat-value text-black">{stats.menuItems}</div>
-            <div className="stat-desc">↘︎ 90 (14%)</div>
           </div>
           <div className="stat">
             <div className="stat-figure text-secondary text-3xl">
@@ -180,7 +184,6 @@ const Dashboard = () => {
             </div>
             <div className="stat-title text-black">Tất cả đơn hàng</div>
             <div className="stat-value text-black">{stats.orders}</div>
-            <div className="stat-desc">↘︎ 90 (14%)</div>
           </div>
         </div>
         <div className="grid grid-cols-2 gap-4 mt-8">

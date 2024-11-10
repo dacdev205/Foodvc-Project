@@ -2,11 +2,12 @@ import React, { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import { CircularProgress, Pagination } from "@mui/material";
-import ConfirmDeleteModal from "../../../components/Modal/ConfirmDeleteModal";
+import ConfirmDeleteModal from "../../../ultis/ConfirmDeleteModal";
 import useAxiosSecure from "../../../hooks/useAxiosSecure";
-import { toast } from "react-toastify";
+import { Bounce, toast } from "react-toastify";
 import useUserCurrent from "../../../hooks/useUserCurrent";
-import AddPermissionModal from "./AddPermissionModal";
+import EditPermissionModal from "../../../components/Modal/EditPermissonModal";
+import AddPermissionModal from "../../../components/Modal/AddPermissionModal";
 
 const ManagementPermission = () => {
   const axiosSecure = useAxiosSecure();
@@ -18,7 +19,8 @@ const ManagementPermission = () => {
   const [search, setSearch] = useState("");
   const [adminPermissions, setAdminPermissions] = useState([]);
   const userData = useUserCurrent();
-
+  const [editPermissionModalOpen, setEditPermissionModalOpen] = useState(false);
+  const [permissionToEdit, setPermissionToEdit] = useState(null);
   const {
     data: permissions = [],
     isLoading,
@@ -56,15 +58,72 @@ const ManagementPermission = () => {
   const isAdminPermission = (permissionId) => {
     return adminPermissions.includes(permissionId);
   };
-
+  const handleEditClick = (permission) => {
+    setPermissionToEdit(permission);
+    setEditPermissionModalOpen(true);
+  };
+  const handleEditPermission = async (updatedPermission) => {
+    try {
+      await axiosSecure.put(
+        `/permissions/${updatedPermission._id}`,
+        updatedPermission
+      );
+      toast.success("Cập nhật quyền thành công!", {
+        position: "bottom-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+        transition: Bounce,
+      });
+      setEditPermissionModalOpen(false);
+      setPermissionToEdit(null);
+      refetch();
+    } catch (error) {
+      toast.error("Cập nhật quyền thất bại!", {
+        position: "bottom-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+        transition: Bounce,
+      });
+    }
+  };
   const handleAddPermission = async (permissionData) => {
     try {
       await axiosSecure.post("/permissions", permissionData);
-      toast.success("Thêm quyền thành công!");
+      toast.success("Thêm quyền thành công!", {
+        position: "bottom-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+        transition: Bounce,
+      });
       setAddPermissionModalOpen(false);
       refetch();
     } catch (error) {
-      toast.error("Thêm quyền thất bại!");
+      toast.error("Thêm quyền thất bại!", {
+        position: "bottom-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+        transition: Bounce,
+      });
     }
   };
 
@@ -72,12 +131,32 @@ const ManagementPermission = () => {
     if (permissionToDelete) {
       try {
         await axiosSecure.delete(`/permissions/${permissionToDelete._id}`);
-        toast.success("Xóa quyền thành công!");
+        toast.success("Xóa quyền thành công!", {
+          position: "bottom-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "colored",
+          transition: Bounce,
+        });
         setShowConfirmModal(false);
         setPermissionToDelete(null);
         refetch();
       } catch (error) {
-        toast.error("Xóa quyền thất bại!");
+        toast.error("Xóa quyền thất bại!", {
+          position: "bottom-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "colored",
+          transition: Bounce,
+        });
       }
     }
   };
@@ -93,14 +172,14 @@ const ManagementPermission = () => {
   return (
     <div>
       <h2 className="text-2xl font-semibold my-4 text-black">
-        Quản lý quyền <span className="text-green">truy cập</span>
+        Quản lý <span className="text-green">quyềntruy cập</span>
       </h2>
       <div className="flex justify-between my-2 items-center">
         <div className="flex space-x-2 items-center">
           <input
             type="text"
             className="input input-sm input-bordered"
-            placeholder="Tìm quyền theo tên / mô tả"
+            placeholder="Tìm theo tên / mô tả"
             value={search}
             onChange={handleSearchChange}
           />
@@ -110,11 +189,6 @@ const ManagementPermission = () => {
           >
             + Thêm quyền
           </button>
-          <AddPermissionModal
-            open={addPermissionModalOpen}
-            onClose={() => setAddPermissionModalOpen(false)}
-            onAddPermission={handleAddPermission}
-          />
         </div>
       </div>
       <table className="table md:w-[870px] shadow-lg">
@@ -142,7 +216,10 @@ const ManagementPermission = () => {
                 <td>
                   {!isAdminPermission(permission._id) && (
                     <div>
-                      <button className="btn btn-xs text-blue">
+                      <button
+                        onClick={() => handleEditClick(permission)}
+                        className="btn btn-xs bg-white hover:bg-slate-300 text-blue border-style"
+                      >
                         <FaEdit />
                       </button>
                       <button
@@ -150,7 +227,7 @@ const ManagementPermission = () => {
                           setPermissionToDelete(permission);
                           setShowConfirmModal(true);
                         }}
-                        className="btn btn-xs text-red"
+                        className=" btn btn-xs bg-white hover:bg-slate-300 text-red border-style"
                       >
                         <FaTrash />
                       </button>
@@ -176,6 +253,17 @@ const ManagementPermission = () => {
         onConfirm={handleDelete}
         title="Xóa quyền"
         message="Bạn có chắc chắn muốn xóa quyền này không?"
+      />
+      <EditPermissionModal
+        open={editPermissionModalOpen}
+        onClose={() => setEditPermissionModalOpen(false)}
+        permission={permissionToEdit}
+        onEditPermission={handleEditPermission}
+      />
+      <AddPermissionModal
+        open={addPermissionModalOpen}
+        onClose={() => setAddPermissionModalOpen(false)}
+        onAddPermission={handleAddPermission}
       />
     </div>
   );

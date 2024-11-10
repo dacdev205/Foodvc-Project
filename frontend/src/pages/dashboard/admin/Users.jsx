@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { FaTrash, FaSearch } from "react-icons/fa";
 import useAxiosSecure from "../../../hooks/useAxiosSecure";
-import AddUserModal from "./AddUserModal";
+import AddUserModal from "../../../components/Modal/AddUserModal";
 import ConfirmDeleteModal from "../../../ultis/ConfirmDeleteModal";
 import { Bounce, toast } from "react-toastify";
 import { CircularProgress, Pagination } from "@mui/material";
@@ -197,7 +197,7 @@ const Users = () => {
             className="btn bg-green text-white hover:opacity-80 hover:bg-green"
             onClick={() => setAddUserModalOpen(true)}
           >
-            + Thêm người dùng
+            + Tạo người dùng
           </button>
           <AddUserModal
             addUserModalOpen={addUserModalOpen}
@@ -239,25 +239,15 @@ const Users = () => {
                   <td>{user.name}</td>
                   <td>{user.email}</td>
                   <td>
-                    {user.roles.some(
-                      (role) => role.name.toLowerCase() === "admin"
-                    ) ? (
-                      "Admin"
-                    ) : (
-                      <select value={user.roles._id}>
-                        {roles
-                          .filter((role) => role.name.toLowerCase() !== "admin")
-                          .map((role) => (
-                            <option key={role._id} value={role._id}>
-                              {role.name === "user"
-                                ? "Người dùng"
-                                : role.name === "seller"
-                                ? "Người bán"
-                                : role.name}
-                            </option>
-                          ))}
-                      </select>
-                    )}
+                    {user.roles
+                      .map((role) =>
+                        role.name.toLowerCase() === "user"
+                          ? "Người dùng"
+                          : role.name.toLowerCase() === "seller"
+                          ? "Người bán"
+                          : role.name
+                      )
+                      .join(", ")}
                   </td>
 
                   <td>

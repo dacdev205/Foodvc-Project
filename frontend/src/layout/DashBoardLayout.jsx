@@ -4,31 +4,35 @@ import {
   MdDashboard,
   MdDashboardCustomize,
   MdOutlineAdminPanelSettings,
-  MdOutlineInventory,
+  MdOutlinePolicy,
   MdOutlineRateReview,
 } from "react-icons/md";
-import { VscLayoutMenubar } from "react-icons/vsc";
-import { FcStatistics } from "react-icons/fc";
+import { CiShop } from "react-icons/ci";
 import {
-  FaWarehouse,
   FaUser,
   FaQuestionCircle,
   FaUsers,
-  FaPercentage,
   FaShoppingBag,
 } from "react-icons/fa";
-import { RiAdminLine, RiMoneyCnyCircleLine } from "react-icons/ri";
-import { IoIosAddCircle, IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
-import { AiOutlineMenu } from "react-icons/ai";
+import { FaRankingStar } from "react-icons/fa6";
+import {
+  RiAdminLine,
+  RiMoneyCnyCircleLine,
+  RiMoneyDollarBoxFill,
+  RiSecurePaymentLine,
+} from "react-icons/ri";
+import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
 import Login from "../components/Account/Login";
 import useAuth from "../hooks/useAuth";
 import usePermission from "../hooks/usePermission";
 import orderRequestAPI from "../api/orderRequest";
+import { AiOutlineMenu } from "react-icons/ai";
+import { VscLayoutMenubar } from "react-icons/vsc";
 
 const DashBoardLayout = () => {
   const { loading } = useAuth();
   const [rolePermission, isPermissionLoading] = usePermission("admin_pages");
-  const [promotionsOpen, setPromotionsOpen] = useState(false);
+  const [methodPayOpen, setMethodPayOpen] = useState(false);
   const [inventoryOpen, setInventoryOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [usersOpen, setUsersOpen] = useState(false);
@@ -38,8 +42,6 @@ const DashBoardLayout = () => {
   const [orderRequests, setOrderRequests] = useState(0);
   const location = useLocation();
 
-  const togglePromotions = () => setPromotionsOpen(!promotionsOpen);
-  const toggleInventory = () => setInventoryOpen(!inventoryOpen);
   const toggleMenu = () => setMenuOpen(!menuOpen);
   const toggleSupport = () => setSupportOpen(!supportOpen);
   const toggleUsers = () => setUsersOpen(!usersOpen);
@@ -115,159 +117,12 @@ const DashBoardLayout = () => {
                 </Link>
               </li>
               <li>
-                <Link
-                  className={`active-link-2 ${
-                    location.pathname === "/admin/users" ? "text-green" : ""
-                  }`}
-                  to="/admin/users"
-                >
-                  <FaUsers />
-                  Quản lý người dùng hệ thống
-                </Link>
-              </li>
-              <li>
-                <div
-                  onClick={toggleUsersManagement}
-                  className="cursor-pointer flex items-center active-link"
-                >
-                  <MdOutlineAdminPanelSettings />
-                  Quản lý kiểm soát truy cập
-                  {usersManagementOpen ? (
-                    <IoIosArrowUp className="ml-auto" />
-                  ) : (
-                    <IoIosArrowDown className="ml-auto" />
-                  )}
-                </div>
-              </li>
-              {usersManagementOpen && (
-                <ul className="ml-4">
-                  <li>
-                    <Link
-                      className={`active-link-2 ${
-                        location.pathname.startsWith(
-                          "/admin/management-permissions"
-                        )
-                          ? "text-green"
-                          : ""
-                      }`}
-                      to="/admin/management-permissions"
-                    >
-                      <RiAdminLine />
-                      Quản lý quyền truy cập
-                    </Link>
-                  </li>
-                  <li>
-                    <Link
-                      className={`active-link-2 ${
-                        location.pathname === "/admin/management-roles"
-                          ? "text-green"
-                          : ""
-                      }`}
-                      to="/admin/management-roles"
-                    >
-                      <MdOutlineAdminPanelSettings />
-                      Quản lý vai trò người dùng
-                    </Link>
-                  </li>
-                </ul>
-              )}
-              <li>
-                <div
-                  onClick={toggleUsers}
-                  className="cursor-pointer flex items-center active-link"
-                >
-                  <FaUsers />
-                  Quản lý khách hàng
-                  {usersOpen ? (
-                    <IoIosArrowUp className="ml-auto" />
-                  ) : (
-                    <IoIosArrowDown className="ml-auto" />
-                  )}
-                </div>
-                {usersOpen && (
-                  <ul className="ml-4">
-                    <li>
-                      <Link
-                        className={`active-link-2 ${
-                          location.pathname.startsWith("/admin/statistics")
-                            ? "text-green"
-                            : ""
-                        }`}
-                        to="/admin/statistics"
-                      >
-                        <FcStatistics />
-                        Thống kê đơn hàng và doanh thu
-                      </Link>
-                    </li>
-                    <li>
-                      <Link
-                        className={`active-link-2 ${
-                          location.pathname.startsWith("/admin/reviews")
-                            ? "text-green"
-                            : ""
-                        }`}
-                        to="/admin/reviews"
-                      >
-                        <FaPercentage />
-                        Tỷ lệ đánh giá sản phẩm
-                      </Link>
-                    </li>
-                  </ul>
-                )}
-              </li>
-              <li>
-                <div
-                  onClick={toggleInventory}
-                  className="cursor-pointer flex items-center active-link"
-                >
-                  <FaWarehouse />
-                  <span>Quản lý kho</span>
-                  {inventoryOpen ? (
-                    <IoIosArrowUp className="ml-auto" />
-                  ) : (
-                    <IoIosArrowDown className="ml-auto" />
-                  )}
-                </div>
-                {inventoryOpen && (
-                  <ul className="ml-4">
-                    <li>
-                      <Link
-                        className={`active-link-2 ${
-                          location.pathname.startsWith(
-                            "/admin/manage-inventory"
-                          )
-                            ? "text-green"
-                            : ""
-                        }`}
-                        to="/admin/manage-inventory"
-                      >
-                        <MdOutlineInventory />
-                        Sản phẩm trong kho
-                      </Link>
-                    </li>
-                    <li>
-                      <Link
-                        className={`active-link-2 ${
-                          location.pathname.startsWith("/admin/add-inventory")
-                            ? "text-green"
-                            : ""
-                        }`}
-                        to="/admin/add-inventory"
-                      >
-                        <IoIosAddCircle />
-                        Nhập kho
-                      </Link>
-                    </li>
-                  </ul>
-                )}
-              </li>
-              <li>
                 <div
                   onClick={toggleMenu}
                   className="cursor-pointer flex items-center active-link"
                 >
                   <VscLayoutMenubar />
-                  <span>Quản lý menu</span>
+                  <span>Quản lý sản phẩm trên hệ thống</span>
                   {menuOpen ? (
                     <IoIosArrowUp className="ml-auto" />
                   ) : (
@@ -286,85 +141,26 @@ const DashBoardLayout = () => {
                         to="/admin/manage-menu"
                       >
                         <AiOutlineMenu />
-                        Sản phẩm trên menu
+                        Sản phẩm trên menu hệ thống
                       </Link>
                     </li>
                     <li>
                       <Link
                         className={`active-link-2 ${
-                          location.pathname.startsWith("/admin/manage-menu")
+                          location.pathname.startsWith(
+                            "/admin/request-send-to-menu"
+                          )
                             ? "text-green"
                             : ""
                         }`}
-                        to="/admin/manage-menu"
+                        to="/admin/request-send-to-menu"
                       >
                         <AiOutlineMenu />
-                        Thống kê sản phẩm đã bán
+                        Các yêu cầu sản phẩm
                       </Link>
                     </li>
                   </ul>
                 )}
-              </li>
-              <li>
-                <div
-                  onClick={togglePromotions}
-                  className="cursor-pointer flex items-center active-link"
-                >
-                  <img
-                    width="12px"
-                    src="/images/price-tag.png"
-                    alt="Promotion Icon"
-                  />
-                  <span>Quản lý khuyến mãi</span>
-                  {promotionsOpen ? (
-                    <IoIosArrowUp className="ml-auto" />
-                  ) : (
-                    <IoIosArrowDown className="ml-auto" />
-                  )}
-                </div>
-                {promotionsOpen && (
-                  <ul className="ml-4">
-                    <li>
-                      <Link
-                        className={`active-link-2 ${
-                          location.pathname.startsWith("/admin/add-voucher")
-                            ? "text-green"
-                            : ""
-                        }`}
-                        to="/admin/add-voucher"
-                      >
-                        <IoIosAddCircle />
-                        Giảm Giá Sản Phẩm
-                      </Link>
-                    </li>
-                    <li>
-                      <Link
-                        className={`active-link-2 ${
-                          location.pathname.startsWith("/admin/create-voucher")
-                            ? "text-green"
-                            : ""
-                        }`}
-                        to="/admin/create-voucher"
-                      >
-                        <MdOutlineRateReview />
-                        Quản lý khuyến mãi
-                      </Link>
-                    </li>
-                  </ul>
-                )}
-              </li>
-              <li>
-                <Link
-                  className={`active-link-2 ${
-                    location.pathname.startsWith("/admin/order-tracking")
-                      ? "text-green"
-                      : ""
-                  }`}
-                  to="/admin/order-tracking"
-                >
-                  <FaShoppingBag />
-                  Quản lý đơn hàng
-                </Link>
               </li>
               <li>
                 <Link
@@ -379,6 +175,130 @@ const DashBoardLayout = () => {
                   Quản lý danh mục
                 </Link>
               </li>
+              <li>
+                <Link
+                  className={`active-link-2 ${
+                    location.pathname === "/admin/users" ? "text-green" : ""
+                  }`}
+                  to="/admin/users"
+                >
+                  <FaUsers />
+                  Quản lý người dùng hệ thống
+                </Link>
+              </li>
+              <li>
+                <Link
+                  className={`active-link-2 ${
+                    location.pathname === "/admin/management-shops"
+                      ? "text-green"
+                      : ""
+                  }`}
+                  to="/admin/management-shops"
+                >
+                  <CiShop />
+                  Quản lý của hàng trên hệ thống
+                </Link>
+              </li>
+
+              <li>
+                <Link
+                  className={`active-link-2 ${
+                    location.pathname.startsWith("/admin/method-pay")
+                      ? "text-green"
+                      : ""
+                  }`}
+                  to="/admin/method-pay"
+                >
+                  <RiSecurePaymentLine />
+                  Quản lý phương thức thanh toán
+                </Link>
+              </li>
+              <li>
+                <Link
+                  className={`active-link-2 ${
+                    location.pathname.startsWith("/admin/transactions")
+                      ? "text-green"
+                      : ""
+                  }`}
+                  to="/admin/transactions"
+                >
+                  <RiMoneyDollarBoxFill />
+                  Quản lý giao dịch
+                </Link>
+              </li>
+              <li>
+                <Link
+                  className={`active-link-2 ${
+                    location.pathname.startsWith("/admin/comission-policy")
+                      ? "text-green"
+                      : ""
+                  }`}
+                  to="/admin/comission-policy"
+                >
+                  <MdOutlinePolicy />
+                  Quản lý chính sách hoa hồng
+                </Link>
+              </li>
+
+              <li>
+                <div
+                  onClick={toggleUsers}
+                  className="cursor-pointer flex items-center active-link"
+                >
+                  <FaUsers />
+                  Quản lý cấp bậc
+                  {usersOpen ? (
+                    <IoIosArrowUp className="ml-auto" />
+                  ) : (
+                    <IoIosArrowDown className="ml-auto" />
+                  )}
+                </div>
+                {usersOpen && (
+                  <ul className="ml-4">
+                    <li>
+                      <Link
+                        className={`active-link-2 ${
+                          location.pathname.startsWith("/admin/user-rank")
+                            ? "text-green"
+                            : ""
+                        }`}
+                        to="/admin/user-rank"
+                      >
+                        <FaRankingStar />
+                        Cấp bậc người dùng
+                      </Link>
+                    </li>
+                    <li>
+                      <Link
+                        className={`active-link-2 ${
+                          location.pathname.startsWith("/admin/shop-rank")
+                            ? "text-green"
+                            : ""
+                        }`}
+                        to="/admin/shop-rank"
+                      >
+                        <FaRankingStar />
+                        Cấp bậc của hàng
+                      </Link>
+                    </li>
+                  </ul>
+                )}
+              </li>
+
+              <li>
+                <Link
+                  className={`active-link-2 ${
+                    location.pathname.startsWith("/admin/order-tracking")
+                      ? "text-green"
+                      : ""
+                  }`}
+                  to="/admin/order-tracking"
+                >
+                  <FaShoppingBag />
+                  Quản lý đơn hàng
+                </Link>
+              </li>
+
               <li>
                 <Link
                   className={`active-link-2 ${
@@ -464,6 +384,52 @@ const DashBoardLayout = () => {
                   </ul>
                 )}
               </li>
+              <li>
+                <div
+                  onClick={toggleUsersManagement}
+                  className="cursor-pointer flex items-center active-link"
+                >
+                  <MdOutlineAdminPanelSettings />
+                  Quản lý kiểm soát truy cập
+                  {usersManagementOpen ? (
+                    <IoIosArrowUp className="ml-auto" />
+                  ) : (
+                    <IoIosArrowDown className="ml-auto" />
+                  )}
+                </div>
+              </li>
+              {usersManagementOpen && (
+                <ul className="ml-4">
+                  <li>
+                    <Link
+                      className={`active-link-2 ${
+                        location.pathname.startsWith(
+                          "/admin/management-permissions"
+                        )
+                          ? "text-green"
+                          : ""
+                      }`}
+                      to="/admin/management-permissions"
+                    >
+                      <RiAdminLine />
+                      Quản lý quyền truy cập
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      className={`active-link-2 ${
+                        location.pathname === "/admin/management-roles"
+                          ? "text-green"
+                          : ""
+                      }`}
+                      to="/admin/management-roles"
+                    >
+                      <MdOutlineAdminPanelSettings />
+                      Quản lý vai trò người dùng
+                    </Link>
+                  </li>
+                </ul>
+              )}
               <li>
                 <Link
                   className={`active-link-2 ${

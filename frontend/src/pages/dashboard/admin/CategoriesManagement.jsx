@@ -130,16 +130,16 @@ const CategoriesManagement = () => {
                 <td>{category.description.slice(0, 30)}...</td>
                 <td className="py-2 px-4 flex space-x-2 justify-center">
                   <button
-                    className="btn btn-xs bg-white hover:bg-slate-300 text-red border-style"
-                    onClick={() => handleDeleteClick(category._id)}
-                  >
-                    <FaTrash />
-                  </button>
-                  <button
                     className="btn btn-xs bg-white hover:bg-slate-300 text-blue border-style"
                     onClick={() => handleEditClick(category._id)}
                   >
                     <FaEdit />
+                  </button>
+                  <button
+                    className="btn btn-xs bg-white hover:bg-slate-300 text-red border-style"
+                    onClick={() => handleDeleteClick(category._id)}
+                  >
+                    <FaTrash />
                   </button>
                 </td>
               </tr>

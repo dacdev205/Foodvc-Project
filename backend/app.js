@@ -56,7 +56,8 @@ app.use("/shop", require("./routes/shopRoutes"));
 app.use("/wish-store", require("./routes/wishStoreRoutes"));
 app.use("/transactions", require("./routes/transactionsRoutes"));
 app.use("/transfer-req", require("./routes/transferRequest"));
-
+app.use("/permissions", require("./routes/permissionRoutes"));
+app.use("/roles", require("./routes/rolesRoutes"));
 app.post("/jwt", async (req, res) => {
   const user = req.body;
   const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {

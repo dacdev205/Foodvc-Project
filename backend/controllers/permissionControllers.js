@@ -85,16 +85,19 @@ module.exports = class PermissionAPI {
 
   static async updatePermission(req, res) {
     try {
-      const { name } = req.params;
-      const { description } = req.body;
+      const { id } = req.params;
+      const { name, description } = req.body;
 
-      const permission = await Permission.findOne({ name });
+      const permission = await Permission.findByIdAndUpdate(id);
       if (!permission) {
         return res.status(404).send({ message: "Permission not found." });
       }
 
-      if (description) permission.description = description;
-      await permission.save();
+      if (description && name) {
+        permission.description = description;
+        permission.name = name;
+        await permission.save();
+      }
 
       res
         .status(200)
@@ -107,9 +110,9 @@ module.exports = class PermissionAPI {
 
   static async deletePermission(req, res) {
     try {
-      const { name } = req.params;
+      const { id } = req.params;
 
-      const permission = await Permission.findOneAndDelete({ name });
+      const permission = await Permission.findByIdAndDelete(id);
       if (!permission) {
         return res.status(404).send({ message: "Permission not found." });
       }

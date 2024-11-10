@@ -262,7 +262,40 @@ module.exports = class inventoryAPI {
       res.status(500).json({ error: "Internal Server Error" });
     }
   }
+  static async removeProductFromMenuAdmin(req, res) {
+    try {
+      const { productId } = req.body;
 
+      const menuItem = await Menu.findOne({ product: productId });
+
+      if (!menuItem) {
+        console.log("Không tìm thấy mục menu cho ID sản phẩm:", productId);
+        return res
+          .status(404)
+          .json({ message: "Không tìm thấy mục menu cho sản phẩm" });
+      }
+
+      const productInInventory = await Product.findOne({
+        _id: productId,
+      });
+      if (!productInInventory) {
+        return res
+          .status(404)
+          .json({ message: "Sản phẩm không tìm thấy trong kho" });
+      }
+
+      productInInventory.quantity += menuItem.quantity;
+      productInInventory.transferredToMenu = false;
+      await productInInventory.save();
+
+      await menuItem.remove();
+
+      res.status(200).json({ message: "Sản phẩm đã được gỡ bỏ khỏi menu" });
+    } catch (error) {
+      console.error("Lỗi khi gỡ sản phẩm khỏi menu", error);
+      res.status(500).json({ error: "Internal Server Error" });
+    }
+  }
   // Delete product from inventory
   static async deleteProductFromInventory(req, res) {
     const { id, shopId } = req.params;

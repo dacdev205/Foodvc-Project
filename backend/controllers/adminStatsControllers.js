@@ -4,6 +4,7 @@ const Order = require("../models/order");
 const moment = require("moment");
 const statusesAPI = require("../controllers/statusesControllers");
 const Product = require("../models/product");
+const Shop = require("../models/shop");
 module.exports = class StatsAPI {
   static async getAllDataForStats(req, res) {
     try {
@@ -11,7 +12,7 @@ module.exports = class StatsAPI {
       const users = await User.countDocuments();
       const menuItems = await Menu.countDocuments();
       const orders = await Order.countDocuments();
-
+      const shops = await Shop.countDocuments();
       let revenue = 0;
       const deliveredOrders = await Order.find({
         statusId: CompletedStatus,
@@ -33,6 +34,7 @@ module.exports = class StatsAPI {
         users,
         menuItems,
         orders,
+        shops,
         revenue,
       });
     } catch (err) {

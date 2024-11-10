@@ -23,7 +23,14 @@ module.exports = class usersAPI {
         limit = 5,
       } = req.query;
 
+      const adminRole = await Role.findOne({ name: "admin" });
+      const adminRoleId = adminRole ? adminRole._id : null;
+
       const query = {};
+      if (adminRoleId) {
+        query.roles = { $ne: adminRoleId };
+      }
+
       if (searchTerm) {
         if (filterType === "name") {
           query.name = { $regex: searchTerm, $options: "i" };
@@ -32,7 +39,7 @@ module.exports = class usersAPI {
             name: { $regex: searchTerm, $options: "i" },
           });
           if (role) {
-            query.roles = role._id;
+            query.roles = { $in: [role._id], $ne: adminRoleId };
           } else {
             query.roles = null;
           }
@@ -40,6 +47,7 @@ module.exports = class usersAPI {
       }
 
       const users = await User.find(query)
+        .sort({ createdAt: -1 })
         .skip((page - 1) * limit)
         .limit(Number(limit))
         .populate("roles");
@@ -52,6 +60,7 @@ module.exports = class usersAPI {
       res.status(500).json({ message: "Internal Server Error" });
     }
   }
+
   static async getUserRank(req, res) {
     const userId = req.params.id;
 
@@ -360,4 +369,31 @@ module.exports = class usersAPI {
       res.status(500).json({ message: "Internal Server Error" });
     }
   }
+  //   static async getAdminRole(req, res) {
+  //   try {
+  //     const email = req?.decoded?.email;
+
+  //     const adminUser = await User.findOne({ email }).populate("roles");
+
+  //     if (!adminUser) {
+  //       return res.status(404).json({ message: "Không tìm thấy admin!" });
+  //     }
+
+  //     // Collect all permissions from the user's roles
+  //     const permissions = adminUser.roles.reduce((acc, role) => {
+  //       return acc.concat(role.permissions || []);
+  //     }, []);
+
+  //     // Remove duplicate permissions using a Set
+  //     const uniquePermissions = [...new Set(permissions)];
+
+  //     // Send the unique permissions as the response
+  //     return res.status(200).json({ permissions: uniquePermissions });
+
+  //   } catch (error) {
+  //     // Log the error and return a 500 server error response
+  //     console.error("Error fetching admin permissions:", error);
+  //     return res.status(500).json({ message: "Internal Server Error" });
+  //   }
+  // }
 };

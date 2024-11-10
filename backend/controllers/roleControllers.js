@@ -39,8 +39,24 @@ module.exports = class RoleAPI {
   // Get all roles
   static async getAllRoles(req, res) {
     try {
-      const roles = await Role.find().populate("permissions");
-      res.status(200).send({ roles });
+      const { page = 1, limit = 5, search = "" } = req.query;
+
+      const query = search ? { name: { $regex: search, $options: "i" } } : {};
+      // Pagination
+      const roles = await Role.find(query)
+        .sort({ createdAt: -1 })
+        .skip((page - 1) * limit)
+        .limit(Number(limit))
+        .populate("permissions");
+
+      const totalCount = await Role.countDocuments(query);
+
+      res.status(200).send({
+        roles,
+        totalCount,
+        totalPages: Math.ceil(totalCount / limit),
+        currentPage: Number(page),
+      });
     } catch (error) {
       console.error(error);
       res.status(500).send({ message: "Internal Server Error" });

@@ -39,7 +39,54 @@ module.exports = class TransferReqestAPI {
         page = 1,
         limit = 5,
         status = "all",
-        sort = "-createAt",
+        shopId,
+      } = req.query;
+
+      if (!shopId) {
+        return res.status(400).json({ message: "shopId is required" });
+      }
+
+      let query = { shopId };
+
+      if (status && status !== "all") {
+        query.status = status;
+      }
+
+      if (searchTerm) {
+        const productIdsByName = await Product.find({
+          name: { $regex: searchTerm, $options: "i" },
+        }).select("_id");
+
+        query.productId = { $in: productIdsByName.map((p) => p._id) };
+      }
+
+      const totalRequests = await TransferRequest.countDocuments(query);
+      const totalPages = Math.ceil(totalRequests / limit);
+
+      const requests = await TransferRequest.find(query)
+        .populate({
+          path: "productId",
+          select: "name price image",
+          match: { name: { $regex: searchTerm, $options: "i" } },
+        })
+        .sort({ createdAt: -1 })
+        .skip((page - 1) * limit)
+        .limit(Number(limit))
+        .exec();
+
+      res.json({ requests, totalPages });
+    } catch (err) {
+      res.status(500).json({ message: err.message });
+    }
+  }
+
+  static async getRequestTransferToMenuAdmin(req, res) {
+    try {
+      const {
+        searchTerm = "",
+        page = 1,
+        limit = 5,
+        status = "all",
       } = req.query;
 
       let query = {};
@@ -62,6 +109,9 @@ module.exports = class TransferReqestAPI {
         }
       }
 
+      const validPage = Math.max(1, parseInt(page));
+      const skip = (validPage - 1) * limit;
+
       const totalRequests = await TransferRequest.countDocuments(query);
       const totalPages = Math.ceil(totalRequests / limit);
       const requests = await TransferRequest.find(query)
@@ -71,7 +121,7 @@ module.exports = class TransferReqestAPI {
           match: { name: { $regex: searchTerm, $options: "i" } },
         })
         .sort({ createdAt: -1 })
-        .skip((page - 1) * limit)
+        .skip(skip)
         .limit(Number(limit))
         .exec();
 

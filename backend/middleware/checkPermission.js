@@ -20,6 +20,7 @@ const checkPermission = (requiredPermission) => {
       const userPermissions = user.roles.reduce((permissions, role) => {
         return permissions.concat(role.permissions || []);
       }, []);
+
       const hasPermission = userPermissions.some((permission) => {
         return (
           permission.name === requiredPermission ||

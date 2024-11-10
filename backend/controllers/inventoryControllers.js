@@ -16,6 +16,7 @@ module.exports = class inventoryAPI {
         limit = 5,
         sortBy = "",
         sortOrder = "asc",
+        sort = "-createAt",
         shopId,
       } = req.query;
 
@@ -61,6 +62,7 @@ module.exports = class inventoryAPI {
       }
 
       const inventory = await Product.find(query)
+        .sort({ createdAt: -1 })
         .sort(sortOptions)
         .skip((page - 1) * limit)
         .limit(Number(limit));

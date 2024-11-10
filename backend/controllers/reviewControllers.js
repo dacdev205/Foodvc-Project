@@ -32,7 +32,10 @@ module.exports = class reviewAPI {
         filter.sentiment = sentiment;
       }
 
-      const reviews = await Review.find(filter).skip(skip).limit(Number(limit));
+      const reviews = await Review.find(filter)
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(Number(limit));
 
       const totalReviews = await Review.countDocuments(filter);
       const totalPages = Math.ceil(totalReviews / limit);

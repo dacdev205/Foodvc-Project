@@ -3,6 +3,7 @@ const fs = require("fs");
 const Role = require("../models/roles");
 const Shop = require("../models/shop");
 const UserRank = require("../models/userRank");
+const Permission = require("../models/permission");
 module.exports = class usersAPI {
   // get all users
   static async getAllUsers(req, res) {
@@ -124,7 +125,7 @@ module.exports = class usersAPI {
   }
 
   static async createUser(req, res) {
-    const { email, name, photoURL, role = "Người dùng" } = req.body;
+    const { email, name, photoURL, role = "user" } = req.body;
     const query = { email };
 
     try {
@@ -239,17 +240,26 @@ module.exports = class usersAPI {
     const email = req.params.email;
     try {
       const user = await User.findOne({ email: email }).populate("roles");
+
       if (!user) {
         return res.status(404).json({ message: "Không tìm thấy người dùng" });
       }
+
       const permissions = await Promise.all(
-        user.roles.map(async (roleId) => {
-          const role = await Role.findById(roleId);
-          return role ? role.permissions : [];
+        user.roles.map(async (role) => {
+          return role.permissions;
         })
       );
+
       const flatPermissions = [].concat(...permissions);
-      res.status(200).json({ permissions: flatPermissions });
+
+      const permissionDetails = await Permission.find({
+        _id: { $in: flatPermissions },
+      });
+
+      res
+        .status(200)
+        .json({ permissions: permissionDetails, user: user.roles });
     } catch (error) {
       res.status(500).json({ message: error.message });
     }
@@ -294,6 +304,60 @@ module.exports = class usersAPI {
       res.status(200).json(user);
     } catch (error) {
       res.status(500).json({ message: error.message });
+    }
+  }
+  static async createUserWithCustomRoles(req, res) {
+    try {
+      const { name, email, roles, permissions } = req.body;
+
+      let assignedRoles = await Role.find({ name: { $in: roles } });
+
+      if (assignedRoles.length === 0 && permissions) {
+        const newRole = new Role({
+          name: roles[0],
+          permissions,
+        });
+        await newRole.save();
+        assignedRoles = [newRole];
+      }
+
+      const newUser = new User({
+        name,
+        email,
+        roles: assignedRoles.map((role) => role._id),
+      });
+
+      await newUser.save();
+
+      res.status(201).json({
+        message: "Người dùng được tạo thành công với quyền tùy chỉnh!",
+        user: newUser,
+      });
+    } catch (error) {
+      console.error("Lỗi khi tạo người dùng:", error);
+      res
+        .status(500)
+        .json({ error: "Không thể tạo người dùng với quyền tùy chỉnh." });
+    }
+  }
+  static async getAdminPermissions(req, res) {
+    try {
+      const email = req?.decoded?.email;
+      const adminUser = await User.findOne({ email: email }).populate("roles");
+      if (!adminUser) {
+        return res.status(404).json({ message: "Không tìm thấy admin!" });
+      }
+
+      const permissions = adminUser.roles.reduce((acc, role) => {
+        return acc.concat(role.permissions || []);
+      }, []);
+
+      const uniquePermissions = [...new Set(permissions)];
+
+      res.status(200).json({ permissions: uniquePermissions });
+    } catch (error) {
+      console.error("Error fetching admin permissions:", error);
+      res.status(500).json({ message: "Internal Server Error" });
     }
   }
 };

@@ -5,12 +5,12 @@ const checkPermission = require("../middleware/checkPermission");
 //middleware
 router.post(
   "/",
-  // checkPermission("create"),
+  checkPermission("create"),
   conversationsAPI.createConversations
 );
 router.get(
   "/:userId",
-  // checkPermission("read"),
+  checkPermission("read"),
   conversationsAPI.getConversationsById
 );
 module.exports = router;

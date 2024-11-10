@@ -16,6 +16,7 @@ module.exports = class menuAPI {
         maxPrice = Infinity,
         minRating = 0,
         maxRating = 5,
+        sort = "-createaAt",
       } = req.query;
 
       let query = {};
@@ -95,6 +96,7 @@ module.exports = class menuAPI {
             path: "category",
           },
         })
+        .sort({ createdAt: -1 })
         .skip((page - 1) * limit)
         .limit(Number(limit))
         .exec();

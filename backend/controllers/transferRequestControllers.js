@@ -39,6 +39,7 @@ module.exports = class TransferReqestAPI {
         page = 1,
         limit = 5,
         status = "all",
+        sort = "-createAt",
       } = req.query;
 
       let query = {};
@@ -69,7 +70,7 @@ module.exports = class TransferReqestAPI {
           select: "name price image",
           match: { name: { $regex: searchTerm, $options: "i" } },
         })
-
+        .sort({ createdAt: -1 })
         .skip((page - 1) * limit)
         .limit(Number(limit))
         .exec();

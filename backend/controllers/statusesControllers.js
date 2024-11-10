@@ -41,7 +41,7 @@ module.exports = class statusesAPI {
         throw new Error("Status không tìm thấy");
       }
     } catch (err) {
-      throw new Error("Lỗi truy xuất ID Status: " + err.message);
+      throw new Error("Lỗi truy xuất ID trạng thái: " + err.message);
     }
   }
 };

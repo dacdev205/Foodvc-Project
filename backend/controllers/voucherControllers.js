@@ -54,6 +54,7 @@ module.exports = class voucherAPI {
       status,
       expiredBefore,
       expiredAfter,
+
       quantity,
     } = req.query;
     try {
@@ -82,6 +83,7 @@ module.exports = class voucherAPI {
       const skip = (page - 1) * limit;
       const limitNum = parseInt(limit, 10);
       const vouchers = await Voucher.find(query)
+        .sort({ createdAt: -1 })
         .skip(skip)
         .limit(limitNum)
         .exec();

@@ -35,6 +35,10 @@ router.post(
 router.get("/roles/role-detail/:id", verifyToken, usersAPI.getRoleById);
 
 router.post("/", usersAPI.createUser);
+router.post(
+  "/create-user-with-custom-role",
+  usersAPI.createUserWithCustomRoles
+);
 router.get("/search-detail", usersAPI.searchUserNShopByName);
 router.get("/:id", usersAPI.getSigleUser);
 router.patch(

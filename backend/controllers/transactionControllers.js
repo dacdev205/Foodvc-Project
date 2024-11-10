@@ -81,6 +81,7 @@ module.exports = class TransactionAPI {
       const limit = pageSizeNumber;
 
       const transactions = await Transaction.find(query)
+        .sort({ createdAt: -1 })
         .skip(skip)
         .limit(limit)
         .exec();

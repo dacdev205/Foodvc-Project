@@ -56,6 +56,7 @@ module.exports = class AddressAPI {
       const { page = 1, limit = 5 } = req.query;
 
       const addresses = await Address.find({ email: email })
+        .sort({ createdAt: -1 })
         .skip((page - 1) * limit)
         .limit(limit);
 

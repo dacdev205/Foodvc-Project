@@ -11,7 +11,7 @@ module.exports = class shopAPI {
   static async createShop(req, res) {
     try {
       const email = req.decoded.email;
-      const user = await User.findOne({ email });
+      const user = await User.findOne({ email }).populate("roles");
 
       if (!user) {
         return res.status(401).json({ message: "Không có quyền truy cập" });
@@ -45,7 +45,12 @@ module.exports = class shopAPI {
       user.isSeller = true;
 
       const sellerRole = await Role.findOne({ name: "seller" });
-      if (sellerRole && !user.roles.includes(sellerRole._id)) {
+      if (
+        sellerRole &&
+        !user.roles.some(
+          (role) => role._id.toString() === sellerRole._id.toString()
+        )
+      ) {
         user.roles.push(sellerRole._id);
       }
 

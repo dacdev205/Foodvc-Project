@@ -146,6 +146,7 @@ module.exports = class orderAPI {
         }
       }
       const orders = await Order.find(query)
+        .sort({ createdAt: -1 })
         .skip((page - 1) * limit)
         .limit(Number(limit))
         .populate("statusId")
@@ -189,6 +190,7 @@ module.exports = class orderAPI {
       }
 
       const orders = await Order.find(filter)
+        .sort({ createdAt: -1 })
         .skip((page - 1) * limit)
         .limit(limit)
         .populate("statusId")
@@ -220,6 +222,7 @@ module.exports = class orderAPI {
       }
 
       const orders = await Order.find(filter)
+        .sort({ createdAt: -1 })
         .skip((page - 1) * limit)
         .limit(Number(limit))
         .populate("statusId")

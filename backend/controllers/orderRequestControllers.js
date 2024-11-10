@@ -36,6 +36,7 @@ module.exports = class orderRequestAPI {
       }
 
       let requests = await OrderRequest.find({ shopId })
+        .sort({ createdAt: -1 })
         .skip((page - 1) * limit)
         .limit(Number(limit))
         .populate("orderId")

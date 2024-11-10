@@ -113,6 +113,9 @@ import ShopDetail from "../pages/menuPage/ShopDetail";
 import WishStorePage from "../pages/menuPage/WishStore";
 import Transactions from "../pages/dashboard/seller/Transactions";
 import RequestSend2Menu from "../pages/dashboard/seller/RequestSend2Menu";
+import ManagementRoleNPermission from "../pages/dashboard/admin/ManagementRole";
+import ManagementRole from "../pages/dashboard/admin/ManagementRole";
+import ManagementPermission from "../pages/dashboard/admin/ManagementPermission";
 const CreateVoucherLazyLoading = lazy(() =>
   import("../pages/dashboard/seller/CreateVoucher")
 );
@@ -366,6 +369,22 @@ const router = createBrowserRouter([
         element: (
           <Suspense>
             <DashboardLazyLoading />
+          </Suspense>
+        ),
+      },
+      {
+        path: "management-roles",
+        element: (
+          <Suspense>
+            <ManagementRole />
+          </Suspense>
+        ),
+      },
+      {
+        path: "management-permissions",
+        element: (
+          <Suspense>
+            <ManagementPermission />
           </Suspense>
         ),
       },

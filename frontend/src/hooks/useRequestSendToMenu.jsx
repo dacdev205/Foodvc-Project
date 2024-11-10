@@ -2,9 +2,9 @@ import useAxiosPublic from "./useAxiosPublic";
 import { useQuery } from "@tanstack/react-query";
 
 const useRequestSendToMenu = (
-  shopId,
   searchTerm = "",
   status = "all",
+  shopId,
   page = 1,
   limit = 5
 ) => {
@@ -22,7 +22,7 @@ const useRequestSendToMenu = (
     isLoading,
     error,
   } = useQuery({
-    queryKey: ["transfer-requests", shopId, searchTerm, status, page, limit],
+    queryKey: ["transfer-requests", searchTerm, status, shopId, page, limit],
     queryFn: async () => {
       const res = await axiosPublic.get(`/transfer-req/${shopId}`, {
         headers: {
@@ -31,6 +31,7 @@ const useRequestSendToMenu = (
         params: {
           searchTerm,
           status,
+          shopId,
           page,
           limit,
         },

@@ -13,10 +13,6 @@ const useMenuSeller = (
 ) => {
   const axiosPublic = useAxiosPublic();
 
-  const effectiveRatingRange =
-    Array.isArray(ratingRange) && ratingRange.length === 2
-      ? ratingRange
-      : [0, 5];
   const getToken = () => localStorage.getItem("access-token");
   const token = getToken();
 
@@ -35,9 +31,8 @@ const useMenuSeller = (
       limit,
       shopId,
       priceRange,
-      effectiveRatingRange,
+      ratingRange,
     ],
-
     queryFn: async () => {
       const res = await axiosPublic.get("/api/foodvc/seller", {
         headers: {
@@ -52,8 +47,8 @@ const useMenuSeller = (
           shopId,
           minPrice: priceRange[0],
           maxPrice: priceRange[1],
-          minRating: effectiveRatingRange[0],
-          maxRating: effectiveRatingRange[1],
+          minRating: ratingRange[0],
+          maxRating: ratingRange[1],
         },
       });
       return res.data;

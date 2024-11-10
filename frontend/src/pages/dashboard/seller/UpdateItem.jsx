@@ -43,7 +43,7 @@ const UpdateItem = () => {
     try {
       const formData = new FormData();
       formData.append("name", data.name);
-      formData.append("category", data.category);
+      formData.append("category", data.category || product.category._id);
       formData.append("quantity", data.quantity);
       formData.append("price", parseFloat(data.price));
       formData.append("recipe", data.recipe);
@@ -121,8 +121,9 @@ const UpdateItem = () => {
         height: product.height,
         recipe: product.recipe,
       });
+      setValue("recipe", product.recipe);
     }
-  }, [product, reset]);
+  }, [product, reset, setValue]);
 
   return (
     <div className="w-full md:w-[870px] px-4 mx-auto">
@@ -302,7 +303,7 @@ const UpdateItem = () => {
                 </span>
               </label>
               <QuillEditor
-                defaultValue={product.recipe}
+                defaultValue={product?.recipe || ""}
                 onChange={(value) => setValue("recipe", value)}
               />
             </div>

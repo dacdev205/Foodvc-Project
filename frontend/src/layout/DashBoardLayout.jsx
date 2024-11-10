@@ -3,6 +3,7 @@ import { Link, Outlet, useLocation } from "react-router-dom";
 import {
   MdDashboard,
   MdDashboardCustomize,
+  MdOutlineAdminPanelSettings,
   MdOutlineInventory,
   MdOutlineRateReview,
 } from "react-icons/md";
@@ -16,7 +17,7 @@ import {
   FaPercentage,
   FaShoppingBag,
 } from "react-icons/fa";
-import { RiMoneyCnyCircleLine } from "react-icons/ri";
+import { RiAdminLine, RiMoneyCnyCircleLine } from "react-icons/ri";
 import { IoIosAddCircle, IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
 import { AiOutlineMenu } from "react-icons/ai";
 import Login from "../components/Account/Login";
@@ -32,6 +33,8 @@ const DashBoardLayout = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [usersOpen, setUsersOpen] = useState(false);
   const [supportOpen, setSupportOpen] = useState(false);
+  const [usersManagementOpen, setusersManagementOpen] = useState(false);
+
   const [orderRequests, setOrderRequests] = useState(0);
   const location = useLocation();
 
@@ -40,12 +43,13 @@ const DashBoardLayout = () => {
   const toggleMenu = () => setMenuOpen(!menuOpen);
   const toggleSupport = () => setSupportOpen(!supportOpen);
   const toggleUsers = () => setUsersOpen(!usersOpen);
-
+  const toggleUsersManagement = () =>
+    setusersManagementOpen(!usersManagementOpen);
   useEffect(() => {
     const fetchOrderReq = async () => {
       try {
         const res = await orderRequestAPI.getAllCancelReq();
-        const pendingOrders = res.requests.filter(
+        const pendingOrders = res?.requests?.filter(
           (order) => order.status === "Pending"
         );
         setOrderRequests(pendingOrders.length);
@@ -107,22 +111,66 @@ const DashBoardLayout = () => {
                   to="/admin"
                 >
                   <MdDashboard />
-                  Dashboard
+                  Thống kê
                 </Link>
               </li>
               <li>
                 <Link
                   className={`active-link-2 ${
-                    location.pathname.startsWith("/admin/users")
-                      ? "text-green"
-                      : ""
+                    location.pathname === "/admin/users" ? "text-green" : ""
                   }`}
                   to="/admin/users"
                 >
-                  <FaUser />
-                  Quản lý người dùng
+                  <FaUsers />
+                  Quản lý người dùng hệ thống
                 </Link>
               </li>
+              <li>
+                <div
+                  onClick={toggleUsersManagement}
+                  className="cursor-pointer flex items-center active-link"
+                >
+                  <MdOutlineAdminPanelSettings />
+                  Quản lý kiểm soát truy cập
+                  {usersManagementOpen ? (
+                    <IoIosArrowUp className="ml-auto" />
+                  ) : (
+                    <IoIosArrowDown className="ml-auto" />
+                  )}
+                </div>
+              </li>
+              {usersManagementOpen && (
+                <ul className="ml-4">
+                  <li>
+                    <Link
+                      className={`active-link-2 ${
+                        location.pathname.startsWith(
+                          "/admin/management-permissions"
+                        )
+                          ? "text-green"
+                          : ""
+                      }`}
+                      to="/admin/management-permissions"
+                    >
+                      <RiAdminLine />
+                      Quản lý quyền truy cập
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      className={`active-link-2 ${
+                        location.pathname === "/admin/management-roles"
+                          ? "text-green"
+                          : ""
+                      }`}
+                      to="/admin/management-roles"
+                    >
+                      <MdOutlineAdminPanelSettings />
+                      Quản lý vai trò người dùng
+                    </Link>
+                  </li>
+                </ul>
+              )}
               <li>
                 <div
                   onClick={toggleUsers}

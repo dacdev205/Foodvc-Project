@@ -128,7 +128,12 @@ const Users = () => {
 
   const handleDelete = async (user) => {
     try {
-      await axiosSecure.delete(`/users/${user._id}`);
+      await axiosSecure.delete(`/users/${user._id}`, {
+        headers: {
+          authorization: `Bearer ${token}`,
+        },
+      });
+
       setShowConfirmModal(false);
       setUserToDelete(null);
       refetch();
@@ -138,13 +143,20 @@ const Users = () => {
   };
 
   const handleDeleteClick = (user) => {
-    setUserToDelete(user);
-    setShowConfirmModal(true);
+    if (user && user._id) {
+      setUserToDelete(user);
+      setShowConfirmModal(true);
+    } else {
+      console.error("User does not have a valid _id.");
+    }
   };
 
   const confirmDeleteUser = () => {
-    if (userToDelete) {
+    if (userToDelete && userToDelete._id) {
+      console.log("Deleting user with ID:", userToDelete._id);
       handleDelete(userToDelete);
+    } else {
+      console.error("User ID is missing or userToDelete is undefined.");
     }
   };
 
@@ -227,23 +239,27 @@ const Users = () => {
                   <td>{user.name}</td>
                   <td>{user.email}</td>
                   <td>
-                    {user.roles[0].name === "admin" ? (
+                    {user.roles.some(
+                      (role) => role.name.toLowerCase() === "admin"
+                    ) ? (
                       "Admin"
                     ) : (
-                      <select
-                        value={user.roles[0]._id}
-                        onChange={(e) => handleRoleChange(user, e.target.value)}
-                      >
+                      <select value={user.roles._id}>
                         {roles
                           .filter((role) => role.name.toLowerCase() !== "admin")
                           .map((role) => (
                             <option key={role._id} value={role._id}>
-                              {role.name}
+                              {role.name === "user"
+                                ? "Người dùng"
+                                : role.name === "seller"
+                                ? "Người bán"
+                                : role.name}
                             </option>
                           ))}
                       </select>
                     )}
                   </td>
+
                   <td>
                     <button
                       onClick={() => handleDeleteClick(user)}
@@ -267,9 +283,10 @@ const Users = () => {
         />
       </div>
       <ConfirmDeleteModal
-        isOpen={showConfirmModal}
+        showModal={showConfirmModal}
         onClose={() => setShowConfirmModal(false)}
         onConfirm={confirmDeleteUser}
+        title="Xóa người dùng"
         message="Bạn có chắc chắn muốn xóa người dùng này?"
       />
     </div>

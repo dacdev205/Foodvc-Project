@@ -222,15 +222,19 @@ const AddUserModal = ({
                   <span className="label-text text-black">Vai trò:</span>
                 </label>
                 <select
-                  value={role} // Set the value of the select to the role state
-                  onChange={(e) => setRole(e.target.value)} // Update the role state on change
+                  value={role}
+                  onChange={(e) => setRole(e.target.value)}
                   className="input input-sm input-bordered text-black"
                 >
                   {roles
                     .filter((role) => role.name.toLowerCase() !== "admin")
                     .map((role) => (
                       <option key={role._id} value={role._id}>
-                        {role.name}
+                        {role.name === "user"
+                          ? "Người dùng"
+                          : role.name === "seller"
+                          ? "Người bán"
+                          : role.name}
                       </option>
                     ))}
                 </select>

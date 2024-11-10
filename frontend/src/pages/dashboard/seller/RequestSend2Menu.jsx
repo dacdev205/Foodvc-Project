@@ -15,7 +15,7 @@ const RequestSend2Menu = () => {
   const shopId = userData?.shops[0];
 
   const { requests, totalPages, refetch, isLoading, error } =
-    useRequestSendToMenu(shopId, searchTerm, status, page, limit);
+    useRequestSendToMenu(searchTerm, status, shopId, page, limit);
 
   useEffect(() => {
     refetch();

@@ -173,7 +173,7 @@ const ManageInventory = () => {
         shopId,
       });
 
-      if (response.data.message === "Product removed from menu successfully") {
+      if (response) {
         toast.success("Sản phẩm đã được xóa khỏi menu", {
           position: "bottom-right",
           autoClose: 5000,

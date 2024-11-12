@@ -105,22 +105,22 @@ const RequestSend2Menu = () => {
                     <div className="avatar">
                       <div className="mask mask-squircle w-12 h-12">
                         <img
-                          src={`${PF}/${item.productId.image}`}
-                          alt={item.productId.name}
+                          src={`${PF}/${item?.productId?.image}`}
+                          alt={item?.productId?.name}
                         />
                       </div>
                     </div>
                   </td>
                   <td
                     className="tooltip mt-4 tooltip-bottom"
-                    data-tip={item.productId.name}
+                    data-tip={item?.productId?.name}
                   >
-                    {item.productId.name.slice(0, 20)}...
+                    {item?.productId?.name?.slice(0, 20)}...
                   </td>
                   <td>
-                    <FormattedPrice price={item.productId.price} />
+                    <FormattedPrice price={item?.productId?.price} />
                   </td>
-                  <td className="text-center">{item.quantity}</td>
+                  <td className="text-center">{item?.quantity}</td>
                   <td className="text-center">
                     {item.status === "pending"
                       ? "Đang chờ"

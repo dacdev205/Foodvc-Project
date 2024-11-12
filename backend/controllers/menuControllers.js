@@ -1,7 +1,6 @@
 const Menu = require("../models/menu");
 const fs = require("fs");
 const Product = require("../models/product");
-const User = require("../models/user");
 const Category = require("../models/category");
 module.exports = class menuAPI {
   static async fetchMenus(req, res) {
@@ -16,7 +15,6 @@ module.exports = class menuAPI {
         maxPrice = Infinity,
         minRating = 0,
         maxRating = 5,
-        sort = "-createaAt",
       } = req.query;
 
       let query = {};
@@ -86,7 +84,13 @@ module.exports = class menuAPI {
 
       query["_id"] = { $in: menuIdsByRating };
 
-      const totalMenus = await Menu.countDocuments(query);
+      const totalMenus = await Menu.countDocuments(query)
+        .populate({
+          path: "shopId",
+          match: { shop_isActive: true },
+        })
+        .exec();
+
       const totalPages = Math.ceil(totalMenus / limit);
 
       const menus = await Menu.find(query)
@@ -96,12 +100,16 @@ module.exports = class menuAPI {
             path: "category",
           },
         })
+        .populate({
+          path: "shopId",
+          match: { shop_isActive: true },
+        })
         .sort({ createdAt: -1 })
         .skip((page - 1) * limit)
         .limit(Number(limit))
         .exec();
 
-      res.json({ menus, totalPages });
+      res.json({ menus: menus.filter((menu) => menu.shopId), totalPages });
     } catch (err) {
       res.status(500).json({ message: err.message });
     }

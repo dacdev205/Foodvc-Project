@@ -5,5 +5,5 @@ const router = require("express").Router();
 //middleware
 router.post("/", transactionAPI.createTransaction);
 router.get("/", transactionAPI.getTransactionsByShop);
-
+router.get("/admin", transactionAPI.getTransactionsByAdmin);
 module.exports = router;

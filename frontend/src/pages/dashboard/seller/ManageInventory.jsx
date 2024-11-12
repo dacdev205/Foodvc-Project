@@ -32,11 +32,17 @@ const ManageInventory = () => {
   const [sortBy, setSortBy] = useState("");
   const [sortOrder, setSortOrder] = useState("asc");
   const userData = useUserCurrent();
-  const shopId = userData?.shops[0];
-
+  const [shopId, setShopId] = useState(null);
   const [openModal, setOpenModal] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [openUpdateQuantityModal, setOpenUpdateQuantityModal] = useState(false);
+
+  useEffect(() => {
+    if (userData && userData.shops.length > 0) {
+      setShopId(userData.shops[0]);
+    }
+  }, [userData]);
+
   const [inventory, totalPages, refetch, isLoading] = useInventory(
     searchTerm,
     filterType,
@@ -48,8 +54,10 @@ const ManageInventory = () => {
   );
 
   useEffect(() => {
-    refetch();
-  }, [page, searchTerm, filterType, refetch]);
+    if (shopId) {
+      refetch();
+    }
+  }, [page, searchTerm, filterType, refetch, shopId]);
   const handleSearch = (e) => {
     setSearchTerm(e.target.value);
     setPage(1);

@@ -3,15 +3,8 @@ module.exports = class FavoritePdAPI {
   static async fetchAllWishListProductWithUserId(req, res) {
     try {
       const userId = req.params.userId;
-
       const wishList = await WishList.find({ userId }).populate("product");
-      if (wishList.length > 0) {
-        res.status(200).json(wishList);
-      } else {
-        res.status(404).json({
-          message: "Không tìm thấy sản phẩm yêu thích của người dùng",
-        });
-      }
+      res.status(200).json(wishList);
     } catch (err) {
       res.status(500).json({ message: err.message });
     }
@@ -63,12 +56,10 @@ module.exports = class FavoritePdAPI {
       await existingWishItem.save();
       res.json(existingWishItem);
     } catch (err) {
-      res
-        .status(500)
-        .json({
-          message: "Lỗi khi cập nhật sản phẩm trong wishList",
-          error: err,
-        });
+      res.status(500).json({
+        message: "Lỗi khi cập nhật sản phẩm trong wishList",
+        error: err,
+      });
     }
   }
 

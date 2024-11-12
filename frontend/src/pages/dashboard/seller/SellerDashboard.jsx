@@ -34,6 +34,7 @@ const SellerDashboard = () => {
   } = useQuery({
     queryKey: ["stats", shopId],
     queryFn: async () => {
+      if (!shopId) return { stats: [] };
       const res = await axiosSecure.get(`/sellerStats/${shopId}`);
       return res.data;
     },

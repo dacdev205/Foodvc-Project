@@ -5,6 +5,7 @@ const OrderStatus = require("../models/orderStatus");
 const User = require("../models/user");
 const OrderRequest = require("../models/orderRequest");
 const methodDeliAPI = require("./methodDeliControllers");
+const { decrypt } = require("../utils/cryptoUtils");
 module.exports = class orderAPI {
   static async createOrder(req, res) {
     const {
@@ -145,13 +146,35 @@ module.exports = class orderAPI {
           query.orderCode = { $regex: searchTerm, $options: "i" };
         }
       }
+
       const orders = await Order.find(query)
         .sort({ createdAt: -1 })
         .skip((page - 1) * limit)
         .limit(Number(limit))
         .populate("statusId")
+        .populate("addressId")
+        .populate({
+          path: "addressId",
+          select: "phone",
+        })
+        .populate({
+          path: "shopId",
+          select: "shop_id_ghn shop_token_ghn",
+        })
+
         .populate("products.productId")
         .populate("orderRequestId");
+
+      orders.forEach((order) => {
+        try {
+          if (order.shopId && order.shopId.shop_token_ghn) {
+            order.shopId.shop_token_ghn = decrypt(order.shopId.shop_token_ghn);
+          }
+        } catch (error) {
+          console.error("Error decrypting shop_token_ghn:", error.message);
+          order.shopId.shop_token_ghn = null;
+        }
+      });
 
       const totalOrders = await Order.countDocuments(query);
       const totalPages = Math.ceil(totalOrders / limit);
@@ -246,7 +269,20 @@ module.exports = class orderAPI {
           path: "products.productId",
           populate: [{ path: "category" }],
         })
-        .populate("addressId");
+        .populate("addressId")
+        .populate({
+          path: "shopId",
+          select: "shop_token_ghn shop_id_ghn addresses",
+          populate: {
+            path: "addresses",
+            select: "street city district ward phone",
+          },
+        });
+
+      if (order && order.shopId && order.shopId.shop_token_ghn) {
+        order.shopId.shop_token_ghn = decrypt(order.shopId.shop_token_ghn);
+      }
+
       if (order) {
         res.status(200).json(order);
       } else {

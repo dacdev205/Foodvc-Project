@@ -62,6 +62,57 @@ module.exports = class reviewAPI {
       res.status(500).json({ message: error.message });
     }
   }
+  static async getAllReviewsAdmin(req, res) {
+    const { page = 1, limit = 5, searchTerm = "", sentiment = "" } = req.query;
+    const skip = (page - 1) * limit;
+    try {
+      let filter = {};
+
+      if (searchTerm) {
+        filter.comment = { $regex: searchTerm, $options: "i" };
+      }
+
+      if (sentiment) {
+        filter.sentiment = sentiment;
+      }
+
+      const reviews = await Review.find(filter)
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(Number(limit));
+
+      const totalReviews = await Review.countDocuments(filter);
+      const totalPages = Math.ceil(totalReviews / limit);
+
+      const positiveReviews = reviews.filter(
+        (review) => review.sentiment === "positive"
+      ).length;
+      const negativeReviews = reviews.filter(
+        (review) => review.sentiment === "negative"
+      ).length;
+      const positivePercentage = (positiveReviews / totalReviews) * 100 || 0;
+      const negativePercentage = (negativeReviews / totalReviews) * 100 || 0;
+
+      // Send response
+      res.status(200).json({
+        reviews,
+        totalReviews,
+        positiveReviews,
+        negativeReviews,
+        positivePercentage,
+        negativePercentage,
+        totalPages,
+      });
+    } catch (error) {
+      // Log the error for better debugging
+      console.error("Error in getAllReviewsAdmin:", error);
+
+      res.status(500).json({
+        message: "Internal server error",
+        error: error.message, // Include the error message in the response for debugging
+      });
+    }
+  }
 
   static async addReview(req, res) {
     try {

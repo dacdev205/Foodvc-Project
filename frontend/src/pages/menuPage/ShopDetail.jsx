@@ -22,6 +22,7 @@ const ShopDetail = () => {
 
   useEffect(() => {
     const fetchShopDetails = async (page = 1) => {
+      if (!id) return;
       try {
         const response = await fetch(
           `http://localhost:3000/shop/get-shop/${id}`,

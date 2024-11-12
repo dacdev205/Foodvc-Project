@@ -1,5 +1,6 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import useUserCurrent from "./useUserCurrent";
+import useAxiosPublic from "./useAxiosPublic";
 
 const useWishStore = () => {
   const userData = useUserCurrent();
@@ -7,6 +8,7 @@ const useWishStore = () => {
   const token = getToken();
   const id = userData?._id || "";
   const queryClient = useQueryClient();
+  const axiosPublic = useAxiosPublic();
 
   const refetchWishStore = async () => {
     if (!id) {
@@ -22,7 +24,7 @@ const useWishStore = () => {
         return [];
       }
       try {
-        const res = await fetch(`http://localhost:3000/wish-store/user/${id}`, {
+        const res = await axiosPublic.get(`/wish-store/user/${id}`, {
           headers: {
             authorization: `Bearer ${token}`,
           },

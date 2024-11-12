@@ -4,7 +4,12 @@ import react from "@vitejs/plugin-react";
 
 export default defineConfig({
   optimizeDeps: {
-    include: ["@emotion/react", "@emotion/styled", "@mui/material/Tooltip"],
+    include: [
+      "@emotion/react",
+      "@emotion/styled",
+      "@mui/material/Tooltip",
+      "react-quill",
+    ],
   },
   plugins: [
     react({

@@ -192,7 +192,11 @@ const ShopManagement = () => {
 
       <div className="bg-white p-4 rounded-lg shadow-md mb-4 flex items-center space-x-6">
         <div className="text-center">
-          {loading && <CircularProgress size={24} color="success" />}
+          {loading && (
+            <div className="fixed inset-0 flex items-center justify-center z-50">
+              <CircularProgress color="success" />
+            </div>
+          )}
 
           <div className="relative">
             <img
@@ -252,6 +256,10 @@ const ShopManagement = () => {
           <p className="text-gray-700 mt-2">
             <span className="font-semibold">Ngày tham gia: </span>
             {formattedJoinDate}
+          </p>
+          <p className="text-gray-700 mt-2">
+            <span className="font-semibold">Hoạt động: </span>
+            {shop.shop_isActive ? "Đang hoạt động" : "Dừng hoạt động"}
           </p>
           <p className="">Đánh giá: {calculateAverageRating(reviews)} / 5</p>
         </div>

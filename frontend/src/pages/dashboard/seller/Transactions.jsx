@@ -8,6 +8,7 @@ import {
   DialogContent,
   DialogActions,
   TextField,
+  Tooltip,
 } from "@mui/material";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -195,14 +196,35 @@ const Transactions = () => {
                 >
                   <th>{index + 1}</th>
                   <td>{transaction.transactionNo}</td>
-                  <td>{transaction.orderCode}</td>
                   <td>
-                    {transaction.payDate
-                      ? moment(transaction.payDate, "YYYYMMDDHHmmss").format(
-                          "DD/MM/YYYY HH:mm:ss"
-                        )
-                      : ""}
+                    <Tooltip arrow title={transaction.orderCode}>
+                      <span>{transaction.orderCode.slice(0, 10)}...</span>
+                    </Tooltip>
                   </td>
+
+                  <td>
+                    <Tooltip
+                      arrow
+                      title={
+                        transaction.payDate
+                          ? moment(
+                              transaction.payDate,
+                              "YYYYMMDDHHmmss"
+                            ).format("DD/MM/YYYY HH:mm:ss")
+                          : ""
+                      }
+                    >
+                      <span>
+                        {transaction.payDate
+                          ? moment(transaction.payDate, "YYYYMMDDHHmmss")
+                              .format("DD/MM/YYYY HH:mm:ss")
+                              .slice(0, 10)
+                          : ""}
+                        ...
+                      </span>
+                    </Tooltip>
+                  </td>
+
                   <td>
                     <FormattedPrice price={transaction.amount} />
                   </td>
@@ -218,6 +240,8 @@ const Transactions = () => {
                   <td>{transaction.orderInfo}</td>
                   <td>
                     {transaction.refund ? (
+                      <span>Đã yêu cầu hoàn tiền</span>
+                    ) : (
                       <button
                         onClick={() => openRefundModal(transaction)}
                         disabled={transaction.transactionStatus !== "00"}
@@ -225,8 +249,6 @@ const Transactions = () => {
                       >
                         Hoàn tiền
                       </button>
-                    ) : (
-                      <span>Đã yêu cầu hoàn tiền</span>
                     )}
                   </td>
                 </tr>

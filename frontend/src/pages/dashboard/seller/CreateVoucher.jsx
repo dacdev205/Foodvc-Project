@@ -44,6 +44,7 @@ const CreateVoucher = () => {
 
   useEffect(() => {
     const fetchVouchers = async () => {
+      if (!shopId) return;
       try {
         const response = await voucherAPI.getAllVoucher(shopId, {
           page: page,
@@ -249,7 +250,7 @@ const CreateVoucher = () => {
           className="input input-sm text-black"
         />
         <select
-          value={voucherStatus}
+          value={voucherStatus || ""}
           onChange={handleStatusChange}
           className="select select-sm ml-2"
         >

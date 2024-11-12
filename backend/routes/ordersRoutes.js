@@ -18,13 +18,15 @@ router.patch(
 router.get(
   "/allOrder",
   verifyToken,
-  checkPermission("seller_actions"),
+  // checkPermission("seller_actions"),
+  // checkPermission("admin_actions"),
+
   orderAPI.fetchAllOrder
 );
 router.get(
   "/allOrder/admin",
-  verifyToken,
-  checkPermission("admin_actions"),
+  // verifyToken,
+  // checkPermission("admin_actions"),
   orderAPI.getAllOrdersAdmin
 );
 router.get("/:id", verifyToken, checkPermission("read"), orderAPI.getOrderById);

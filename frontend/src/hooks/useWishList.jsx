@@ -1,5 +1,6 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import useUserCurrent from "./useUserCurrent";
+import useAxiosPublic from "./useAxiosPublic";
 
 const useWishList = () => {
   const userData = useUserCurrent();
@@ -7,10 +8,11 @@ const useWishList = () => {
   const token = getToken();
   const id = userData?._id || "";
   const queryClient = useQueryClient();
+  const axiosPublic = useAxiosPublic();
 
   const refetchWishList = async () => {
     if (!id) {
-      return;
+      return { wishList: [], totalPages: 0 };
     }
     await queryClient.invalidateQueries(["wish-list", id]);
   };
@@ -22,7 +24,7 @@ const useWishList = () => {
         return [];
       }
       try {
-        const res = await fetch(`http://localhost:3000/wish-list/user/${id}`, {
+        const res = await axiosPublic.get(`/wish-list/user/${id}`, {
           headers: {
             authorization: `Bearer ${token}`,
           },

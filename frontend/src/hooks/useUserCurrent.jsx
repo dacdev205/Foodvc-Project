@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import useAuth from "./useAuth";
+import useAxiosPublic from "./useAxiosPublic";
 
 const useUserCurrent = () => {
   const { user } = useAuth();
@@ -8,13 +9,14 @@ const useUserCurrent = () => {
   const getToken = () => localStorage.getItem("access-token");
   const token = getToken();
   const [isFetched, setIsFetched] = useState(false);
+  const axiosPublic = useAxiosPublic();
 
   useEffect(() => {
     if (user && token && !isFetched) {
       const fetchUserData = async () => {
         try {
-          const response = await axios.get(
-            `http://localhost:3000/users/getUserByEmail/${user.email}`,
+          const response = await axiosPublic.get(
+            `/users/getUserByEmail/${user.email}`,
             {
               headers: {
                 authorization: `Bearer ${token}`,
@@ -30,7 +32,7 @@ const useUserCurrent = () => {
       };
       fetchUserData();
     }
-  }, [user, token, isFetched]);
+  }, [user, token, isFetched, axiosPublic]);
 
   return userData;
 };

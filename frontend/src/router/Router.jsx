@@ -35,9 +35,11 @@ const SellerDashboardLazyLoading = lazy(() =>
 );
 const UsersLazyLoading = lazy(() => import("../pages/dashboard/admin/Users"));
 const NotFoundPageLazyLoading = lazy(() => import("../ultis/NotFoundPage"));
-const AddInventoryLazyLoading = lazy(() =>
-  import("../pages/dashboard/seller/AddInventory")
-);
+
+// const AddInventory = React.lazy(() =>
+//   import("../pages/dashboard/seller/AddInventory")
+// );
+
 const WishListPageLazyLoading = lazy(() =>
   import("../pages/menuPage/WishListPage")
 );
@@ -84,7 +86,7 @@ const ForgetPasswordLazyLoading = lazy(() =>
   import("../components/Account/ForgetPassword")
 );
 const OrderRequestLazyLoading = lazy(() =>
-  import("../pages/dashboard/seller/OrderRequest")
+  import("../pages/dashboard/adminNseller/OrderRequest")
 );
 const CreateShopLazyLoading = lazy(() =>
   import("../pages/menuPage/CreateShop")
@@ -93,33 +95,67 @@ const MenuLazyLoading = lazy(() => import("../pages/menuPage/Menu"));
 const BlogLazyLoading = lazy(() => import("../pages/Blog/Blog"));
 const AboutLazyLoading = lazy(() => import("../pages/About/About"));
 const ReviewsManagementLazyLoading = lazy(() =>
-  import("../pages/dashboard/seller/ReviewsManagement")
+  import("../pages/dashboard/adminNseller/ReviewsManagement")
 );
 
 const AddressesLazyLoading = lazy(() =>
   import("../components/Address/AddressManagement")
 );
 
-import LoadingSpinner from "../ultis/LoadingSpinner";
-import PrivateRouter from "../PrivateRouter/PrivateRouter";
-import AccountManagement from "../layout/AccountManagement";
-import ProtectedRoute from "../context/ProtectedRoute";
-import OrderSuccess from "../components/Order/OrderSuccess";
-import SearchResult from "../pages/menuPage/SearchResult";
-import UserOrderDetail from "../components/Order/UserOrderDetail";
-import EditCategory from "../pages/dashboard/admin/EditCategory";
-import ShopManagement from "../pages/dashboard/seller/ShopManagement";
-import ShopDetail from "../pages/menuPage/ShopDetail";
-import WishStorePage from "../pages/menuPage/WishStore";
-import Transactions from "../pages/dashboard/seller/Transactions";
-import ManagementReqSend2Menu from "../pages/dashboard/admin/ManagementReqSend2Menu";
-import ManagementRole from "../pages/dashboard/admin/ManagementRole";
-import ManagementPermission from "../pages/dashboard/admin/ManagementPermission";
-import RequestSend2Menu from "../pages/dashboard/seller/RequestSend2Menu";
-import ManageMenuAdmin from "../pages/dashboard/admin/ManageMenuAdmin";
+const AccountManagementLazyLoading = lazy(() =>
+  import("../layout/AccountManagement")
+);
+const OrderSuccess = lazy(() => import("../components/Order/OrderSuccess"));
+const SearchResult = lazy(() => import("../pages/menuPage/SearchResult"));
+const UserOrderDetail = lazy(() =>
+  import("../components/Order/UserOrderDetail")
+);
+const EditCategory = lazy(() =>
+  import("../pages/dashboard/admin/EditCategory")
+);
+const ShopManagement = lazy(() =>
+  import("../pages/dashboard/seller/ShopManagement")
+);
+const ShopDetail = lazy(() => import("../pages/menuPage/ShopDetail"));
+const WishStorePage = lazy(() => import("../pages/menuPage/WishStore"));
+const Transactions = lazy(() =>
+  import("../pages/dashboard/seller/Transactions")
+);
+const ManagementReqSend2Menu = lazy(() =>
+  import("../pages/dashboard/admin/ManagementReqSend2Menu")
+);
+const ManagementRole = lazy(() =>
+  import("../pages/dashboard/admin/ManagementRole")
+);
+const ManagementPermission = lazy(() =>
+  import("../pages/dashboard/admin/ManagementPermission")
+);
+const RequestSend2Menu = lazy(() =>
+  import("../pages/dashboard/seller/RequestSend2Menu")
+);
+const ManageMenuAdmin = lazy(() =>
+  import("../pages/dashboard/admin/ManageMenuAdmin")
+);
+const ManagementShops = lazy(() =>
+  import("../pages/dashboard/admin/ManagementShops")
+);
+const ManagementTransactions = lazy(() =>
+  import("../pages/dashboard/admin/ManagementTransactions")
+);
+const ManagementMethodPay = lazy(() =>
+  import("../pages/dashboard/admin/ManagementMethodPay")
+);
+const ManagementShippingParners = lazy(() =>
+  import("../pages/dashboard/admin/ManagementShippingParners")
+);
 const CreateVoucherLazyLoading = lazy(() =>
   import("../pages/dashboard/seller/CreateVoucher")
 );
+import LoadingSpinner from "../ultis/LoadingSpinner";
+import PrivateRouter from "../PrivateRouter/PrivateRouter";
+import ProtectedRoute from "../context/ProtectedRoute";
+import AddInventory from "../pages/dashboard/seller/AddInventory";
+
 const router = createBrowserRouter([
   {
     path: "/",
@@ -231,7 +267,7 @@ const router = createBrowserRouter([
 
       {
         path: "/user",
-        element: <AccountManagement />,
+        element: <AccountManagementLazyLoading />,
         children: [
           {
             path: "update-profile",
@@ -382,6 +418,39 @@ const router = createBrowserRouter([
         ),
       },
       {
+        path: "management-shops",
+        element: (
+          <Suspense>
+            <ManagementShops />
+          </Suspense>
+        ),
+      },
+      {
+        path: "shipping-partners",
+        element: (
+          <Suspense>
+            <ManagementShippingParners />
+          </Suspense>
+        ),
+      },
+      {
+        path: "management-transactions",
+        element: (
+          <Suspense>
+            <ManagementTransactions />
+          </Suspense>
+        ),
+      },
+      {
+        path: "payment-methods",
+        element: (
+          <Suspense>
+            <ManagementMethodPay />
+          </Suspense>
+        ),
+      },
+
+      {
         path: "request-send-to-menu",
         element: (
           <Suspense>
@@ -397,6 +466,7 @@ const router = createBrowserRouter([
           </Suspense>
         ),
       },
+
       {
         path: "users",
         element: (
@@ -429,22 +499,7 @@ const router = createBrowserRouter([
           </Suspense>
         ),
       },
-      {
-        path: "add-inventory",
-        element: (
-          <Suspense>
-            <AddInventoryLazyLoading />
-          </Suspense>
-        ),
-      },
-      {
-        path: "manage-inventory",
-        element: (
-          <Suspense>
-            <ManageInventoryLazyLoading />
-          </Suspense>
-        ),
-      },
+
       {
         path: "manage-menu",
         element: (
@@ -567,7 +622,7 @@ const router = createBrowserRouter([
         path: "add-inventory",
         element: (
           <Suspense>
-            <AddInventoryLazyLoading />
+            <AddInventory />
           </Suspense>
         ),
       },

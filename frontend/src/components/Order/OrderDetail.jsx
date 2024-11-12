@@ -14,15 +14,17 @@ import {
 } from "@mui/material";
 import { MdOutlineReceiptLong } from "react-icons/md";
 import ghnAPI from "../../api/ghnAPI";
+import useUserCurrent from "../../hooks/useUserCurrent";
 
 const OrderDetail = () => {
   const { id } = useParams();
   const [order, setOrder] = useState(null);
   const [orderDetailGHN, setOrderDetailGHN] = useState();
   const [openModal, setOpenModal] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [loading, setLoading] = useState(true);
   const PRINT_URL = import.meta.env.VITE_PRINT_URL;
+  const userData = useUserCurrent();
+  const isAdmin = userData?.roles.some((role) => role?.name?.includes("admin"));
 
   useEffect(() => {
     const fetchOrderDetail = async () => {
@@ -55,11 +57,13 @@ const OrderDetail = () => {
 
   useEffect(() => {
     const fetchOrderData = async () => {
+      const token = order.shopId.shop_token_ghn;
+      if (!token) return;
       try {
         const res = await ghnAPI.getOrderDetailGHN({
+          Token: token,
           client_order_code: order?.orderCode,
         });
-
         setOrderDetailGHN(res.data.order_code);
       } catch (error) {
         console.log(error);
@@ -72,28 +76,26 @@ const OrderDetail = () => {
 
   const handlePrintBill = async (format) => {
     if (!order) return;
-
+    const token = order.shopId.shop_token_ghn;
+    if (!token) return;
     try {
-      const token2PrintBill = await ghnAPI.printBillGHN({
-        order_codes: [orderDetailGHN],
-      });
-
-      const token = token2PrintBill.data.token;
+      const token2PrintBill = await ghnAPI.printBillGHN(
+        [orderDetailGHN],
+        token
+      );
+      const printToken = token2PrintBill.data.token;
       let printUrl = "";
 
       switch (format) {
         case "A5":
-          printUrl = `${PRINT_URL}${token}`;
-          break;
         case "80x80":
-          printUrl = `${PRINT_URL}${token}`;
-          break;
         case "50x72":
-          printUrl = `${PRINT_URL}${token}`;
+          printUrl = `${PRINT_URL}${printToken}`;
           break;
         default:
           return;
       }
+
       const iframe = document.createElement("iframe");
       iframe.style.position = "absolute";
       iframe.style.width = "0px";
@@ -128,14 +130,16 @@ const OrderDetail = () => {
               <h2 className="text-3xl font-semibold text-gray-800">
                 Chi tiết đơn hàng
               </h2>
-              <Button
-                onClick={handleOpenModal}
-                variant="contained"
-                startIcon={<MdOutlineReceiptLong />}
-                className="bg-green-600 hover:bg-green-500 text-white"
-              >
-                In vận đơn
-              </Button>
+              {!isAdmin && (
+                <Button
+                  onClick={handleOpenModal}
+                  variant="contained"
+                  startIcon={<MdOutlineReceiptLong />}
+                  className="bg-green-600 hover:bg-green-500 text-white"
+                >
+                  In vận đơn
+                </Button>
+              )}
             </div>
             {/* Thông tin đơn hàng */}
             <div className="space-y-4">

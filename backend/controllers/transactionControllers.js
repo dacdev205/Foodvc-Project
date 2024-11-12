@@ -106,4 +106,63 @@ module.exports = class TransactionAPI {
       return res.status(500).json({ message: "Server error" });
     }
   }
+  static async getTransactionsByAdmin(req, res) {
+    try {
+      const {
+        transactionNo,
+        payDate,
+        searchTerm,
+        page = 1,
+        pageSize = 10,
+      } = req.query;
+
+      let query = {};
+
+      if (transactionNo) {
+        query.transactionNo = transactionNo;
+      }
+
+      if (payDate) {
+        query.payDate = payDate;
+      }
+
+      if (searchTerm) {
+        query.$or = [
+          { transactionNo: { $regex: searchTerm, $options: "i" } },
+          { orderCode: { $regex: searchTerm, $options: "i" } },
+        ];
+      }
+
+      const pageNumber = parseInt(page, 10);
+      const pageSizeNumber = parseInt(pageSize, 10);
+
+      const skip = (pageNumber - 1) * pageSizeNumber;
+      const limit = pageSizeNumber;
+
+      const transactions = await Transaction.find(query)
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .exec();
+
+      const totalTransactions = await Transaction.countDocuments(query).exec();
+      const totalPages = Math.ceil(totalTransactions / pageSizeNumber);
+
+      if (!transactions || transactions.length === 0) {
+        return res
+          .status(404)
+          .json({ message: "Không tìm thấy giao dịch nào" });
+      }
+
+      return res.status(200).json({
+        transactions,
+        totalPages,
+        currentPage: pageNumber,
+        totalTransactions,
+      });
+    } catch (error) {
+      console.error("Lỗi nhận giao dịch", error);
+      return res.status(500).json({ message: "Server error" });
+    }
+  }
 };

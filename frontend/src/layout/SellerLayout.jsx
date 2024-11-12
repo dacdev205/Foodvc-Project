@@ -7,13 +7,10 @@ import {
   MdOutlineRateReview,
 } from "react-icons/md";
 import { VscLayoutMenubar } from "react-icons/vsc";
-import { FcStatistics } from "react-icons/fc";
 import {
   FaWarehouse,
   FaUser,
   FaQuestionCircle,
-  FaUsers,
-  FaPercentage,
   FaShoppingBag,
   FaChessBishop,
   FaRegMoneyBillAlt,
@@ -22,7 +19,6 @@ import { RiMoneyCnyCircleLine } from "react-icons/ri";
 import { IoIosAddCircle, IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
 import { AiOutlineMenu } from "react-icons/ai";
 import Login from "../components/Account/Login";
-import useAuth from "../hooks/useAuth";
 import usePermission from "../hooks/usePermission";
 import orderRequestAPI from "../api/orderRequest";
 import useUserCurrent from "../hooks/useUserCurrent";

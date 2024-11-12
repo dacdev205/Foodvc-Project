@@ -1,5 +1,5 @@
 const Payment = require("../models/payment");
-
+const { decrypt } = require("../utils/cryptoUtils");
 module.exports = class PaymentAPI {
   static async createPayment(req, res) {
     const { userId, products, totalAmount } = req.body;
@@ -34,6 +34,7 @@ module.exports = class PaymentAPI {
       const payments = await Payment.find({ userId }).populate(
         "products.productId"
       );
+
       if (payments.length > 0) {
         res.status(200).json(payments);
       } else {
@@ -43,6 +44,7 @@ module.exports = class PaymentAPI {
       res.status(500).json({ message: err.message });
     }
   }
+
   static async updateProductInPayment(req, res) {
     const paymentId = req.params.paymentId;
     const { productId, quantity } = req.body;
@@ -69,19 +71,35 @@ module.exports = class PaymentAPI {
   static async fetchPaymentByUserID(req, res) {
     const userId = req.params.userId;
     try {
-      const payments = await Payment.find({ userId: userId }).populate(
-        "products.productId"
-      );
+      const payments = await Payment.find({ userId: userId })
+        .populate("products.productId")
+        .populate({
+          path: "products.shopId",
+          select: "shop_token_ghn shop_id_ghn addresses",
+          populate: {
+            path: "addresses",
+            select: "street city district ward phone",
+          },
+        });
 
       if (payments.length > 0) {
-        res.status(200).json(payments);
-      } else {
-        res
-          .status(404)
-          .json({ message: "Người dùng không có trang thanh toán nào" });
+        payments.forEach((payment) => {
+          payment.products.forEach((product) => {
+            if (product.shopId?.shop_token_ghn) {
+              product.shopId.shop_token_ghn = decrypt(
+                product.shopId.shop_token_ghn
+              );
+            }
+          });
+        });
+
+        return res.status(200).json(payments);
       }
+      return res
+        .status(404)
+        .json({ message: "Người dùng không có trang thanh toán nào" });
     } catch (err) {
-      res.status(500).json({ message: err.message });
+      return res.status(500).json({ message: err.message });
     }
   }
 };

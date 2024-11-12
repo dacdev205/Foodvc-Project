@@ -36,6 +36,8 @@ app.use("/cart", require("./routes/cartRoutes"));
 app.use("/wish-list", require("./routes/wishListRoutes"));
 app.use("/users", require("./routes/userRoutes"));
 app.use("/reviews", require("./routes/reviewRoutes"));
+app.use("/reviews-admin", require("./routes/reviewAdminRoutes"));
+
 app.use("/inventory", require("./routes/inventoryRoutes"));
 app.use("/check-out", require("./routes/paymentRoutes"));
 app.use("/adminStats", require("./routes/adminStats"));
@@ -58,6 +60,7 @@ app.use("/transactions", require("./routes/transactionsRoutes"));
 app.use("/transfer-req", require("./routes/transferRequest"));
 app.use("/permissions", require("./routes/permissionRoutes"));
 app.use("/roles", require("./routes/rolesRoutes"));
+app.use("/shipping-partners", require("./routes/shippingPartnersRoutes"));
 app.post("/jwt", async (req, res) => {
   const user = req.body;
   const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {

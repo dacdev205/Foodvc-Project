@@ -6,6 +6,7 @@ const Review = require("../models/reviews");
 const Product = require("../models/product");
 const fs = require("fs");
 const wishStore = require("../models/wishStore");
+const { encrypt, decrypt } = require("../utils/cryptoUtils");
 
 module.exports = class shopAPI {
   static async createShop(req, res) {
@@ -25,13 +26,18 @@ module.exports = class shopAPI {
         return res.status(400).json({ message: "Tên cửa hàng đã tồn tại" });
       }
 
+      const encryptedShopToken = encrypt(req.body.shop_token_ghn);
+
       const newShop = new Shop({
         ownerId,
+        shopGHN_id: req.body.shopGNN_id,
+        shippingPartner: req.body.shippingPartner,
         shopName: req.body.shopName,
         shop_image,
+        shop_id_ghn: req.body.shop_id_ghn,
+        shop_token_ghn: encryptedShopToken,
         shop_isOpen: req.body.shop_isOpen ?? true,
         shop_isActive: req.body.shop_isActive ?? true,
-        shop_wallet: req.body.shop_wallet ?? "",
         shop_rating: req.body.shop_rating ?? 0,
         description: req.body.description,
         inventories: req.body.inventories || [],
@@ -62,10 +68,27 @@ module.exports = class shopAPI {
     }
   }
 
-  static async getAllShops(req, res, next) {
+  static async getAllShops(req, res) {
     try {
-      const shops = await Shop.find();
-      res.status(200).json(shops);
+      const { page = 1, limit = 10, searchTerm = "" } = req.query;
+
+      const pageNumber = parseInt(page, 10);
+      const limitNumber = parseInt(limit, 10);
+      const searchFilter = searchTerm
+        ? { shopName: { $regex: searchTerm, $options: "i" } }
+        : {};
+
+      const totalShops = await Shop.countDocuments(searchFilter);
+
+      const shops = await Shop.find(searchFilter)
+        .skip((pageNumber - 1) * limitNumber)
+        .limit(limitNumber);
+
+      res.status(200).json({
+        shops,
+        totalPages: Math.ceil(totalShops / limitNumber),
+        currentPage: pageNumber,
+      });
     } catch (error) {
       res.status(500).json({ message: error.message });
     }
@@ -241,7 +264,6 @@ module.exports = class shopAPI {
       shopName,
       shop_isOpen,
       shop_isActive,
-      shop_wallet,
       description,
       inventories,
       addresses,
@@ -257,7 +279,6 @@ module.exports = class shopAPI {
       if (shopName) shop.shopName = shopName;
       if (shop_isOpen !== undefined) shop.shop_isOpen = shop_isOpen;
       if (shop_isActive !== undefined) shop.shop_isActive = shop_isActive;
-      if (shop_wallet) shop.shop_wallet = shop_wallet;
       if (description) shop.description = description;
       if (inventories) shop.inventories = inventories;
       if (addresses) shop.addresses = addresses;
@@ -284,7 +305,31 @@ module.exports = class shopAPI {
       res.status(500).json({ message: error.message });
     }
   }
+  static async updateShopStatus(req, res) {
+    try {
+      const { shop_isActive } = req.body;
+      const { shopId } = req.params;
+      const updatedShop = await Shop.findByIdAndUpdate(
+        shopId,
+        { shop_isActive },
+        { new: true }
+      );
 
+      if (!updatedShop) {
+        return res.status(404).json({ message: "Shop not found" });
+      }
+
+      res.status(200).json({
+        message: "Shop status updated successfully",
+        shop: updatedShop,
+      });
+    } catch (error) {
+      res.status(500).json({
+        message: "Failed to update shop status",
+        error: error.message,
+      });
+    }
+  }
   static async deleteShop(req, res) {
     try {
       const deletedShop = await Shop.findByIdAndDelete(req.params.shopId);

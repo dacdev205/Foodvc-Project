@@ -1,35 +1,36 @@
 import axios from "axios";
 const url = "https://dev-online-gateway.ghn.vn/shiip/public-api/v2";
-const GHN_TOKEN = import.meta.env.VITE_GHN_TOKEN;
 
 export default class ghnAPI {
-  static async getAddressFOODVC(
-    offset = 0,
-    limit = 50,
-    clientPhone = "0962034466"
-  ) {
+  static async getShopById(client_phone, shopId, GHNToken) {
     try {
-      const response = await axios.post(
-        `${url}/shop/all`,
+      const response = await fetch(
+        "https://dev-online-gateway.ghn.vn/shiip/public-api/v2/shop/all",
         {
-          offset: offset,
-          limit: limit,
-          client_phone: clientPhone,
-        },
-        {
+          method: "POST",
           headers: {
+            Token: GHNToken,
             "Content-Type": "application/json",
-            Token: GHN_TOKEN,
           },
+          body: JSON.stringify({ client_phone }),
         }
       );
-      return response.data;
+
+      const data = await response.json();
+
+      if (data.code === 200) {
+        const shop = data.data.shops.find((shop) => shop._id === shopId);
+        return shop || null;
+      } else {
+        throw new Error(`Error: ${data.message}`);
+      }
     } catch (error) {
-      console.log(error.message);
+      console.error("An error occurred:", error);
       throw error;
     }
   }
-  static async createOrder(payload) {
+
+  static async createOrder(payload, token) {
     try {
       const response = await axios.post(
         `${url}/shipping-order/create`,
@@ -37,7 +38,7 @@ export default class ghnAPI {
         {
           headers: {
             "Content-Type": "application/json",
-            Token: GHN_TOKEN,
+            Token: token,
           },
         }
       );
@@ -47,33 +48,54 @@ export default class ghnAPI {
       throw error;
     }
   }
-  static async cancelOrder(payload) {
+  static async cancelOrder({ order_codes, token, shopId }) {
     try {
       const response = await axios.post(
-        `${url}/switch-status/cancel`,
-        payload,
+        "https://dev-online-gateway.ghn.vn/shiip/public-api/v2/switch-status/cancel",
+        { order_codes },
         {
           headers: {
             "Content-Type": "application/json",
-            Token: GHN_TOKEN,
+            Token: token,
+            ShopId: shopId,
           },
         }
       );
       return response.data;
     } catch (error) {
-      console.log(error.message);
+      console.error("Error in cancelOrder:", error.message);
       throw error;
     }
   }
-  static async getOrderDetailGHN(client_order_code) {
+
+  static async getOrderDetailGHN({ Token, client_order_code }) {
     try {
       const response = await axios.post(
         `${url}/shipping-order/detail-by-client-code`,
-        client_order_code,
+        { client_order_code },
         {
           headers: {
             "Content-Type": "application/json",
-            Token: GHN_TOKEN,
+            Token: Token,
+          },
+        }
+      );
+      return response.data;
+    } catch (error) {
+      console.log("Error fetching order details:", error.message);
+      throw error;
+    }
+  }
+
+  static async printBillGHN(order_codes, token) {
+    try {
+      const response = await axios.post(
+        `${url}/a5/gen-token`,
+        { order_codes },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Token: token,
           },
         }
       );
@@ -83,12 +105,13 @@ export default class ghnAPI {
       throw error;
     }
   }
-  static async printBillGHN(order_codes) {
+
+  static async createShop(shopInfo) {
     try {
-      const response = await axios.post(`${url}/a5/gen-token`, order_codes, {
+      const response = await axios.post(`${url}/shop/register`, shopInfo, {
         headers: {
           "Content-Type": "application/json",
-          Token: GHN_TOKEN,
+          Token: shopInfo.token,
         },
       });
       return response.data;

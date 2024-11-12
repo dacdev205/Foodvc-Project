@@ -5,6 +5,7 @@ const getToken = () => localStorage.getItem("access-token");
 export default class orderRequestAPI {
   static async getAllCancelReq(searchTerm = "", page = 1, limit = 5, shopId) {
     const token = getToken();
+    if (!shopId) return;
     try {
       const response = await axios.get(`${url}/all-requests`, {
         headers: {

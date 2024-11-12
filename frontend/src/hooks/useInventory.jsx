@@ -11,7 +11,6 @@ const useInventory = (
   sortOrder = "asc",
   shopId = ""
 ) => {
-  const userData = useUserCurrent();
   const getToken = () => localStorage.getItem("access-token");
   const axiosPublic = useAxiosPublic();
   const token = getToken();
@@ -23,6 +22,9 @@ const useInventory = (
   } = useQuery({
     queryKey: ["inventory", searchTerm, filterType, page, limit],
     queryFn: async () => {
+      if (!shopId) {
+        return { inventory: [] };
+      }
       const res = await axiosPublic.get("/inventory", {
         headers: {
           authorization: `Bearer ${token}`,

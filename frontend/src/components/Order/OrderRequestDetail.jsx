@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from "react";
 import orderRequestAPI from "../../api/orderRequest";
 import { useNavigate, useParams } from "react-router-dom";
@@ -21,20 +22,34 @@ const OrderRequestDetail = () => {
         console.error("Lỗi khi lấy dữ liệu yêu cầu hủy đơn:", error);
       }
     };
+
     fetchOrderReq();
   }, [id]);
   const fetchShopData = async () => {
+    const token = orderRequest?.shopId?.shop_token_ghn;
+    const shop_id_ghn = orderRequest?.shopId?.shop_id_ghn;
+    if (!token) return;
+    if (!orderRequest) return;
     try {
-      const res = await ghnAPI.getAddressFOODVC();
-      setShopData(res.data.shops[0]);
+      const res = await ghnAPI.getShopById(
+        orderRequest.addresssId?.phone,
+        shop_id_ghn,
+        token
+      );
+      console.log(res);
+
+      setShopData(res);
     } catch (error) {
       console.error(error);
     }
   };
   const fetchOrderData = async () => {
+    const token = orderRequest?.shopId?.shop_token_ghn;
+    if (!token) return;
     if (!orderRequest) return;
     try {
       const res = await ghnAPI.getOrderDetailGHN({
+        Token: token,
         client_order_code: orderRequest.orderId.orderCode,
       });
       setOrderDetailGHN(res.data.order_code);
@@ -43,9 +58,14 @@ const OrderRequestDetail = () => {
     }
   };
   useEffect(() => {
-    fetchShopData();
-  }, []);
+    if (shopData) {
+      fetchShopData();
+    }
+  }, [fetchShopData]);
   useEffect(() => {
+    if (orderRequest) {
+      fetchOrderData();
+    }
     fetchOrderData();
   });
 
@@ -74,18 +94,18 @@ const OrderRequestDetail = () => {
     }
   };
   const handleConfirm = async () => {
+    const token = orderRequest?.shopId?.shop_token_ghn;
+    const shop_id_ghn = orderRequest?.shopId?.shop_id_ghn;
+    if (!token) return;
     try {
       await orderRequestAPI.updateRequest(id, {
         status: "Approved",
       });
-      await ghnAPI.cancelOrder(
-        { order_codes: [orderDetailGHN] },
-        {
-          headers: {
-            ShopId: shopData?._id,
-          },
-        }
-      );
+      await ghnAPI.cancelOrder({
+        order_codes: [orderDetailGHN],
+        token: token,
+        shopId: shop_id_ghn,
+      });
       toast.info("Yêu cầu đã được đồng ý!", {
         position: "bottom-right",
         autoClose: 5000,

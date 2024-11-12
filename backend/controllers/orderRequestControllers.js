@@ -2,6 +2,7 @@ const Order = require("../models/order");
 const OrderRequest = require("../models/orderRequest");
 const statusesAPI = require("./statusesControllers");
 const Menu = require("../models/menu");
+const { decrypt } = require("../utils/cryptoUtils");
 module.exports = class orderRequestAPI {
   static async createCancelRequest(req, res) {
     try {
@@ -40,6 +41,7 @@ module.exports = class orderRequestAPI {
         .skip((page - 1) * limit)
         .limit(Number(limit))
         .populate("orderId")
+
         .populate("userId");
 
       if (searchTerm) {
@@ -65,11 +67,22 @@ module.exports = class orderRequestAPI {
     try {
       const { id } = req.params;
       const request = await OrderRequest.findById(id)
-        .populate("orderId")
+        .populate({
+          path: "orderId",
+          populate: { path: "addressId", select: "phone" },
+        })
+        .populate({
+          path: "shopId",
+          select: "shop_id_ghn shop_token_ghn",
+        })
         .populate("userId");
 
       if (!request) {
         return res.status(404).json({ message: "Yêu cầu không tìm thấy." });
+      }
+
+      if (request.shopId?.shop_token_ghn) {
+        request.shopId.shop_token_ghn = decrypt(request.shopId.shop_token_ghn);
       }
 
       res.status(200).json(request);

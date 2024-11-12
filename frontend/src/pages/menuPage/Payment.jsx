@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from "react";
 import LoadingSpinner from "../../ultis/LoadingSpinner";
 import usePayment from "../../hooks/usePayment";
@@ -20,6 +21,12 @@ import cartAPI from "../../api/cartAPI";
 import { useNavigate } from "react-router-dom";
 import PaymentMethodModal from "../../components/PaymentMethod";
 import { Bounce, toast } from "react-toastify";
+import {
+  generateRandomString,
+  extractProductData,
+  calculatePrice,
+} from "/src/ultis/helpers.js";
+import { sendEmailToUser } from "../../ultis/helpers";
 
 const Payment = () => {
   const [payment, refetch, isLoading] = usePayment();
@@ -41,7 +48,6 @@ const Payment = () => {
   const [selectedVoucher, setSelectedVoucher] = useState(null);
   const [isVoucherApplied, setIsVoucherApplied] = useState(false);
   const [discountedAmount, setDiscountedAmount] = useState(0);
-  const GHN_TOKEN = import.meta.env.VITE_GHN_TOKEN;
   const getToken = () => localStorage.getItem("access-token");
   const token = getToken();
   const navigate = useNavigate();
@@ -59,54 +65,30 @@ const Payment = () => {
     district: { districtId: null, districtName: "" },
     ward: { wardCode: "", wardName: "" },
   });
+
   useEffect(() => {
     const fetchShopData = async () => {
+      const shopId = payment[0]?.products[0]?.shopId?.shop_id_ghn;
+      if (!shopId) return;
       try {
-        const res = await ghnAPI.getAddressFOODVC();
-        setShopData(res.data.shops[0]);
+        const res = await ghnAPI.getShopById(
+          payment[0]?.products[0]?.shopId?.addresses[0]?.phone,
+          Number(shopId),
+          payment[0]?.products[0]?.shopId.shop_token_ghn
+        );
+        setShopData(res);
       } catch (error) {
         console.error(error);
       }
     };
-    fetchShopData();
-  }, []);
-
-  useEffect(() => {
     const fetchPaymentMethods = async () => {
       try {
-        const methods = await axios.get(
-          "http://localhost:3000/method-deli/all_methods"
-        );
-        setPaymentMethods(methods.data);
+        const res = await axios.get(`${PF}/method-deli/all_methods`);
+        setPaymentMethods(res.data);
       } catch (error) {
         console.error("Error fetching payment methods:", error);
       }
     };
-
-    fetchPaymentMethods();
-  }, []);
-  const handleOpenPaymentMethodModal = () => {
-    setIsPaymentMethodModalOpen(true);
-  };
-
-  const handleClosePaymentMethodModal = () => {
-    setIsPaymentMethodModalOpen(false);
-  };
-
-  const handleSelectPaymentMethod = (method) => {
-    setSelectedPaymentMethod(method);
-    setPaymentMethodSelected(true);
-    localStorage.setItem("selectedPaymentMethod", JSON.stringify(method));
-    handleClosePaymentMethodModal();
-  };
-  useEffect(() => {
-    const savedPaymentMethod = localStorage.getItem("selectedPaymentMethod");
-    if (savedPaymentMethod) {
-      setSelectedPaymentMethod(JSON.parse(savedPaymentMethod));
-      setPaymentMethodSelected(true);
-    }
-  }, []);
-  useEffect(() => {
     const fetchVoucherData = async () => {
       payment.forEach((item) => {
         item.products.forEach(async (product) => {
@@ -116,17 +98,10 @@ const Payment = () => {
         });
       });
     };
+
+    fetchShopData();
+    fetchPaymentMethods();
     fetchVoucherData();
-  }, [payment]);
-  useEffect(() => {
-    let total = 0;
-    payment.forEach((item) => {
-      item.products.forEach((product) => {
-        const totalPrice = product.productId.price * product.quantity;
-        total += totalPrice;
-      });
-    });
-    setSubOrderTotal(total);
   }, [payment]);
 
   useEffect(() => {
@@ -160,67 +135,37 @@ const Payment = () => {
     userData,
   ]);
 
-  const calculatePrice = (item) => {
-    const totalPrice = item.productId.price * item.quantity;
-    return parseFloat(totalPrice.toFixed(2));
-  };
-  const applyVoucher = (voucherCode) => {
+  const applyVoucher = async (voucherCode) => {
     setSelectedVoucher(voucherCode);
-    payment.forEach(async (item) => {
+    try {
       const res = await axios.post(
-        "http://localhost:3000/vouchers/apply",
-        {
-          voucherCode: voucherCode.code,
-          paymentId: item._id,
-        },
-        {
-          headers: {
-            authorization: `Bearer ${token}`,
-          },
-        }
+        `${PF}/vouchers/apply`,
+        { voucherCode: voucherCode.code, paymentId: payment[0]._id },
+        { headers: { authorization: `Bearer ${token}` } }
       );
       setDiscountedAmount(res.data.discountedAmount);
-    });
-    setIsVoucherApplied(true);
-    setIsVoucherModalOpen(!isVoucherModalOpen);
-  };
-  function generateRandomString(length) {
-    let result = "";
-    const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-    const charactersLength = characters.length;
-    for (let i = 0; i < length; i++) {
-      result += characters.charAt(Math.floor(Math.random() * charactersLength));
-    }
-    return result;
-  }
-
-  const sendEmailToUser = async (email, orderId) => {
-    try {
-      await axios.post("http://localhost:3000/email", {
-        email: email,
-        subject: "Xác nhận đơn hàng từ FOODVC",
-        html: `
-        <html>
-        <head>
-          <style>
-            @import url('https://unpkg.com/tailwindcss@^2.0/dist/tailwind.min.css');
-          </style>
-        </head>
-        <body class="font-sans bg-gray-100">
-          <div class="max-w-xl mx-auto p-8 bg-white rounded shadow">
-            <h1 class="text-2xl font-bold text-center text-gray-800 mb-4">Xác nhận đơn hàng của bạn</h1>
-            <h2 class="text-lg font-semibold text-gray-700 mb-2">Mã đơn hàng: ${orderId}</h2>
-            <p class="text-gray-600 mb-2"><span class="font-semibold">Email:</span> ${email}</p>
-            <p class="text-gray-600 mb-4">Cảm ơn bạn đã mua sắm tại FOODVC. Chúng tôi sẽ xử lý đơn hàng của bạn trong thời gian sớm nhất.</p>
-          </div>
-        </body>
-        </html>
-      `,
-      });
+      setIsVoucherApplied(true);
+      setIsVoucherModalOpen(false);
     } catch (error) {
-      console.error("Error sending email to:", email, error);
+      console.error("Error applying voucher:", error);
     }
   };
+  useEffect(() => {
+    const total = payment.reduce(
+      (acc, item) =>
+        acc +
+        item.products.reduce(
+          (sum, product) => sum + product.productId.price * product.quantity,
+          0
+        ),
+      0
+    );
+    setSubOrderTotal(total);
+    const finalTotal = isVoucherApplied
+      ? discountedAmount + shippingFee
+      : total + shippingFee;
+    setOrderTotal(finalTotal);
+  }, [payment, shippingFee, discountedAmount]);
   function getPickShifts() {
     let currentHour = new Date().getHours();
     if (currentHour < 12) {
@@ -231,28 +176,6 @@ const Payment = () => {
       return [3];
     }
   }
-  const extractProductData = (payment) => {
-    let totalHeight = 0;
-    let totalLength = 0;
-    let totalWeight = 0;
-    let totalWidth = 0;
-
-    payment.forEach((item) => {
-      item.products.forEach((product) => {
-        const { height, length, weight, width } = product.productId;
-        totalHeight += height;
-        totalLength += length;
-        totalWeight += weight;
-        totalWidth += width;
-      });
-    });
-    return {
-      totalHeight,
-      totalLength,
-      totalWeight,
-      totalWidth,
-    };
-  };
 
   const handleBuyItem = async () => {
     try {
@@ -271,7 +194,9 @@ const Payment = () => {
         return;
       }
       if (selectedPaymentMethod.methodId === 1) {
-        await handleCODPayment();
+        if (shopData) {
+          await handleCODPayment();
+        }
       } else if (selectedPaymentMethod.methodId === 2) {
         await handleVNPayPayment();
       } else {
@@ -282,6 +207,73 @@ const Payment = () => {
       console.error("Đã xảy ra lỗi trong quá trình thanh toán:", error);
     }
   };
+  const createPayload = (
+    payment,
+    note,
+    shopData,
+    addressUser,
+    subOrderTotal,
+    orderTotal
+  ) => {
+    const randomId = generateRandomString(20);
+    const productData = extractProductData(payment);
+    return {
+      payment_type_id: 2,
+      note: note,
+      required_note: "CHOXEMHANGKHONGTHU",
+      return_phone: `${shopData.phone}`,
+      return_address: `${shopData.address}`,
+      return_district_id: `${shopData.district_id}`,
+      return_ward_code: `${shopData.ward_code}`,
+      client_order_code: randomId,
+      from_name: `${shopData.name}`,
+      from_phone: `${shopData.phone}`,
+      from_address: `${shopData.address}`,
+      from_ward_name:
+        payment[0]?.products[0]?.shopId?.addresses[0]?.ward?.wardName,
+      from_district_name:
+        payment[0]?.products[0]?.shopId?.addresses[0]?.district?.districtName,
+      from_province_name:
+        payment[0]?.products[0]?.shopId?.addresses[0]?.city?.cityName,
+      to_name: addressUser.fullName,
+      to_phone: addressUser.phone,
+      to_address: `${addressUser?.street}, ${addressUser?.ward.wardName}, ${addressUser?.district.districtName}, ${addressUser?.city.cityName}`,
+      to_ward_name: addressUser?.ward.wardName,
+      to_district_name: addressUser?.district.districtName,
+      to_province_name: addressUser?.city.cityName,
+      cod_amount: subOrderTotal,
+      content: note,
+      weight: productData.totalWeight,
+      length: productData.totalLength,
+      width: productData.totalWidth,
+      height: productData.totalHeight,
+      cod_failed_amount: 0,
+      pick_station_id: 1444,
+      deliver_station_id: null,
+      insurance_value: Math.min(orderTotal, 5000000),
+      service_id: 0,
+      service_type_id: 2,
+      coupon: null,
+      pickup_time: Math.floor(Date.now() / 1000),
+      pick_shift: getPickShifts(),
+      items: payment.flatMap((item) =>
+        item.products.map((product) => ({
+          name: product.productId.name,
+          quantity: product.quantity,
+          price: parseInt(product.productId.price),
+        }))
+      ),
+    };
+  };
+  const createOrderGhn = async (payload, shopToken) => {
+    const response = await ghnAPI.createOrder(payload, shopToken);
+    if (!response.status === 200) {
+      console.error("Lỗi tạo đơn hàng GHN:", response.message);
+      return null;
+    }
+    return response;
+  };
+
   const handleVNPayPayment = async () => {
     const randomId = generateRandomString(20);
     const productData = extractProductData(payment);
@@ -322,14 +314,18 @@ const Payment = () => {
           return_phone: `${shopData.phone}`,
           return_address: `${shopData.address}`,
           return_district_id: `${shopData.district_id}`,
-          return_ward_code: "",
+          return_ward_code: `${shopData.ward_code}`,
           client_order_code: randomId,
           from_name: `${shopData.name}`,
           from_phone: `${shopData.phone}`,
           from_address: `${shopData.address}`,
-          from_ward_name: "Xuân Khánh",
-          from_district_name: "Ninh Kiều",
-          from_province_name: "Cần Thơ",
+          from_ward_name:
+            payment[0]?.products[0]?.shopId?.addresses[0]?.ward?.wardName,
+          from_district_name:
+            payment[0]?.products[0]?.shopId?.addresses[0]?.district
+              ?.districtName,
+          from_province_name:
+            payment[0]?.products[0]?.shopId?.addresses[0]?.city?.cityName,
           to_name: addressUser.fullName,
           to_phone: addressUser.phone,
           to_address: `${addressUser?.street}, ${addressUser?.ward.wardName}, ${addressUser?.district.districtName}, ${addressUser?.city.cityName}`,
@@ -360,6 +356,10 @@ const Payment = () => {
           ),
         })
       );
+      const ghnResponse = await createOrderGhn(
+        JSON.parse(localStorage.getItem("orderDataPostGHN")),
+        payment[0]?.products[0]?.shopId.shop_token_ghn
+      );
       window.location.href = res.data.paymentUrl;
     } catch (error) {
       console.error("Payment error:", error);
@@ -385,14 +385,17 @@ const Payment = () => {
       return_phone: `${shopData.phone}`,
       return_address: `${shopData.address}`,
       return_district_id: `${shopData.district_id}`,
-      return_ward_code: "",
+      return_ward_code: `${shopData.ward_code}`,
       client_order_code: randomId,
       from_name: `${shopData.name}`,
       from_phone: `${shopData.phone}`,
       from_address: `${shopData.address}`,
-      from_ward_name: "Xuân Khánh",
-      from_district_name: "Ninh Kiều",
-      from_province_name: "Cần Thơ",
+      from_ward_name:
+        payment[0]?.products[0]?.shopId?.addresses[0]?.ward?.wardName,
+      from_district_name:
+        payment[0]?.products[0]?.shopId?.addresses[0]?.district?.districtName,
+      from_province_name:
+        payment[0]?.products[0]?.shopId?.addresses[0]?.city?.cityName,
       to_name: addressUser.fullName,
       to_phone: addressUser.phone,
       to_address: `${addressUser?.street}, ${addressUser?.ward.wardName}, ${addressUser?.district.districtName}, ${addressUser?.city.cityName}`,
@@ -422,7 +425,11 @@ const Payment = () => {
         }))
       ),
     };
-    const createOrderGhn = await ghnAPI.createOrder(payload);
+
+    const createOrderGhn = await ghnAPI.createOrder(
+      payload,
+      payment[0]?.products[0]?.shopId.shop_token_ghn
+    );
     if (!createOrderGhn.status === 200) {
       console.error("Lỗi tạo đơn hàng GHN:", createOrderGhn.message);
       return;
@@ -489,6 +496,8 @@ const Payment = () => {
             weight: product.productId.weight,
           }))
         );
+        const token = payment[0]?.products[0]?.shopId.shop_token_ghn;
+        if (!token) return;
         try {
           const response = await axios.post(
             "https://dev-online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/fee",
@@ -505,7 +514,7 @@ const Payment = () => {
             },
             {
               headers: {
-                Token: GHN_TOKEN,
+                Token: token,
                 ShopId: shopData?._id,
                 "Content-Type": "application/json",
               },
@@ -519,7 +528,12 @@ const Payment = () => {
     };
 
     calculateShippingFee();
-  }, [addressUser, shopData, payment, GHN_TOKEN]);
+  }, [
+    addressUser,
+    shopData,
+    payment,
+    payment[0]?.products[0]?.shopId.shop_token_ghn,
+  ]);
 
   const handleRemoveVoucher = () => {
     setSelectedVoucher(null);
@@ -542,6 +556,25 @@ const Payment = () => {
     setAddress(newAddress);
     setIsModalOpen(false);
   };
+  const handleClosePaymentMethodModal = () => {
+    setIsPaymentMethodModalOpen(false);
+  };
+  const handleOpenPaymentMethodModal = () => {
+    setIsPaymentMethodModalOpen(true);
+  };
+  const handleSelectPaymentMethod = (method) => {
+    setSelectedPaymentMethod(method);
+    setPaymentMethodSelected(true);
+    localStorage.setItem("selectedPaymentMethod", JSON.stringify(method));
+    handleClosePaymentMethodModal();
+  };
+  useEffect(() => {
+    const savedPaymentMethod = localStorage.getItem("selectedPaymentMethod");
+    if (savedPaymentMethod) {
+      setSelectedPaymentMethod(JSON.parse(savedPaymentMethod));
+      setPaymentMethodSelected(true);
+    }
+  }, []);
   if (!userData || !userData._id) {
     return null;
   }
@@ -640,21 +673,21 @@ const Payment = () => {
                               <div className="avatar p-3">
                                 <div className="mask mask-squircle w-12 h-12">
                                   <img
-                                    src={PF + "/" + product.productId.image}
+                                    src={PF + "/" + product?.productId.image}
                                     alt="product"
                                   />
                                 </div>
                               </div>
                               <span className="p-2">
-                                {product.productId.name.slice(0, 50)}...
+                                {product?.productId?.name?.slice(0, 50)}...
                               </span>
                             </div>
                           </td>
                           <td>
-                            <FormattedPrice price={product.productId.price} />
+                            <FormattedPrice price={product?.productId.price} />
                           </td>
                           <td className="text-center">
-                            <div className="">{product.quantity}</div>
+                            <div className="">{product?.quantity}</div>
                           </td>
                           <td>
                             <FormattedPrice price={calculatePrice(product)} />

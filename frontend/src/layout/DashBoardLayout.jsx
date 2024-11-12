@@ -13,6 +13,7 @@ import {
   FaQuestionCircle,
   FaUsers,
   FaShoppingBag,
+  FaShippingFast,
 } from "react-icons/fa";
 import { FaRankingStar } from "react-icons/fa6";
 import {
@@ -30,7 +31,6 @@ import { AiOutlineMenu } from "react-icons/ai";
 import { VscLayoutMenubar } from "react-icons/vsc";
 
 const DashBoardLayout = () => {
-  const { loading } = useAuth();
   const [rolePermission, isPermissionLoading] = usePermission("admin_pages");
   const [methodPayOpen, setMethodPayOpen] = useState(false);
   const [inventoryOpen, setInventoryOpen] = useState(false);
@@ -54,7 +54,7 @@ const DashBoardLayout = () => {
         const pendingOrders = res?.requests?.filter(
           (order) => order.status === "Pending"
         );
-        setOrderRequests(pendingOrders.length);
+        setOrderRequests(pendingOrders?.length);
       } catch (error) {
         console.error("Error fetching order requests:", error);
       }
@@ -203,11 +203,11 @@ const DashBoardLayout = () => {
               <li>
                 <Link
                   className={`active-link-2 ${
-                    location.pathname.startsWith("/admin/method-pay")
+                    location.pathname.startsWith("/admin/payment-methods")
                       ? "text-green"
                       : ""
                   }`}
-                  to="/admin/method-pay"
+                  to="/admin/payment-methods"
                 >
                   <RiSecurePaymentLine />
                   Quản lý phương thức thanh toán
@@ -216,11 +216,26 @@ const DashBoardLayout = () => {
               <li>
                 <Link
                   className={`active-link-2 ${
-                    location.pathname.startsWith("/admin/transactions")
+                    location.pathname.startsWith("/admin/shipping-partners")
                       ? "text-green"
                       : ""
                   }`}
-                  to="/admin/transactions"
+                  to="/admin/shipping-partners"
+                >
+                  <FaShippingFast />
+                  Quản lý đối tác vận chuyển
+                </Link>
+              </li>
+              <li>
+                <Link
+                  className={`active-link-2 ${
+                    location.pathname.startsWith(
+                      "/admin/management-transactions"
+                    )
+                      ? "text-green"
+                      : ""
+                  }`}
+                  to="/admin/management-transactions"
                 >
                   <RiMoneyDollarBoxFill />
                   Quản lý giao dịch

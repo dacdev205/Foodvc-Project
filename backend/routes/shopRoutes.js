@@ -17,10 +17,11 @@ let upload = multer({
   storage: storage,
 }).single("image");
 //middleware
-
+router.get("/", shopAPI.getAllShops);
 router.post("/create-shop", upload, verifyToken, shopAPI.createShop);
 router.get("/get-shop/:shopId", shopAPI.fetchShopById);
 router.get("/get-shop-detail/:shopId", shopAPI.getShopById);
 router.patch("/update/:shopId", upload, shopAPI.updateShop);
+router.patch("/update-status/:shopId", shopAPI.updateShopStatus);
 
 module.exports = router;

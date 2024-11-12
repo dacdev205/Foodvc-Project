@@ -92,7 +92,33 @@ export default class orderAPI {
       throw error;
     }
   }
+  static async getAllOrderAdmin(
+    searchTerm = "",
+    searchStatus = "",
+    page = 1,
+    limit = 5
+  ) {
+    const token = getToken();
 
+    try {
+      const res = await axios.get(`${url}/allOrder/admin`, {
+        headers: {
+          authorization: `Bearer ${token}`,
+        },
+        params: {
+          searchTerm,
+          searchStatus,
+          page,
+          limit,
+        },
+      });
+
+      return res.data;
+    } catch (error) {
+      console.error("Error fetching orders:", error);
+      throw error;
+    }
+  }
   static async updateOrderStatus(orderId, statusId) {
     const token = getToken();
 

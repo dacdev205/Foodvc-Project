@@ -24,6 +24,9 @@ const useRequestSendToMenu = (
   } = useQuery({
     queryKey: ["transfer-requests", searchTerm, status, shopId, page, limit],
     queryFn: async () => {
+      if (!shopId) {
+        return { requests: [], totalPages: 0 };
+      }
       const res = await axiosPublic.get(`/transfer-req/${shopId}`, {
         headers: {
           authorization: `Bearer ${token}`,

@@ -95,7 +95,9 @@ module.exports = class usersAPI {
   static async getUserByEmail(req, res) {
     const email = req.params.email;
     try {
-      const user = await User.findOne({ email }).populate("rank");
+      const user = await User.findOne({ email })
+        .populate("rank")
+        .populate("roles");
       res.status(200).json(user);
     } catch (error) {
       res.status(500).json({ message: error.message });

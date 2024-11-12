@@ -18,16 +18,14 @@ const OrdersTracking = () => {
   const [totalPages, setTotalPages] = useState(1);
   const userData = useUserCurrent();
   const shopId = userData?.shops[0];
-  const isAdmin = userData?.roles.some((role) =>
-    role?.permissions?.includes("dashboard_actions")
-  );
+  const isAdmin = userData?.roles.some((role) => role?.name?.includes("admin"));
 
   useEffect(() => {
     const fetchAllOrders = async () => {
       setLoading(true);
       try {
         const response = isAdmin
-          ? await orderAPI.getAllOrder(searchTerm, searchStatus, page, 5)
+          ? await orderAPI.getAllOrderAdmin(searchTerm, searchStatus, page, 5)
           : await orderAPI.getAllOrder(
               searchTerm,
               searchStatus,
@@ -36,6 +34,7 @@ const OrdersTracking = () => {
               shopId
             );
         setTotalPages(response.totalPages);
+
         setAllOrders(response.orders);
       } catch (error) {
         console.error("Failed to fetch orders:", error);
@@ -44,10 +43,10 @@ const OrdersTracking = () => {
         setLoading(false);
       }
     };
-    if (shopId) {
+    if (userData) {
       fetchAllOrders();
     }
-  }, [searchTerm, searchStatus, page, shopId, isAdmin]);
+  }, [searchTerm, searchStatus, page, shopId, isAdmin, userData]);
 
   useEffect(() => {
     const fetchStatuses = async () => {

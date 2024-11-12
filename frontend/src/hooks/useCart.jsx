@@ -1,5 +1,7 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import useUserCurrent from "./useUserCurrent";
+import useAxiosPublic from "./useAxiosPublic";
+import { responsiveProperty } from "@mui/material/styles/cssUtils";
 
 const useCart = () => {
   const userData = useUserCurrent();
@@ -7,6 +9,8 @@ const useCart = () => {
   const queryClient = useQueryClient();
   const getToken = () => localStorage.getItem("access-token");
   const token = getToken();
+  const axiosPublic = useAxiosPublic();
+
   const refetchCart = async () => {
     if (!id) {
       return;
@@ -22,22 +26,17 @@ const useCart = () => {
       }
 
       try {
-        const res = await fetch(`http://localhost:3000/cart/user/${id}`, {
+        const res = await axiosPublic.get(`/cart/user/${id}`, {
           headers: {
             authorization: `Bearer ${token}`,
           },
         });
 
-        if (res.status === 404) {
-          return [];
-        }
-
-        if (!res.ok) {
-          return [];
-        }
-
-        return await res.json();
+        return res.data;
       } catch (error) {
+        if (error.response?.status !== 404) {
+          console.error("Error fetching cart data:", error);
+        }
         return [];
       }
     },

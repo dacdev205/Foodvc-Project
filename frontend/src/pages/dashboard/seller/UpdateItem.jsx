@@ -20,6 +20,7 @@ const UpdateItem = () => {
 
   useEffect(() => {
     const fetchProductDetail = async () => {
+      if (!shopId) return;
       try {
         const response = await inventoryAPI.getProductById(id, shopId);
         setProduct(response);

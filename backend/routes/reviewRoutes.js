@@ -7,6 +7,7 @@ const verifyToken = require("../middleware/verifyToken");
 router.post("/", verifyToken, checkPermission("create"), reviewAPI.addReview);
 router.get("/:productId", reviewAPI.getReviewsByProductId);
 router.get("/", reviewAPI.getAllReviews);
+
 router.post(
   "/update-sentiment",
   // verifyToken,

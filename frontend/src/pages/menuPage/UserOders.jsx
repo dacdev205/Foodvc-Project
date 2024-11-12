@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useEffect } from "react";
 import useOrders from "../../hooks/useOrders";
 import {
@@ -6,19 +7,17 @@ import {
   Box,
   Modal,
   Button,
-  MenuItem,
-  Select,
   Pagination,
   CircularProgress,
 } from "@mui/material";
 import FormattedPrice from "../../ultis/FormatedPriece";
-import axios from "axios";
 import ghnAPI from "../../api/ghnAPI";
 import { Bounce, toast } from "react-toastify";
 import WarningModal from "../../components/Modal/WarningModal";
 import orderAPI from "../../api/orderAPI";
 import orderRequestAPI from "../../api/orderRequest";
 import { useNavigate } from "react-router-dom";
+import { useCallback } from "react";
 
 const UserOrders = () => {
   const navigate = useNavigate();
@@ -48,30 +47,40 @@ const UserOrders = () => {
 
   const handleChange = (event, newValue) => setValue(newValue);
 
-  const fetchShopData = async () => {
-    try {
-      const res = await ghnAPI.getAddressFOODVC();
-      setShopData(res.data.shops[0]);
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  const fetchOrderData = async () => {
+  const fetchShopData = useCallback(async () => {
     if (!selectedOrder) return;
+    const token = selectedOrder?.shopId?.shop_token_ghn;
+    if (!token) return;
+    try {
+      const res = await ghnAPI.getShopById(
+        selectedOrder.addressId.phone,
+        selectedOrder.shopId.shop_id_ghn,
+        token
+      );
+      setShopData(res);
+    } catch (error) {
+      console.error("Error fetching shop data:", error);
+    }
+  }, [selectedOrder]);
+
+  const fetchOrderData = useCallback(async () => {
+    if (!selectedOrder) return;
+    const token = selectedOrder?.shopId?.shop_token_ghn;
+    if (!token) return;
     try {
       const res = await ghnAPI.getOrderDetailGHN({
+        Token: token,
         client_order_code: selectedOrder.orderCode,
       });
       setOrderDetailGHN(res.data.order_code);
     } catch (error) {
-      console.error(error);
+      console.error("Error fetching order details:", error);
     }
-  };
+  }, [selectedOrder]);
 
   useEffect(() => {
     fetchShopData();
-  }, [selectedOrder]);
+  }, [fetchShopData, selectedOrder]);
 
   useEffect(() => {
     fetchOrderData();
@@ -96,25 +105,24 @@ const UserOrders = () => {
   };
   const handleCancel = async () => {
     const orderId = selectedOrder._id;
+    const token = selectedOrder?.shopId?.shop_token_ghn;
+    const shopId = selectedOrder?.shopId?.shop_id_ghn;
+
     try {
+      if (!token && !shopId) {
+        console.error("Token is missing");
+        return;
+      }
       if (selectedOrder.statusId.name === "Waiting4Pickup") {
         const payload = {
           orderId: orderId,
           userId: selectedOrder.userId,
           reason: cancelReason,
         };
-        const res = await orderRequestAPI.createReq(payload);
 
+        const res = await orderRequestAPI.createReq(payload);
         const orderRequestId = res._id;
         await orderAPI.addOrderRequest(orderId, orderRequestId);
-        await ghnAPI.cancelOrder(
-          { order_codes: [orderDetailGHN] },
-          {
-            headers: {
-              ShopId: shopData?._id,
-            },
-          }
-        );
         toast.success("Yêu cầu hủy đơn hàng đã được gửi thành công.", {
           position: "bottom-right",
           autoClose: 5000,
@@ -150,24 +158,24 @@ const UserOrders = () => {
   };
 
   const proceedWithCancellation = async () => {
+    const token = selectedOrder?.shopId?.shop_token_ghn;
+    const shopId = selectedOrder?.shopId?.shop_id_ghn;
+    if (!token || !shopId) return;
     try {
       const payload = {
         orderId: selectedOrder._id,
         reason: cancelReason,
       };
       const res = await orderAPI.cancelOrder(payload.orderId, payload.reason);
-
       const orderRequestId = res.request._id;
-
       await orderAPI.addOrderRequest(payload.orderId, orderRequestId);
-      await ghnAPI.cancelOrder(
-        { order_codes: [orderDetailGHN] },
-        {
-          headers: {
-            ShopId: shopData?._id,
-          },
-        }
-      );
+
+      await ghnAPI.cancelOrder({
+        order_codes: [orderDetailGHN],
+        token: token,
+        shopId: shopId,
+      });
+
       if (res.showWarning) {
         setWarningMessage(res.warningMessage);
         setIsModalCancelOpen(true);
@@ -202,6 +210,7 @@ const UserOrders = () => {
       });
     }
   };
+
   const getOrderStatusMessage = (order) => {
     if (order.orderRequestId.length === 0) {
       return (
@@ -214,9 +223,6 @@ const UserOrders = () => {
         </Button>
       );
     }
-    const handleOrderClick = (orderId) => {
-      navigate(`/user/orders/${orderId}`);
-    };
     const orderRequestStatus = order.orderRequestId[0]?.status;
     if (orderRequestStatus === "Pending") {
       return <p>Yêu cầu của bạn đang được xử lý.</p>;

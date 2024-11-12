@@ -34,6 +34,9 @@ const useMenuSeller = (
       ratingRange,
     ],
     queryFn: async () => {
+      if (!shopId || !token) {
+        return { menus: [], totalPages: 0 };
+      }
       const res = await axiosPublic.get("/api/foodvc/seller", {
         headers: {
           authorization: `Bearer ${token}`,

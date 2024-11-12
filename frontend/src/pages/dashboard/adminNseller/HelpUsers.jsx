@@ -7,6 +7,7 @@ import { io } from "socket.io-client";
 import ChatMessage from "../../../components/Chat/ChatMessage";
 import { CircularProgress } from "@mui/material";
 import userAPI from "../../../api/userAPI";
+import useAxiosSecure from "../../../hooks/useAxiosSecure";
 
 const HelpUsers = () => {
   const [newMessage, setNewMessage] = useState("");
@@ -19,13 +20,14 @@ const HelpUsers = () => {
   const [loadingMessages, setLoadingMessages] = useState(false);
   const [loadingConversations, setLoadingConversations] = useState(true);
   const [partnerName, setPartnerName] = useState("");
+  const axiosSecure = useAxiosSecure();
 
   useEffect(() => {
     const getConversations = async () => {
       try {
-        if (userData) {
-          const res = await axios.get(
-            "http://localhost:3000/api/conversations/" + userData?.shops[0]
+        if (userData && userData?.shops[0]) {
+          const res = await axiosSecure.get(
+            "/api/conversations/" + userData?.shops[0]
           );
           setConversations(res.data);
         }
@@ -36,7 +38,7 @@ const HelpUsers = () => {
       }
     };
     getConversations();
-  }, [userData]);
+  }, [axiosSecure, userData]);
 
   useEffect(() => {
     const getMessages = async () => {

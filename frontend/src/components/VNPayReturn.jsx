@@ -8,6 +8,7 @@ import useCart from "../hooks/useCart";
 import LoadingSpinner from "../ultis/LoadingSpinner";
 import ghnAPI from "../api/ghnAPI";
 import useUserCurrent from "../hooks/useUserCurrent";
+import { sendEmailToUser } from "../ultis/helpers";
 
 const VNPayReturn = () => {
   const [searchParams] = useSearchParams();
@@ -27,7 +28,6 @@ const VNPayReturn = () => {
   const saveTransaction = async (transactionData) => {
     try {
       await axios.post("http://localhost:3000/transactions", transactionData);
-      console.log("Thông tin giao dịch đã được lưu.");
     } catch (error) {
       console.error("Lỗi khi lưu giao dịch:", error);
     }
@@ -63,33 +63,7 @@ const VNPayReturn = () => {
   }, [orderData.orderCode, searchParams, shopId, user?._id]);
 
   const isPaymentSuccessful = paymentResult.responseCode === "00";
-  const sendEmailToUser = async (email, orderCode) => {
-    try {
-      await axios.post("http://localhost:3000/email", {
-        email: email,
-        subject: "Xác nhận đơn hàng từ FOODVC",
-        html: `
-        <html>
-        <head>
-          <style>
-            @import url('https://unpkg.com/tailwindcss@^2.0/dist/tailwind.min.css');
-          </style>
-        </head>
-        <body class="font-sans bg-gray-100">
-          <div class="max-w-xl mx-auto p-8 bg-white rounded shadow">
-            <h1 class="text-2xl font-bold text-center text-gray-800 mb-4">Xác nhận đơn hàng của bạn</h1>
-            <h2 class="text-lg font-semibold text-gray-700 mb-2">Mã đơn hàng: ${orderCode}</h2>
-            <p class="text-gray-600 mb-2"><span class="font-semibold">Email:</span> ${email}</p>
-            <p class="text-gray-600 mb-4">Cảm ơn bạn đã mua sắm tại FOODVC. Chúng tôi sẽ xử lý đơn hàng của bạn trong thời gian sớm nhất.</p>
-          </div>
-        </body>
-        </html>
-      `,
-      });
-    } catch (error) {
-      console.error("Error sending email to:", email, error);
-    }
-  };
+
   useEffect(() => {
     const sendParamsToIPN = async () => {
       try {
@@ -134,8 +108,6 @@ const VNPayReturn = () => {
     try {
       const orderData = JSON.parse(localStorage.getItem("orderData"));
       const rspCode = localStorage.getItem("RspCode");
-      const payload = localStorage.getItem("orderDataPostGHN");
-
       if (orderData && rspCode === "00") {
         const res = {
           userId: orderData.userId,
@@ -165,14 +137,7 @@ const VNPayReturn = () => {
             }
           })
         );
-
-        const createOrderGhn = await ghnAPI.createOrder(payload);
-        if (createOrderGhn.status !== 200) {
-          console.error("Lỗi tạo đơn hàng GHN:", createOrderGhn.message);
-          return;
-        }
       }
-
       localStorage.removeItem("orderData");
       localStorage.removeItem("RspCode");
       localStorage.removeItem("orderDataPostGHN");

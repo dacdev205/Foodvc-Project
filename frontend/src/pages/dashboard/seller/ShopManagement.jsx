@@ -14,6 +14,7 @@ import shopAPI from "../../../api/shopAPI";
 import { useForm } from "react-hook-form";
 import { Bounce, toast } from "react-toastify";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+import FormattedPrice from "../../../ultis/FormatedPriece";
 
 const ShopManagement = () => {
   const { register, handleSubmit, setValue } = useForm({ mode: "onChange" });
@@ -189,155 +190,166 @@ const ShopManagement = () => {
       <h2 className="text-2xl font-semibold my-4 text-black">
         Quản lý thông tin <span className="text-green">cửa hàng</span>
       </h2>
-
-      <div className="bg-white p-4 rounded-lg shadow-md mb-4 flex items-center space-x-6">
-        <div className="text-center">
-          {loading && (
-            <div className="fixed inset-0 flex items-center justify-center z-50">
-              <CircularProgress color="success" />
-            </div>
-          )}
-
-          <div className="relative">
-            <img
-              src={
-                photo ? URL.createObjectURL(photo) : PF + "/" + shop.shop_image
-              }
-              alt="Profile Image"
-              className={`w-40 h-40 object-cover rounded-full border-4 border-gray-200 shadow-lg ${
-                loading ? "hidden" : "block"
-              }`}
-              onLoad={() => setLoading(false)}
-            />
-            <label
-              htmlFor="shopImage"
-              className="absolute top-2 left-2 bg-white p-2 rounded-full shadow-md cursor-pointer"
-            >
-              <FaCamera size={24} color="gray" />
-            </label>
-            <input
-              id="shopImage"
-              accept="image/*"
-              type="file"
-              {...register("image")}
-              onChange={handlePhotoChange}
-              className="hidden"
-            />
-          </div>
-          <form onSubmit={handleSubmit(onSubmit)}>
-            <button className="btn bg-green text-white px-6 border-none hover:bg-green hover:opacity-80">
-              Cập nhật <FaUtensils />
-            </button>
-          </form>
+      {loading ? (
+        <div className="fixed inset-0 flex items-center justify-center z-50">
+          <CircularProgress color="success" />
         </div>
+      ) : (
         <div>
-          <p>
-            <strong>Tên cửa hàng:</strong> {shop.shopName}
-          </p>
-          <p>
-            <strong>Mô tả:</strong> {shop.description}
-          </p>
-          <p>
-            <strong>Trạng thái:</strong>{" "}
-            {shop.shop_isOpen ? "Mở cửa" : "Đóng cửa"}
-          </p>
-          <p className="text-gray-700">
-            <span className="font-semibold">Số lượng người yêu thích: </span>
-            <span className="text-green-600">{favoriteUserIds.length}</span>
-          </p>
-          <button
-            onClick={handleEditClick}
-            className="text-blue-500 hover:underline"
-          >
-            Chỉnh sửa
-          </button>
-        </div>
-        <div className="">
-          <p className="text-gray-700 mt-2">
-            <span className="font-semibold">Ngày tham gia: </span>
-            {formattedJoinDate}
-          </p>
-          <p className="text-gray-700 mt-2">
-            <span className="font-semibold">Hoạt động: </span>
-            {shop.shop_isActive ? "Đang hoạt động" : "Dừng hoạt động"}
-          </p>
-          <p className="">Đánh giá: {calculateAverageRating(reviews)} / 5</p>
-        </div>
-      </div>
-
-      <div className="mt-6">
-        <h3 className="text-lg font-semibold text-gray-800 mb-2">
-          Địa chỉ cửa hàng:
-        </h3>
-        <ul className="space-y-2">
-          {address.map((addr) => (
-            <li
-              key={addr._id}
-              className="text-gray-600 bg-gray-100 p-2 rounded-md"
-            >
-              <div>
-                <span className="font-semibold">Địa chỉ: </span>
-                {addr.street},{addr.ward.wardName},{addr.district.districtName},
-                {addr.city.cityName}
+          <div className="bg-white p-4 rounded-lg shadow-md mb-4 flex items-center space-x-6">
+            <div className="text-center">
+              <div className="relative">
+                <img
+                  src={
+                    photo
+                      ? URL.createObjectURL(photo)
+                      : PF + "/" + shop.shop_image
+                  }
+                  alt="Profile Image"
+                  className={`w-40 h-40 object-cover rounded-full border-4 border-gray-200 shadow-lg ${
+                    loading ? "hidden" : "block"
+                  }`}
+                  onLoad={() => setLoading(false)}
+                />
+                <label
+                  htmlFor="shopImage"
+                  className="absolute top-2 left-2 bg-white p-2 rounded-full shadow-md cursor-pointer"
+                >
+                  <FaCamera size={24} color="gray" />
+                </label>
+                <input
+                  id="shopImage"
+                  accept="image/*"
+                  type="file"
+                  {...register("image")}
+                  onChange={handlePhotoChange}
+                  className="hidden"
+                />
               </div>
-
-              <div>
-                <span className="font-semibold">Số điện thoại: </span>
-                {addr.phone}
-              </div>
-            </li>
-          ))}
-        </ul>
-      </div>
-
-      <div className="mt-6">
-        <h3 className="text-lg font-semibold text-gray-800 mb-2">
-          Thực đơn của cửa hàng:
-        </h3>
-        <input
-          type="text"
-          className="w-[260px] border border-gray-300 rounded-lg py-2 px-4 mb-6"
-          placeholder="Tìm kiếm..."
-          value={searchTerm}
-          onChange={handleSearch}
-        />
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {filteredMenuDetails.map((item, index) => (
-            <div
-              key={index}
-              className="bg-white shadow-md rounded-lg overflow-hidden transition-transform duration-200 ease-in-out hover:scale-105 hover:bg-slate-100 cursor-pointer"
-              onClick={() => navigate(`/product/${item.product._id}`)}
-            >
-              <img
-                src={PF + "/" + item.product.image}
-                alt={item?.product?.name}
-                className="w-full h-40 object-cover"
-              />
-              <div className="p-4">
-                <h4 className="font-semibold text-md">{item?.product?.name}</h4>
-                <p className="text-gray-600 mt-2">
-                  Giá: {item.product.price.toLocaleString()} đ
-                </p>
-                <div className="flex items-center mt-2">
-                  <span className="mr-2 underline ">
-                    {item.reviews.length > 0
-                      ? (
-                          item.reviews.reduce(
-                            (sum, review) => sum + review.rating,
-                            0
-                          ) / item.reviews.length
-                        ).toFixed(1)
-                      : 0}
-                  </span>
-                  <span className="flex items-center justify-center">
-                    {renderRating(calculateAverageRating(item.reviews))}
-                  </span>
-                </div>
-              </div>
+              <form onSubmit={handleSubmit(onSubmit)}>
+                <button className="btn bg-green text-white px-6 border-none hover:bg-green hover:opacity-80">
+                  Cập nhật <FaUtensils />
+                </button>
+              </form>
             </div>
-          ))}
+            <div>
+              <p>
+                <strong>Tên cửa hàng:</strong> {shop.shopName}
+              </p>
+              <p>
+                <strong>Mô tả:</strong> {shop.description}
+              </p>
+              <p>
+                <strong>Trạng thái:</strong>{" "}
+                {shop.shop_isOpen ? "Mở cửa" : "Đóng cửa"}
+              </p>
+              <p className="text-gray-700">
+                <span className="font-semibold">
+                  Số lượng người yêu thích:{" "}
+                </span>
+                <span className="text-green-600">{favoriteUserIds.length}</span>
+              </p>
+              <button
+                onClick={handleEditClick}
+                className="text-blue-500 hover:underline"
+              >
+                Chỉnh sửa
+              </button>
+            </div>
+            <div className="">
+              <p className="text-gray-700 mt-2">
+                <span className="font-semibold">Ngày tham gia: </span>
+                {formattedJoinDate}
+              </p>
+              <p className="text-gray-700 mt-2">
+                <span className="font-semibold">Hoạt động: </span>
+                {shop.shop_isActive ? "Đang hoạt động" : "Dừng hoạt động"}
+              </p>
+              <p className="">
+                Đánh giá: {calculateAverageRating(reviews)} / 5
+              </p>
+            </div>
+          </div>
+
+          <div className="mt-6">
+            <h3 className="text-lg font-semibold text-gray-800 mb-2">
+              Địa chỉ cửa hàng:
+            </h3>
+            <ul className="space-y-2">
+              {address.map((addr) => (
+                <li
+                  key={addr._id}
+                  className="text-gray-600 bg-gray-100 p-2 rounded-md"
+                >
+                  <div>
+                    <span className="font-semibold">Địa chỉ: </span>
+                    {addr.street},{addr.ward.wardName},
+                    {addr.district.districtName},{addr.city.cityName}
+                  </div>
+
+                  <div>
+                    <span className="font-semibold">Số điện thoại: </span>
+                    {addr.phone}
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="mt-6">
+            <h3 className="text-lg font-semibold text-gray-800 mb-2">
+              Thực đơn của cửa hàng:
+            </h3>
+            <input
+              type="text"
+              className="w-[260px] border border-gray-300 rounded-lg py-2 px-4 mb-6"
+              placeholder="Tìm kiếm..."
+              value={searchTerm}
+              onChange={handleSearch}
+            />
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+              {filteredMenuDetails.map((item, index) => (
+                <div
+                  key={index}
+                  className="bg-white shadow-md rounded-lg overflow-hidden transition-transform duration-200 ease-in-out hover:scale-105 hover:bg-slate-100 cursor-pointer"
+                  onClick={() => navigate(`/product/${item.product._id}`)}
+                >
+                  <img
+                    src={PF + "/" + item.product.image}
+                    alt={item?.product?.name}
+                    className="w-full h-40 object-cover"
+                  />
+                  <div className="p-4">
+                    <h4 className="font-semibold text-md">
+                      {item?.product?.name}
+                    </h4>
+                    <p className="text-gray-600 mt-2">
+                      <FormattedPrice
+                        price={item.product.price}
+                      ></FormattedPrice>
+                    </p>
+                    <div className="flex items-center mt-2">
+                      <span className="mr-2 underline ">
+                        {item.reviews.length > 0
+                          ? (
+                              item.reviews.reduce(
+                                (sum, review) => sum + review.rating,
+                                0
+                              ) / item.reviews.length
+                            ).toFixed(1)
+                          : 0}
+                      </span>
+                      <span className="flex items-center justify-center">
+                        {renderRating(calculateAverageRating(item.reviews))}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
-      </div>
+      )}
 
       {totalPages >= 1 && (
         <div className="flex justify-center mt-4">

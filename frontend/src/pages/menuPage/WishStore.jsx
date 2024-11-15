@@ -7,6 +7,7 @@ import styles from "../../CssModule/CartnWishPage.module.css";
 import wishListAPI from "../../api/wishListAPI";
 import { Bounce, toast } from "react-toastify";
 import useUserCurrent from "../../hooks/useUserCurrent";
+import useAxiosSecure from "../../hooks/useAxiosSecure";
 
 const WishStorePage = () => {
   const [wishStores, refetchWishStore, isLoading] = useWishStore();

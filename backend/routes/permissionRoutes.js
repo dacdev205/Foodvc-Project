@@ -4,14 +4,35 @@ const PermissionAPI = require("../controllers/permissionControllers");
 const checkPermission = require("../middleware/checkPermission");
 const verifyToken = require("../middleware/verifyToken");
 
-router.post("/", PermissionAPI.createPermission);
+router.post(
+  "/",
+  verifyToken,
+  checkPermission(["admin_actions"]),
+  PermissionAPI.createPermission
+);
 
 router.get("/", PermissionAPI.getAllPermissions);
+router.get("/zz", PermissionAPI.getAllPermissionsSelect);
 
-router.get("/:name", PermissionAPI.getPermissionByName);
+router.get(
+  "/:name",
+  verifyToken,
+  checkPermission(["read"]),
+  PermissionAPI.getPermissionByName
+);
 
-router.put("/:id", PermissionAPI.updatePermission);
+router.put(
+  "/:id",
+  verifyToken,
+  checkPermission(["admin_pages"]),
+  PermissionAPI.updatePermission
+);
 
-router.delete("/:id", PermissionAPI.deletePermission);
+router.delete(
+  "/:id",
+  verifyToken,
+  checkPermission(["admin_pages"]),
+  PermissionAPI.deletePermission
+);
 
 module.exports = router;

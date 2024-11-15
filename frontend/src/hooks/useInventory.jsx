@@ -1,6 +1,5 @@
-import useAxiosPublic from "./useAxiosPublic";
 import { useQuery } from "@tanstack/react-query";
-import useUserCurrent from "../hooks/useUserCurrent";
+import useAxiosSecure from "./useAxiosSecure";
 
 const useInventory = (
   searchTerm = "",
@@ -12,9 +11,8 @@ const useInventory = (
   shopId = ""
 ) => {
   const getToken = () => localStorage.getItem("access-token");
-  const axiosPublic = useAxiosPublic();
   const token = getToken();
-
+  const axiosSecure = useAxiosSecure();
   const {
     refetch,
     data: inventory = { inventory: [] },
@@ -25,10 +23,7 @@ const useInventory = (
       if (!shopId) {
         return { inventory: [] };
       }
-      const res = await axiosPublic.get("/inventory", {
-        headers: {
-          authorization: `Bearer ${token}`,
-        },
+      const res = await axiosSecure.get("/inventory", {
         params: {
           searchTerm,
           filterType,

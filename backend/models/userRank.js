@@ -4,7 +4,7 @@ const userRankSchema = mongoose.Schema({
   user_rank_name: {
     type: String,
     required: true,
-    enum: ["Bronze", "Silver", "Gold", "Platinum"],
+    // enum: ["Bronze", "Silver", "Gold", "Platinum"],
   },
   user_discount: {
     type: Number,

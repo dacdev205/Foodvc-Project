@@ -58,14 +58,6 @@ const Navbar = () => {
           Chúng tôi
         </Link>
       </li>
-      <li className="active-link rounded-box">
-        <Link
-          className="active-link rounded-box lg:text-white text-black"
-          to="/blog"
-        >
-          Blogs
-        </Link>
-      </li>
     </>
   );
 

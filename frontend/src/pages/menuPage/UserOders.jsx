@@ -18,6 +18,7 @@ import orderAPI from "../../api/orderAPI";
 import orderRequestAPI from "../../api/orderRequest";
 import { useNavigate } from "react-router-dom";
 import { useCallback } from "react";
+import { formatDate } from "../../ultis/formatDate";
 
 const UserOrders = () => {
   const navigate = useNavigate();
@@ -344,6 +345,10 @@ const UserOrders = () => {
                   ))}
                   <div className="text-right">
                     Tổng đơn hàng: <FormattedPrice price={order.totalAmount} />
+                    <p className="text-sm italic text-red">
+                      (Thời gian giao hàng dự kiến:{" "}
+                      {formatDate(order.expected_delivery_time)})
+                    </p>
                   </div>
                 </div>
               </div>

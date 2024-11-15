@@ -4,10 +4,11 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { FaGoogle, FaFacebook, FaEyeSlash, FaEye } from "react-icons/fa";
 import { AuthContext } from "../../context/AuthProvider";
-import useAxiosPublic from "../../hooks/useAxiosPublic";
+
 import * as Yup from "yup";
 import { Bounce, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import useAxiosSecure from "../../hooks/useAxiosSecure";
 
 const Modal = () => {
   const {
@@ -18,7 +19,7 @@ const Modal = () => {
   } = useForm();
 
   const { signUpWithGmail, login } = useContext(AuthContext);
-  const axiosPublic = useAxiosPublic();
+  const axiosSecure = useAxiosSecure();
   const [errorMessage, setErrorMessage] = useState({});
   const [errorMessageSubmit, setErrorMessageSubmit] = useState("");
   const location = useLocation();
@@ -68,7 +69,7 @@ const Modal = () => {
             name: data.name,
             email: data.email,
           };
-          axiosPublic.post("/users", userInfor);
+          axiosSecure.post("/users", userInfor);
           reset();
           toast.success("Chào mừng bạn trở lại!", {
             position: "bottom-right",
@@ -103,7 +104,7 @@ const Modal = () => {
         email: result?.user?.email,
         photoURL: result?.user?.photoURL,
       };
-      await axiosPublic.post("/users", userInfor);
+      await axiosSecure.post("/users", userInfor);
       toast.success("Chào mừng bạn đến với FOODVC", {
         position: "bottom-right",
         autoClose: 2000,

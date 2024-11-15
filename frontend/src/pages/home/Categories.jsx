@@ -3,27 +3,23 @@ import React from "react";
 const categoryItems = [
   {
     id: 1,
-    title: "Main Dish",
-    desc: "86 dishes",
-    image: "/images/home/category/img1.png",
+    title: "Rau",
+    image: "/images/home/category/rau.jpg",
   },
   {
     id: 2,
-    title: "Main Dish",
-    desc: "86 dishes",
-    image: "/images/home/category/img2.png",
+    title: "Củ",
+    image: "/images/home/category/cu.jpg",
   },
   {
     id: 3,
-    title: "Main Dish",
-    desc: "86 dishes",
-    image: "/images/home/category/img3.png",
+    title: "Quả",
+    image: "/images/home/category/qua.jpg",
   },
   {
     id: 4,
-    title: "Main Dish",
-    desc: "86 dishes",
-    image: "/images/home/category/img4.png",
+    title: "Nấm",
+    image: "/images/home/category/nam.jpg",
   },
 ];
 
@@ -51,7 +47,6 @@ const Categories = () => {
             </div>
             <div>
               <h5>{item.title}</h5>
-              <h5>{item.desc}</h5>
             </div>
           </div>
         ))}

@@ -1,4 +1,5 @@
 const Transaction = require("../models/transactions");
+const Order = require("../models/order");
 module.exports = class TransactionAPI {
   static async createTransaction(req, res) {
     const {
@@ -88,13 +89,6 @@ module.exports = class TransactionAPI {
 
       const totalTransactions = await Transaction.countDocuments(query).exec();
       const totalPages = Math.ceil(totalTransactions / pageSizeNumber);
-
-      if (!transactions || transactions.length === 0) {
-        return res
-          .status(404)
-          .json({ message: "Không tìm thấy giao dịch nào" });
-      }
-
       return res.status(200).json({
         transactions,
         totalPages,
@@ -148,12 +142,6 @@ module.exports = class TransactionAPI {
       const totalTransactions = await Transaction.countDocuments(query).exec();
       const totalPages = Math.ceil(totalTransactions / pageSizeNumber);
 
-      if (!transactions || transactions.length === 0) {
-        return res
-          .status(404)
-          .json({ message: "Không tìm thấy giao dịch nào" });
-      }
-
       return res.status(200).json({
         transactions,
         totalPages,
@@ -163,6 +151,30 @@ module.exports = class TransactionAPI {
     } catch (error) {
       console.error("Lỗi nhận giao dịch", error);
       return res.status(500).json({ message: "Server error" });
+    }
+  }
+  static async checkOrderStatus(req, res) {
+    const { orderCode } = req.params;
+
+    try {
+      const order = await Order.findOne({ orderCode }).populate("statusId");
+
+      if (!order) {
+        return res.status(404).json({ message: "Order not found" });
+      }
+
+      const isCompleted = order.statusId && order.statusId.name === "Completed";
+
+      if (isCompleted) {
+        return res.status(200).json({ message: "Order is completed", order });
+      } else {
+        return res
+          .status(200)
+          .json({ message: "Order is not completed", order });
+      }
+    } catch (error) {
+      console.error("Error checking order status", error);
+      return res.status(500).json({ message: "Server error", error });
     }
   }
 };

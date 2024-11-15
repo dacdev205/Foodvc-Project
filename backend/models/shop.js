@@ -16,13 +16,14 @@ const shopSchema = mongoose.Schema({
   shop_token_ghn: { type: String, required: true },
   inventories: [{ type: mongoose.Schema.Types.ObjectId, ref: "Inventory" }],
   addresses: [{ type: mongoose.Schema.Types.ObjectId, ref: "Address" }],
-  shopRank: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "shopRank",
-  },
   shippingPartner: [
     { type: mongoose.Schema.Types.ObjectId, ref: "ShippingPartner" },
   ],
+  commissionPolicy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "CommissionTier",
+    required: true,
+  },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
 });

@@ -5,25 +5,25 @@ const serviceLists = [
   {
     id: 1,
     title: "Dịch vụ ăn uống",
-    des: "Text example Description",
+    des: "Sản phẩm tươi ngon đến từ các công ty, trang trại chất lượng.",
     image: "/images/home/services/icon1.png",
   },
   {
     id: 2,
     title: "Chuyển phát nhanh",
-    des: "Text example Description",
+    des: "Đối tác vận chuyển Giao Hàng Nhanh",
     image: "/images/home/services/icon2.png",
   },
   {
     id: 3,
     title: "Đặt hàng trực tuyến",
-    des: "Text example Description",
+    des: "Đặt hàng trực tuyến dễ dàng.",
     image: "/images/home/services/icon3.png",
   },
   {
     id: 4,
-    title: "Thẻ quà tặng",
-    des: "Text example Description",
+    title: "Cấp bậc người dùng",
+    des: "Nhận được ưu đãi khi đạt đến cấp bậc nhất định.",
     image: "/images/home/services/icon4.png",
   },
 ];
@@ -58,7 +58,7 @@ const OurService = () => {
             {serviceLists.map((service) => (
               <div
                 key={service.id}
-                className="shadow-md transition-all duration-200 rounded-sm py-5 px-4 text-center space-y-2 text-green cursor-pointer"
+                className="shadow-md transition-all duration-200 rounded-sm py-5 px-4 text-center space-y-2 text-green"
               >
                 <img src={service.image} alt="" className="mx-auto" />
                 <h5 className="pt-3 font-semibold">{service.title}</h5>

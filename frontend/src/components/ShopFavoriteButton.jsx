@@ -1,7 +1,7 @@
 /* eslint-disable react/prop-types */
 import React, { useEffect, useState } from "react";
 import { FaHeart } from "react-icons/fa";
-import wishListAPI from "../api/wishListAPI"; // Update with your actual API method
+import wishListAPI from "../api/wishListAPI";
 import { Bounce, toast } from "react-toastify";
 
 const ShopFavoriteButton = ({

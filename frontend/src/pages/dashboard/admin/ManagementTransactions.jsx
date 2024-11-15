@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { CircularProgress, Pagination, Tooltip } from "@mui/material";
-import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
 import FormattedPrice from "../../../ultis/FormatedPriece";
 import moment from "moment";
+import useAxiosSecure from "../../../hooks/useAxiosSecure";
 
 const ManagementTransactions = () => {
   const PF = "http://localhost:3000";
@@ -14,13 +14,14 @@ const ManagementTransactions = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+  const axiosSecure = useAxiosSecure();
 
   useEffect(() => {
     const fetchTransactions = async () => {
       setIsLoading(true);
       setError(null);
       try {
-        const response = await axios.get(`${PF}/transactions/admin`, {
+        const response = await axiosSecure.get(`${PF}/transactions/admin`, {
           params: {
             searchTerm,
             page,
@@ -36,7 +37,7 @@ const ManagementTransactions = () => {
       }
     };
     fetchTransactions();
-  }, [page, searchTerm]);
+  }, [axiosSecure, page, searchTerm]);
 
   const handleSearch = (e) => {
     setSearchTerm(e.target.value);
@@ -49,7 +50,6 @@ const ManagementTransactions = () => {
 
   return (
     <div className="w-full md:w-[1150px] px-4 mx-auto">
-      <ToastContainer />
       <h2 className="text-2xl font-semibold my-4 text-black">
         Quản lý tất cả <span className="text-green">giao dịch</span>
       </h2>

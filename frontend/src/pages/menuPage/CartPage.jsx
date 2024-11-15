@@ -3,10 +3,8 @@ import styles from "../../CssModule/CartnWishPage.module.css";
 import useCart from "../../hooks/useCart";
 import { FaTrash } from "react-icons/fa";
 import cartAPI from "../../api/cartAPI";
-import LoadingSpinner from "../../ultis/LoadingSpinner";
 import menuAPI from "../../api/menuAPI";
-import { Link } from "react-router-dom";
-import inventoryAPI from "../../api/inventoryAPI";
+import { Link, useNavigate } from "react-router-dom";
 import FormattedPrice from "../../ultis/FormatedPriece";
 import { FaCheck } from "react-icons/fa6";
 import paymentAPI from "../../api/paymentAPI";
@@ -15,7 +13,9 @@ import { Bounce, toast } from "react-toastify";
 import useUserCurrent from "../../hooks/useUserCurrent";
 import { CircularProgress } from "@mui/material";
 import { CiShop } from "react-icons/ci";
+
 const CartPage = () => {
+  const navigate = useNavigate();
   const [cart, refetchCart, isLoading] = useCart();
   const userData = useUserCurrent();
   const PF = "http://localhost:3000";
@@ -241,14 +241,23 @@ const CartPage = () => {
   const orderTotal = cartSubTotal;
 
   const handleCheckOut = async () => {
+    const products = cart.products
+      .filter((item) => selectedItems.includes(item.productId._id))
+      .map((item) => ({
+        productId: item.productId._id,
+        shopId: item.productId.shopId._id,
+        quantity: item.quantity,
+      }));
     try {
-      await paymentAPI.postProductToPayment({
+      const res = await paymentAPI.postProductToPayment({
         userId: userData._id,
-        products: cart.products.filter((item) =>
-          selectedItems.includes(item.productId._id)
-        ),
+        products,
         totalAmount: orderTotal,
       });
+      if (res) {
+        navigate("/check-out");
+        console.log(products);
+      }
     } catch (error) {
       console.error("Error during check-out:", error);
     }
@@ -522,15 +531,13 @@ const CartPage = () => {
                 </p>
                 <FormattedPrice price={orderTotal.toFixed(2)} />
               </div>
-              <Link to={"/check-out"}>
-                <button
-                  className="btn bg-green text-white px-5 w-full hover:bg-green hover:opacity-80 border-none"
-                  disabled={selectedItems.length === 0}
-                  onClick={handleCheckOut}
-                >
-                  Mua hàng
-                </button>
-              </Link>
+              <button
+                className="btn bg-green text-white px-5 w-full hover:bg-green hover:opacity-80 border-none"
+                disabled={selectedItems.length === 0}
+                onClick={handleCheckOut}
+              >
+                Mua hàng
+              </button>
             </div>
           </div>
           {/* End PC devices */}

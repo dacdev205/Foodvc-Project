@@ -2,8 +2,13 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { CircularProgress, Pagination } from "@mui/material";
 import { FaTrash, FaEdit, FaPlus } from "react-icons/fa";
-import ConfirmDeleteModal from "../../../ultis/ConfirmDeleteModal";
-import CreateCategoryModal from "../../../components/Modal/CreateCategoryModal";
+const ConfirmDeleteModal = React.lazy(() =>
+  import("../../../ultis/ConfirmDeleteModal")
+);
+
+const CreateCategoryModal = React.lazy(() =>
+  import("../../../components/Modal/CreateCategoryModal")
+);
 import categoryAPI from "../../../api/categoryAPI";
 import { useNavigate } from "react-router-dom";
 
@@ -17,10 +22,11 @@ const CategoriesManagement = () => {
   const [loading, setLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const navigate = useNavigate();
+
   const fetchCategories = async (page, searchTerm) => {
     setLoading(true);
     try {
-      const response = await categoryAPI.getAllCategory(searchTerm, page);
+      const response = await categoryAPI.getAllCategory(searchTerm, page, 5);
       setCategories(response.categories);
       setTotalPages(response.totalPages);
     } catch (error) {
@@ -64,9 +70,11 @@ const CategoriesManagement = () => {
       handleDelete(categoryToDelete);
     }
   };
+
   const handleEditClick = (id) => {
     navigate(`edit/${id}`);
   };
+
   const handleCreateCategory = async (newCategory) => {
     try {
       await categoryAPI.createCategory(newCategory);
@@ -92,7 +100,7 @@ const CategoriesManagement = () => {
           className="input input-sm"
         />
         <button
-          className="ml-auto btn  bg-green text-white hover:bg-green"
+          className="ml-auto btn bg-green text-white hover:bg-green"
           onClick={() => setShowCreateModal(true)}
         >
           <FaPlus className="mr-1" />
@@ -109,21 +117,21 @@ const CategoriesManagement = () => {
             <th className="text-center">Thao tác</th>
           </tr>
         </thead>
-        {loading ? (
-          <tr>
-            <td colSpan="4" className="text-center py-4">
-              <CircularProgress color="success" />
-            </td>
-          </tr>
-        ) : categories.length === 0 ? (
-          <tr>
-            <td colSpan="4" className="text-center py-4">
-              Không có danh mục nào
-            </td>
-          </tr>
-        ) : (
-          <tbody>
-            {categories.map((category, index) => (
+        <tbody>
+          {loading ? (
+            <tr>
+              <td colSpan="4" className="text-center py-4">
+                <CircularProgress color="success" />
+              </td>
+            </tr>
+          ) : categories.length === 0 ? (
+            <tr>
+              <td colSpan="4" className="text-center py-4">
+                Không có danh mục nào
+              </td>
+            </tr>
+          ) : (
+            categories.map((category, index) => (
               <tr key={category._id} className="border-gray-300 text-black">
                 <td>{(page - 1) * 5 + index + 1}</td>
                 <td>{category.name}</td>
@@ -143,9 +151,9 @@ const CategoriesManagement = () => {
                   </button>
                 </td>
               </tr>
-            ))}
-          </tbody>
-        )}
+            ))
+          )}
+        </tbody>
       </table>
 
       <ConfirmDeleteModal

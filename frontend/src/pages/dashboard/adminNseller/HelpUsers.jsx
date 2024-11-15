@@ -45,9 +45,7 @@ const HelpUsers = () => {
       setLoadingMessages(true);
       try {
         if (currentChat) {
-          const res = await axios.get(
-            "http://localhost:3000/api/messages/" + currentChat._id
-          );
+          const res = await axiosSecure.get("/api/messages/" + currentChat._id);
           setMessages(res.data);
         }
       } catch (err) {
@@ -57,7 +55,7 @@ const HelpUsers = () => {
       }
     };
     getMessages();
-  }, [currentChat]);
+  }, [axiosSecure, currentChat]);
 
   useEffect(() => {
     const socket = io("http://localhost:8800");
@@ -132,7 +130,7 @@ const HelpUsers = () => {
       content: newMessage,
     });
     try {
-      await axios.post(
+      await axiosSecure.post(
         "http://localhost:3000/api/messages/send-message",
         message
       );

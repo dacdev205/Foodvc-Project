@@ -1,5 +1,6 @@
 const Menu = require("../models/menu");
 const Order = require("../models/order");
+const Status = require("../models/orderStatus");
 const statusesAPI = require("../controllers/statusesControllers");
 const OrderStatus = require("../models/orderStatus");
 const User = require("../models/user");
@@ -13,6 +14,9 @@ module.exports = class orderAPI {
       shopId,
       orderCode,
       products,
+      totalProductAmount,
+      shippingFee,
+      expected_delivery_time,
       totalAmount,
       addressId,
       orderRequestId,
@@ -28,7 +32,7 @@ module.exports = class orderAPI {
     let paymentStatus = false;
     if (methodDoc.methodId === 2) {
       statusId = waiting4PickupStatusId;
-      paymentStatus = true;
+      paymentStatus = false;
     } else {
       statusId = pendingStatusId;
     }
@@ -40,6 +44,9 @@ module.exports = class orderAPI {
         products,
         orderRequestId,
         totalAmount,
+        totalProductAmount,
+        shippingFee,
+        expected_delivery_time,
         statusId,
         addressId,
         note,
@@ -265,6 +272,7 @@ module.exports = class orderAPI {
       const order = await Order.findById(id)
         .populate("userId")
         .populate("statusId")
+        .populate("methodId")
         .populate({
           path: "products.productId",
           populate: [{ path: "category" }],
@@ -299,9 +307,17 @@ module.exports = class orderAPI {
     const { statusId } = req.body;
 
     try {
+      const status = await Status.findById(statusId);
+
+      if (!status) {
+        return res.status(404).json({ message: "Status không tìm thấy" });
+      }
+
       const order = await Order.findByIdAndUpdate(
         orderId,
-        { statusId },
+        {
+          statusId,
+        },
         { new: true }
       ).populate("statusId");
 

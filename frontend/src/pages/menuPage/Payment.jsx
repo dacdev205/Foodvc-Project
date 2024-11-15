@@ -27,6 +27,8 @@ import {
   calculatePrice,
 } from "/src/ultis/helpers.js";
 import { sendEmailToUser } from "../../ultis/helpers";
+import { convertLeadtimeToNormalTime } from "../../ultis/convertTime";
+import useAxiosSecure from "../../hooks/useAxiosSecure";
 
 const Payment = () => {
   const [payment, refetch, isLoading] = usePayment();
@@ -57,6 +59,12 @@ const Payment = () => {
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(null);
   const [paymentMethodSelected, setPaymentMethodSelected] = useState(false);
   const [amount, setAmount] = useState(0);
+  const [leadTime, setLeadTime] = useState(null);
+  const axiosSecure = useAxiosSecure();
+
+  const discountedAmountFinal = discountedAmount
+    ? discountedAmount
+    : subOrderTotal;
   const [addressUser, setAddress] = useState({
     fullName: "",
     phone: "",
@@ -83,7 +91,7 @@ const Payment = () => {
     };
     const fetchPaymentMethods = async () => {
       try {
-        const res = await axios.get(`${PF}/method-deli/all_methods`);
+        const res = await axiosSecure.get(`/method-deli/all_methods`);
         setPaymentMethods(res.data);
       } catch (error) {
         console.error("Error fetching payment methods:", error);
@@ -99,10 +107,16 @@ const Payment = () => {
       });
     };
 
-    fetchShopData();
-    fetchPaymentMethods();
-    fetchVoucherData();
-  }, [payment]);
+    const fetchData = () => {
+      fetchShopData();
+      fetchPaymentMethods();
+      fetchVoucherData();
+    };
+
+    if (payment) {
+      fetchData();
+    }
+  }, [payment, userData]);
 
   useEffect(() => {
     let total = 0;
@@ -207,64 +221,7 @@ const Payment = () => {
       console.error("Đã xảy ra lỗi trong quá trình thanh toán:", error);
     }
   };
-  const createPayload = (
-    payment,
-    note,
-    shopData,
-    addressUser,
-    subOrderTotal,
-    orderTotal
-  ) => {
-    const randomId = generateRandomString(20);
-    const productData = extractProductData(payment);
-    return {
-      payment_type_id: 2,
-      note: note,
-      required_note: "CHOXEMHANGKHONGTHU",
-      return_phone: `${shopData.phone}`,
-      return_address: `${shopData.address}`,
-      return_district_id: `${shopData.district_id}`,
-      return_ward_code: `${shopData.ward_code}`,
-      client_order_code: randomId,
-      from_name: `${shopData.name}`,
-      from_phone: `${shopData.phone}`,
-      from_address: `${shopData.address}`,
-      from_ward_name:
-        payment[0]?.products[0]?.shopId?.addresses[0]?.ward?.wardName,
-      from_district_name:
-        payment[0]?.products[0]?.shopId?.addresses[0]?.district?.districtName,
-      from_province_name:
-        payment[0]?.products[0]?.shopId?.addresses[0]?.city?.cityName,
-      to_name: addressUser.fullName,
-      to_phone: addressUser.phone,
-      to_address: `${addressUser?.street}, ${addressUser?.ward.wardName}, ${addressUser?.district.districtName}, ${addressUser?.city.cityName}`,
-      to_ward_name: addressUser?.ward.wardName,
-      to_district_name: addressUser?.district.districtName,
-      to_province_name: addressUser?.city.cityName,
-      cod_amount: subOrderTotal,
-      content: note,
-      weight: productData.totalWeight,
-      length: productData.totalLength,
-      width: productData.totalWidth,
-      height: productData.totalHeight,
-      cod_failed_amount: 0,
-      pick_station_id: 1444,
-      deliver_station_id: null,
-      insurance_value: Math.min(orderTotal, 5000000),
-      service_id: 0,
-      service_type_id: 2,
-      coupon: null,
-      pickup_time: Math.floor(Date.now() / 1000),
-      pick_shift: getPickShifts(),
-      items: payment.flatMap((item) =>
-        item.products.map((product) => ({
-          name: product.productId.name,
-          quantity: product.quantity,
-          price: parseInt(product.productId.price),
-        }))
-      ),
-    };
-  };
+
   const createOrderGhn = async (payload, shopToken) => {
     const response = await ghnAPI.createOrder(payload, shopToken);
     if (!response.status === 200) {
@@ -285,30 +242,16 @@ const Payment = () => {
     );
     setIsSubmitting(true);
     try {
-      const res = await axios.post("http://localhost:3000/method-deli/vn_pay", {
+      const res = await axiosSecure.post("/method-deli/vn_pay", {
         amount: amount * 100,
         bankCode: "VNPAY",
         language: "vn",
       });
-      for (const item of payment) {
-        localStorage.setItem(
-          "orderData",
-          JSON.stringify({
-            userId: userData._id,
-            shopId: item.products[0].productId.shopId,
-            products: productsWithShopId,
-            totalAmount: amount,
-            orderCode: randomId,
-            note: note,
-            addressId: addressUser._id,
-            methodId: selectedPaymentMethod,
-          })
-        );
-      }
+
       localStorage.setItem(
         "orderDataPostGHN",
         JSON.stringify({
-          payment_type_id: 2,
+          payment_type_id: 1,
           note: note,
           required_note: "CHOXEMHANGKHONGTHU",
           return_phone: `${shopData.phone}`,
@@ -332,7 +275,7 @@ const Payment = () => {
           to_ward_name: addressUser?.ward.wardName,
           to_district_name: addressUser?.district.districtName,
           to_province_name: addressUser?.city.cityName,
-          cod_amount: subOrderTotal,
+          cod_amount: 0,
           content: note,
           weight: productData.totalWeight,
           length: productData.totalLength,
@@ -356,11 +299,50 @@ const Payment = () => {
           ),
         })
       );
-      const ghnResponse = await createOrderGhn(
-        JSON.parse(localStorage.getItem("orderDataPostGHN")),
-        payment[0]?.products[0]?.shopId.shop_token_ghn
-      );
-      window.location.href = res.data.paymentUrl;
+      try {
+        const token = payment[0]?.products[0]?.shopId.shop_token_ghn;
+        if (!token) return;
+        const createOrderResponse = await createOrderGhn(
+          JSON.parse(localStorage.getItem("orderDataPostGHN")),
+          payment[0]?.products[0]?.shopId.shop_token_ghn
+        );
+        console.log("createOrderResponse:", createOrderResponse);
+
+        if (createOrderResponse.code === 200) {
+          const orderData = createOrderResponse.data;
+          console.log(orderData);
+
+          if (orderData.expected_delivery_time) {
+            for (const item of payment) {
+              localStorage.setItem(
+                "orderData",
+                JSON.stringify({
+                  userId: userData._id,
+                  shopId: item.products[0].productId.shopId,
+                  products: productsWithShopId,
+                  totalProductAmount: subOrderTotal,
+                  shippingFee: shippingFee,
+                  totalAmount: amount,
+                  note: note,
+                  expected_delivery_time: orderData.expected_delivery_time,
+                  orderCode: randomId,
+                  addressId: addressUser._id,
+                  methodId: selectedPaymentMethod,
+                })
+              );
+            }
+            window.location.href = res.data.paymentUrl;
+          } else {
+            console.error(
+              "Expected delivery time is missing in the order response."
+            );
+          }
+        } else {
+          console.error("Error creating order with GHN:", createOrderResponse);
+        }
+      } catch (error) {
+        console.log(error);
+      }
     } catch (error) {
       console.error("Payment error:", error);
     } finally {
@@ -371,6 +353,7 @@ const Payment = () => {
   const handleCODPayment = async () => {
     const randomId = generateRandomString(20);
     const productData = extractProductData(payment);
+
     const productsWithShopId = payment.flatMap((item) =>
       item.products.map((product) => ({
         ...product,
@@ -402,7 +385,7 @@ const Payment = () => {
       to_ward_name: addressUser?.ward.wardName,
       to_district_name: addressUser?.district.districtName,
       to_province_name: addressUser?.city.cityName,
-      cod_amount: subOrderTotal,
+      cod_amount: discountedAmountFinal,
       content: note,
       weight: productData.totalWeight,
       length: productData.totalLength,
@@ -430,22 +413,26 @@ const Payment = () => {
       payload,
       payment[0]?.products[0]?.shopId.shop_token_ghn
     );
-    if (!createOrderGhn.status === 200) {
+    if (!createOrderGhn.code === 200) {
       console.error("Lỗi tạo đơn hàng GHN:", createOrderGhn.message);
       return;
     } else {
       try {
         for (const item of payment) {
-          await orderAPI.postProductToOrder({
+          const res = await orderAPI.postProductToOrder({
             userId: userData._id,
             shopId: item.products[0].productId.shopId,
             products: productsWithShopId,
+            totalProductAmount: subOrderTotal,
+            shippingFee: shippingFee,
             totalAmount: amount,
             note: note,
+            expected_delivery_time: createOrderGhn.data.expected_delivery_time,
             orderCode: randomId,
             addressId: addressUser._id,
             methodId: selectedPaymentMethod,
           });
+          console.log(res);
           await Promise.all(
             item.products.map(async (product) => {
               if (product) {
@@ -549,6 +536,7 @@ const Payment = () => {
   }, [address]);
 
   const handleSetAddress = (newAddress) => {
+    setSelectedPaymentMethod(null);
     setAddress(newAddress);
   };
 
@@ -563,18 +551,36 @@ const Payment = () => {
     setIsPaymentMethodModalOpen(true);
   };
   const handleSelectPaymentMethod = (method) => {
+    const getLeadTime = async () => {
+      const shopId = payment[0]?.products[0]?.shopId?.shop_id_ghn;
+      if (!shopId || !shopData) return;
+
+      const payload = {
+        from_district_id: Number(shopData?.district_id),
+        from_ward_code: shopData?.ward_code,
+        to_district_id: addressUser.district.districtId,
+        to_ward_code: addressUser.ward.wardCode,
+        service_id: 53320,
+      };
+
+      try {
+        const res = await ghnAPI.getLeadtime(
+          payload,
+          Number(shopId),
+          payment[0]?.products[0]?.shopId.shop_token_ghn
+        );
+
+        setLeadTime(res.data.leadtime);
+      } catch (error) {
+        console.error("Error fetching lead time:", error);
+      }
+    };
+    getLeadTime();
     setSelectedPaymentMethod(method);
     setPaymentMethodSelected(true);
-    localStorage.setItem("selectedPaymentMethod", JSON.stringify(method));
     handleClosePaymentMethodModal();
   };
-  useEffect(() => {
-    const savedPaymentMethod = localStorage.getItem("selectedPaymentMethod");
-    if (savedPaymentMethod) {
-      setSelectedPaymentMethod(JSON.parse(savedPaymentMethod));
-      setPaymentMethodSelected(true);
-    }
-  }, []);
+
   if (!userData || !userData._id) {
     return null;
   }
@@ -759,6 +765,7 @@ const Payment = () => {
                   <div>
                     <span>Tổng tiền hàng: </span>
                   </div>
+
                   <FormattedPrice
                     className="text-green text-lg"
                     price={subOrderTotal.toFixed(2)}
@@ -829,10 +836,14 @@ const Payment = () => {
                   <div>
                     <span>Tổng tiền hàng:</span>
                   </div>
-                  <FormattedPrice
-                    className="text-green text-lg"
-                    price={subOrderTotal.toFixed(2)}
-                  />
+                  {discountedAmount ? (
+                    <FormattedPrice price={discountedAmount.toFixed(2)} />
+                  ) : (
+                    <FormattedPrice
+                      className="text-green text-lg"
+                      price={subOrderTotal.toFixed(2)}
+                    />
+                  )}
                 </div>
                 <div className="flex items-center justify-between">
                   <div>
@@ -857,10 +868,17 @@ const Payment = () => {
                     <FormattedPrice price={orderTotal.toFixed(2)} />
                   </span>
                 </div>
+                {selectedPaymentMethod !== null && (
+                  <p className="text-sm italic text-red">
+                    (Thời gian dự kiến nhận hàng:{" "}
+                    {convertLeadtimeToNormalTime(leadTime)})
+                  </p>
+                )}
+                {}
                 <button
                   className="btn bg-green text-white hover:bg-green hover:opacity-80 px-5 w-full border-style"
                   onClick={handleBuyItem}
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || selectedPaymentMethod === null}
                 >
                   Đặt hàng
                 </button>

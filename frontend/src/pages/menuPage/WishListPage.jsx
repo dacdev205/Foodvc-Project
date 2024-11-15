@@ -9,6 +9,8 @@ import styles from "../../CssModule/CartnWishPage.module.css";
 
 const WishListPage = () => {
   const [wishList, refetchWishList, isLoading] = useWishList();
+  console.log(wishList);
+
   const PF = "http://localhost:3000";
   const [heartFilledIds, setHeartFilledIds] = useState(
     JSON.parse(localStorage.getItem("heartFilledIds")) || []

@@ -4,17 +4,14 @@ const url = "https://dev-online-gateway.ghn.vn/shiip/public-api/v2";
 export default class ghnAPI {
   static async getShopById(client_phone, shopId, GHNToken) {
     try {
-      const response = await fetch(
-        "https://dev-online-gateway.ghn.vn/shiip/public-api/v2/shop/all",
-        {
-          method: "POST",
-          headers: {
-            Token: GHNToken,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ client_phone }),
-        }
-      );
+      const response = await fetch(`${url}/shop/all`, {
+        method: "POST",
+        headers: {
+          Token: GHNToken,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ client_phone }),
+      });
 
       const data = await response.json();
 
@@ -48,10 +45,30 @@ export default class ghnAPI {
       throw error;
     }
   }
+  static async getLeadtime(payload, shopId, token) {
+    try {
+      const response = await axios.post(
+        `${url}/shipping-order/leadtime`,
+        payload,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            token: token,
+            shopId: shopId,
+          },
+        }
+      );
+      return response.data;
+    } catch (error) {
+      console.log(error.message);
+      throw error;
+    }
+  }
+
   static async cancelOrder({ order_codes, token, shopId }) {
     try {
       const response = await axios.post(
-        "https://dev-online-gateway.ghn.vn/shiip/public-api/v2/switch-status/cancel",
+        `${url}/switch-status/cancel`,
         { order_codes },
         {
           headers: {

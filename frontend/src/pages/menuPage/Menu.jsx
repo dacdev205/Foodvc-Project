@@ -37,12 +37,17 @@ const Menu = () => {
         <div className="py-48 flex flex-col items-center justify-center">
           <div className="text-center px-4 space-y-7">
             <h2 className="md:text-5xl text-4xl font-bold md:leading-snug leading-snug text-black">
-              Vì tình yêu đồ ăn <span className="text-green">ngon</span>
+              Vì tình yêu với{" "}
+              <span className="text-green">thực phẩm tươi ngon</span>
             </h2>
             <p className="text-[#4A4A4A] text-xl md:w-4/5 mx-auto">
-              Hãy đến cùng gia đình và cảm nhận niềm vui khi thưởng thức các món
-              ăn ngon miệng như Salad Hy Lạp, Lasagne, Bí ngô Butternut, Tokusen
-              Wagyu, Olivas Rellenas và nhiều món khác với chi phí vừa phải
+              Hãy đến cùng gia đình và trải nghiệm niềm vui khi thưởng thức
+              những món ăn tuyệt vời được chế biến từ rau củ tươi ngon. Từ Salad
+              rau hữu cơ giòn tan, Bí ngô Butternut nướng caramel, đến các món
+              ăn bổ dưỡng như Cà rốt xào tỏi và Rau bina hấp, chúng tôi mang đến
+              cho bạn hương vị tự nhiên và sức khỏe. Tất cả với chi phí hợp lý,
+              giúp bạn và người thân có những bữa ăn vừa ngon miệng vừa tốt cho
+              sức khỏe.
             </p>
             <button className="bg-green font-semibold btn text-white px-8 py-3 rounded-full border-style hover:bg-green hover:opacity-80">
               Đặt ngay

@@ -1,6 +1,6 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import useUserCurrent from "./useUserCurrent";
-import useAxiosPublic from "./useAxiosPublic";
+import useAxiosSecure from "./useAxiosSecure";
 
 const useWishStore = () => {
   const userData = useUserCurrent();
@@ -8,7 +8,7 @@ const useWishStore = () => {
   const token = getToken();
   const id = userData?._id || "";
   const queryClient = useQueryClient();
-  const axiosPublic = useAxiosPublic();
+  const axiosSecure = useAxiosSecure();
 
   const refetchWishStore = async () => {
     if (!id) {
@@ -24,22 +24,13 @@ const useWishStore = () => {
         return [];
       }
       try {
-        const res = await axiosPublic.get(`/wish-store/user/${id}`, {
-          headers: {
-            authorization: `Bearer ${token}`,
-          },
-        });
+        const res = await axiosSecure.get(`/wish-store/user/${id}`);
 
-        if (res.status === 404) {
-          return [];
-        }
-
-        if (!res.ok) {
-          return [];
-        }
-
-        return await res.json();
+        return await res.data;
       } catch (error) {
+        if (error.response?.status !== 404) {
+          console.error("Error fetching cart data:", error);
+        }
         return [];
       }
     },

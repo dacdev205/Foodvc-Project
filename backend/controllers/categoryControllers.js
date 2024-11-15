@@ -34,7 +34,29 @@ module.exports = class categoryAPI {
       res.status(500).json({ success: false, message: error.message });
     }
   }
+  static async getCategories(req, res) {
+    try {
+      const { searchTerm = "", page = 1, limit = 20 } = req.query;
+      const query = {};
+      if (searchTerm) {
+        const regex = new RegExp(searchTerm, "i");
+        query.name = regex;
+      }
+      const categories = await Category.find(query)
+        .skip((page - 1) * limit)
+        .limit(limit);
 
+      const totalCategories = await Category.countDocuments(query);
+      const totalPages = Math.ceil(totalCategories / limit);
+
+      res.status(200).json({
+        categories,
+        totalPages,
+      });
+    } catch (error) {
+      res.status(500).json({ success: false, message: error.message });
+    }
+  }
   static async getCategoryById(req, res) {
     try {
       const category = await Category.findById(req.params.id);

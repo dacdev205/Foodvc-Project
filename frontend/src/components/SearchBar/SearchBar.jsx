@@ -144,15 +144,16 @@ const SearchBar = () => {
               >
                 {result?.photoURL ? (
                   <img
-                    src={result.photoURL || "https://via.placeholder.com/150"}
+                    src={result.photoURL}
                     alt={result.name || result.shopName}
                     className="w-8 h-8 rounded-full mr-3"
                   />
                 ) : (
                   <img
                     src={
-                      PF + "/" + result.shop_image ||
-                      "https://via.placeholder.com/150"
+                      result.shop_image
+                        ? `${PF}/${result.shop_image}`
+                        : "/images/user.png"
                     }
                     alt={result.name || result.shopName}
                     className="w-8 h-8 rounded-full mr-3"

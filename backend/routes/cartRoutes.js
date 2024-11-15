@@ -6,31 +6,31 @@ const router = require("express").Router();
 router.get(
   "/user/:id",
   verifyToken,
-  checkPermission("read"),
+  checkPermission(["read"]),
   cartAPI.fetchAllProductsByUserId
 );
 router.get(
   "/:id",
   verifyToken,
-  checkPermission("read"),
+  checkPermission(["read"]),
   cartAPI.fetchProductInCartByID
 );
 router.post(
   "/",
   verifyToken,
-  checkPermission("create"),
+  checkPermission(["create"]),
   cartAPI.postProductToCart
 );
 router.patch(
   "/:cartId/product/:productId",
   verifyToken,
-  checkPermission("update"),
+  checkPermission(["update"]),
   cartAPI.updateProductInCart
 );
 router.delete(
   "/:cartId/product/:productId",
   verifyToken,
-  checkPermission("delete"),
+  checkPermission(["delete"]),
   cartAPI.deleteProductInCart
 );
 

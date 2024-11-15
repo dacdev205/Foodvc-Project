@@ -28,6 +28,10 @@ import "react-confirm-alert/src/react-confirm-alert.css";
 import useUserCurrent from "../../hooks/useUserCurrent";
 import { CiShop } from "react-icons/ci";
 import conversationAPI from "../../api/conversationAPI";
+import FormattedPrice from "../../ultis/FormatedPriece";
+import Cards from "../../components/CardProduct/Cards";
+import axios from "axios";
+import useAxiosSecure from "../../hooks/useAxiosSecure";
 
 const CardDetails = () => {
   const { id } = useParams();
@@ -78,8 +82,10 @@ const CardDetails = () => {
   const totalPages = Math.ceil(reviews.length / itemsPerPage);
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-
+  const [recomendedProducts, setRecommendedProducts] = useState([]);
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
+  const axiosSecure = useAxiosSecure();
+
   useEffect(() => {
     const fetchProductDetail = async () => {
       try {
@@ -96,8 +102,39 @@ const CardDetails = () => {
       }
     };
 
+    const fetchProductRecommended = async () => {
+      try {
+        let url = "/recommended";
+        if (userData && userData._id) {
+          // Sử dụng userId nếu có
+          url += `/${userData._id}`;
+        }
+
+        const { data } = await axiosSecure.get(url);
+        const { recommendedProducts } = data;
+
+        if (!recommendedProducts || recommendedProducts.length === 0) {
+          console.warn("No recommended products returned from the server.");
+          setRecommendedProducts([]);
+          return;
+        }
+
+        const filteredProducts = recommendedProducts.filter(
+          (product) => product.productId && product.productId._id !== id
+        );
+
+        setRecommendedProducts(filteredProducts);
+      } catch (error) {
+        console.error("Error fetching recommended products:", error);
+        setRecommendedProducts([]);
+      }
+    };
+
     fetchProductDetail();
-  }, [id]);
+
+    fetchProductRecommended();
+  }, [id, userData]);
+
   const openDeleteModal = useCallback((review) => {
     setReviewToDelete(review);
     setIsDeleteModalOpen(true);
@@ -178,7 +215,6 @@ const CardDetails = () => {
     try {
       const userOrdersResponse = await orderAPI.getUserOrders(userData._id);
       const userOrders = userOrdersResponse.orders;
-      console.log(userOrders);
 
       if (!Array.isArray(userOrders)) {
         throw new Error("Expected userOrders to be an array.");
@@ -351,20 +387,7 @@ const CardDetails = () => {
       </div>
     );
   }
-  const formattedPrice = (price) => {
-    const priceNumber = new Intl.NumberFormat("vi-VN", {
-      currency: "VND",
-    }).format(price);
 
-    const [, decimalPart] = priceNumber.split(",");
-    if (decimalPart && parseInt(decimalPart) >= 5) {
-      return new Intl.NumberFormat("vi-VN", {
-        currency: "VND",
-      }).format(Math.ceil(price));
-    }
-
-    return priceNumber;
-  };
   const handleContactSeller = async () => {
     const senderId = userData._id;
     const receiverId = shopId;
@@ -431,8 +454,9 @@ const CardDetails = () => {
                 </div>
                 {/* price */}
                 <p className="text-lg font-bold ">
-                  {formattedPrice(product.productId.price)}
-                  <span>₫</span>
+                  <FormattedPrice
+                    price={product.productId.price}
+                  ></FormattedPrice>
                 </p>
 
                 {/* quantity */}
@@ -590,6 +614,20 @@ const CardDetails = () => {
               </div>
             )}
           </div>
+        </div>
+        <div>
+          {recomendedProducts.length > 0 ? (
+            <section>
+              <h1 className="text-lg font-bold">Có thể bạn sẽ thích</h1>
+              <div className="grid lg:grid-cols-4 sm:grid-cols-2 grid-cols-1">
+                {recomendedProducts.map((item) => (
+                  <Cards key={item.productId._id} item={item} />
+                ))}
+              </div>
+            </section>
+          ) : (
+            ""
+          )}
         </div>
 
         {/* review container */}

@@ -19,7 +19,18 @@ const orderSchema = mongoose.Schema({
     ref: "OrderStatus",
     required: true,
   },
+  totalProductAmount: {
+    // Tổng tiền hàng
+    type: Number,
+    required: true,
+  },
+  shippingFee: {
+    // Phí vận chuyển
+    type: Number,
+    required: true,
+  },
   totalAmount: {
+    // Tổng giá trị đơn hàng (tổng tiền hàng + phí vận chuyển)
     type: Number,
     required: true,
   },
@@ -54,6 +65,7 @@ const orderSchema = mongoose.Schema({
       required: true,
     },
   ],
+  expected_delivery_time: { type: Date, required: true },
   createdAt: {
     type: Date,
     default: Date.now,

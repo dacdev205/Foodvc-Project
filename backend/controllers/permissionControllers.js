@@ -29,7 +29,7 @@ module.exports = class PermissionAPI {
 
   static async getAllPermissions(req, res) {
     try {
-      const { page = 1, limit = 10, search, sort = "-createdAt" } = req.query;
+      const { page = 1, limit = 10, search } = req.query;
 
       const pageNumber = parseInt(page, 10);
       const pageSize = parseInt(limit, 10);
@@ -60,6 +60,18 @@ module.exports = class PermissionAPI {
         totalPages,
         currentPage: pageNumber,
         pageSize,
+      });
+    } catch (error) {
+      console.error(error);
+      res.status(500).send({ message: "Internal Server Error" });
+    }
+  }
+  static async getAllPermissionsSelect(req, res) {
+    try {
+      const permissions = await Permission.find().sort({ createdAt: -1 });
+
+      res.status(200).send({
+        permissions,
       });
     } catch (error) {
       console.error(error);

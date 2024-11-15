@@ -11,43 +11,51 @@ router.patch(
   "/cancel-order",
   verifyToken,
   checkCancelCount,
-  checkPermission("update"),
+  checkPermission(["update"]),
   orderAPI.cancelOrder
 );
 
 router.get(
   "/allOrder",
   verifyToken,
-  // checkPermission("seller_actions"),
-  // checkPermission("admin_actions"),
-
+  checkPermission(["read"]),
   orderAPI.fetchAllOrder
 );
 router.get(
   "/allOrder/admin",
-  // verifyToken,
-  // checkPermission("admin_actions"),
+  verifyToken,
+  checkPermission(["admin_pages"]),
   orderAPI.getAllOrdersAdmin
 );
-router.get("/:id", verifyToken, checkPermission("read"), orderAPI.getOrderById);
-router.get("/order-user/:userId", verifyToken, orderAPI.getUserOrders);
+router.get(
+  "/:id",
+  verifyToken,
+  checkPermission(["read"]),
+  orderAPI.getOrderById
+);
+router.get(
+  "/order-user/:userId",
+  verifyToken,
+  checkPermission(["read"]),
+  orderAPI.getUserOrders
+);
 
 router.patch(
   "/:orderId/add-order-request",
   verifyToken,
-  checkPermission("create"),
+  checkPermission(["create"]),
   orderAPI.addOrderReq
 );
 router.patch(
   "/:id",
   verifyToken,
-  checkPermission("update"),
+  checkPermission(["update"]),
   orderAPI.updateOrderStatus
 );
 router.get(
   "/reports/today",
   verifyToken,
-  checkPermission("create"),
+  checkPermission(["create"]),
   orderAPI.reportRevenueToday
 );
 module.exports = router;

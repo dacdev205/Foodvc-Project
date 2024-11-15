@@ -6,25 +6,25 @@ const router = require("express").Router();
 router.get(
   "/",
   verifyToken,
-  checkPermission("read"),
+  checkPermission(["read"]),
   paymentAPI.fetchAllPaymentWithUserId
 );
 router.get(
   "/:userId",
   verifyToken,
-  checkPermission("read"),
+  checkPermission(["read"]),
   paymentAPI.fetchPaymentByUserID
 );
 router.post(
   "/",
   verifyToken,
-  checkPermission("create"),
+  checkPermission(["create"]),
   paymentAPI.createPayment
 );
 router.patch(
   "/:id",
   verifyToken,
-  checkPermission("update"),
+  checkPermission(["update"]),
   paymentAPI.updateProductInPayment
 );
 

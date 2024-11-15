@@ -22,7 +22,6 @@ const AddInventory = () => {
     const fetchCategories = async () => {
       try {
         const data = await categoryAPI.getAllCategory();
-        // console.log(data);
         setCategories(data.categories);
       } catch (error) {
         console.log(error);

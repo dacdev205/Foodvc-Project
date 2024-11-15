@@ -4,32 +4,37 @@ const reviewAPI = require("../controllers/reviewControllers");
 const checkPermission = require("../middleware/checkPermission");
 const verifyToken = require("../middleware/verifyToken");
 
-router.post("/", verifyToken, checkPermission("create"), reviewAPI.addReview);
+router.post("/", verifyToken, checkPermission(["create"]), reviewAPI.addReview);
 router.get("/:productId", reviewAPI.getReviewsByProductId);
-router.get("/", reviewAPI.getAllReviews);
+router.get(
+  "/",
+  verifyToken,
+  checkPermission(["admin_actions", "quan_ly_danh_gia", "seller_pages"]),
+  reviewAPI.getAllReviews
+);
 
 router.post(
   "/update-sentiment",
-  // verifyToken,
-  // checkPermission("update"),
+  verifyToken,
+  checkPermission(["admin_actions", "quan_ly_danh_gia"]),
   reviewAPI.updateSentimentByReviewId
 );
 router.delete(
   "/:reviewId",
   verifyToken,
-  checkPermission("delete"),
+  checkPermission(["delete"]),
   reviewAPI.deleteReviewByReviewId
 );
 router.patch(
   "/:reviewId",
   verifyToken,
-  checkPermission("update"),
+  checkPermission(["update"]),
   reviewAPI.updateReviewByReviewId
 );
 router.get(
   "/editReview/:reviewId",
   verifyToken,
-  checkPermission("read"),
+  checkPermission(["read"]),
   reviewAPI.getReviewsByReviewId
 );
 

@@ -2,12 +2,18 @@ import React, { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import { CircularProgress, Pagination, Tooltip } from "@mui/material";
-import ConfirmDeleteModal from "../../../ultis/ConfirmDeleteModal";
+const ConfirmDeleteModal = React.lazy(() =>
+  import("../../../ultis/ConfirmDeleteModal")
+);
 import useAxiosSecure from "../../../hooks/useAxiosSecure";
 import { Bounce, toast } from "react-toastify";
-import useUserCurrent from "../../../hooks/useUserCurrent";
-import AddRoleModal from "../../../components/Modal/AddRoleModal";
-import EditRoleModal from "../../../components/Modal/EditRoleModal";
+const AddRoleModal = React.lazy(() =>
+  import("../../../components/Modal/AddRoleModal")
+);
+
+const EditRoleModal = React.lazy(() =>
+  import("../../../components/Modal/EditRoleModal")
+);
 
 const ManagementRole = () => {
   const axiosSecure = useAxiosSecure();

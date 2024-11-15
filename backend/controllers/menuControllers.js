@@ -300,6 +300,7 @@ module.exports = class menuAPI {
       const totalPages = Math.ceil(totalMenus / limit);
 
       const menus = await Menu.find(query)
+        .sort({ createAt: -1 })
         .populate("productId")
         .skip((page - 1) * limit)
         .limit(Number(limit))

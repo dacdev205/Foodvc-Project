@@ -6,38 +6,38 @@ const verifyToken = require("../middleware/verifyToken");
 router.post(
   "/",
   verifyToken,
-  checkPermission("create"),
+  checkPermission(["create"]),
   addressAPI.createAddress
 );
 router.get(
   "/",
   verifyToken,
-  checkPermission("read"),
+  checkPermission(["read"]),
   addressAPI.fetchAllAddressWithEmail
 );
 router.get(
   "/:id",
   verifyToken,
-  checkPermission("read"),
+  checkPermission(["read"]),
   addressAPI.fetchAddressByID
 );
 router.patch(
   "/:id",
   verifyToken,
-  checkPermission("update"),
+  checkPermission(["update"]),
   addressAPI.updateAddress
 );
 router.delete("/:id", verifyToken, addressAPI.deleteAddressByID);
 
 router.patch(
   "/isDefault/:id",
-  checkPermission("update"),
+  checkPermission(["update"]),
   verifyToken,
   addressAPI.updateAddressDefault
 );
 router.patch(
   "/:id/setDefault",
-  checkPermission("update"),
+  checkPermission(["update"]),
   verifyToken,
   addressAPI.setDefaultAddress
 );

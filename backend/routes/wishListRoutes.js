@@ -16,19 +16,19 @@ router.get(
 router.post(
   "/",
   verifyToken,
-  checkPermission("create"),
+  checkPermission(["create"]),
   favoritePdAPI.postProductToWishList
 );
 router.put(
   "/:id",
   verifyToken,
-  checkPermission("update"),
+  checkPermission(["update"]),
   favoritePdAPI.updateProductWishList
 );
 router.delete(
   "/:id",
   verifyToken,
-  checkPermission("delete"),
+  checkPermission(["delete"]),
   favoritePdAPI.deleteProductInWishList
 );
 

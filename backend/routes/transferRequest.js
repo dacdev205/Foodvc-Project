@@ -6,11 +6,21 @@ const router = require("express").Router();
 
 router.post(
   "/",
-  //   verifyToken,
-  //   checkPermission("create"),
+  verifyToken,
+  checkPermission(["create"]),
   transferRequestAPI.requestTransferToMenu
 );
-router.get("/:shopId", transferRequestAPI.getShopRequestTransferToMenu);
-router.get("/", transferRequestAPI.getRequestTransferToMenuAdmin);
+router.get(
+  "/:shopId",
+  verifyToken,
+  checkPermission(["seller_actions"]),
+  transferRequestAPI.getShopRequestTransferToMenu
+);
+router.get(
+  "/",
+  verifyToken,
+  checkPermission(["admin_actions", "duyet_san_pham"]),
+  transferRequestAPI.getRequestTransferToMenuAdmin
+);
 
 module.exports = router;

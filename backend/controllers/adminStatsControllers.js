@@ -4,6 +4,8 @@ const Order = require("../models/order");
 const moment = require("moment");
 const statusesAPI = require("../controllers/statusesControllers");
 const Product = require("../models/product");
+const mongoose = require("mongoose");
+
 const Shop = require("../models/shop");
 module.exports = class StatsAPI {
   static async getAllDataForStats(req, res) {
@@ -61,6 +63,8 @@ module.exports = class StatsAPI {
       for (const order of orders) {
         for (const product of order.products) {
           const productData = await Product.findById(product.productId);
+          if (!productData) continue;
+
           const category = productData.category || "Uncategorized";
           const totalAmount = product.quantity * productData.price;
 
@@ -76,11 +80,11 @@ module.exports = class StatsAPI {
         }
       }
 
-      // Fetch monthly revenue
+      // Fetch monthly revenue without shopId filter
       const monthlyRevenue = await Order.aggregate([
         {
           $match: {
-            statusId: CompletedStatus,
+            statusId: mongoose.Types.ObjectId(CompletedStatus),
             createdAt: {
               $gte: new Date(selectedYear, 0, 1),
               $lt: new Date(parseInt(selectedYear) + 1, 0, 1),
@@ -88,9 +92,15 @@ module.exports = class StatsAPI {
           },
         },
         {
+          $unwind: "$products",
+        },
+        {
           $group: {
             _id: { $month: "$createdAt" },
-            totalAmount: { $sum: "$totalAmount" },
+            totalRevenue: {
+              $sum: { $multiply: ["$products.quantity", "$totalAmount"] },
+            },
+            orderCount: { $sum: 1 },
           },
         },
         {
@@ -121,19 +131,24 @@ module.exports = class StatsAPI {
 
       for (const order of orders) {
         for (const product of order.products) {
-          const productData = await Product.findById(product.productId);
-          const category = productData.category || "Uncategorized";
+          const productData = await Product.findById(
+            product.productId
+          ).populate("category");
+
+          const categoryName = productData.category
+            ? productData.category.name
+            : "Uncategorized";
           const totalAmount = product.quantity * productData.price;
 
-          if (monthlyRevenue[category]) {
-            monthlyRevenue[category].totalAmount += totalAmount;
-            monthlyRevenue[category].products.push({
+          if (monthlyRevenue[categoryName]) {
+            monthlyRevenue[categoryName].totalAmount += totalAmount;
+            monthlyRevenue[categoryName].products.push({
               name: productData.name,
               quantity: product.quantity,
               totalAmount,
             });
           } else {
-            monthlyRevenue[category] = {
+            monthlyRevenue[categoryName] = {
               products: [
                 {
                   name: productData.name,

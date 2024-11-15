@@ -14,11 +14,17 @@ import { Link, useNavigate } from "react-router-dom";
 import { FaCartShopping } from "react-icons/fa6";
 import { MdOutlineAdminPanelSettings } from "react-icons/md";
 import usePermission from "../../hooks/usePermission";
-import useUserCurrent from "../../hooks/useUserCurrent";
 const Profile = ({ user }) => {
   const { logOut } = useContext(AuthContext);
   const navigate = useNavigate();
-  const [sellerPermission, isPermissionLoading] = usePermission("seller_pages");
+  const [rolePermission] = usePermission(["seller_pages"]);
+  function hasPermission(permission) {
+    const permissionsList = ["seller_pages"];
+    const index = permissionsList.indexOf(permission);
+    return rolePermission[index] || false;
+  }
+  const isSeller = hasPermission("seller_pages");
+
   const handleLogout = () => {
     logOut()
       .then(() => {
@@ -114,7 +120,7 @@ const Profile = ({ user }) => {
             Đơn mua
           </MenuItem>
         </Link>
-        {sellerPermission && (
+        {isSeller && (
           <Link to="/seller">
             <MenuItem onClick={handleClose}>
               <ListItemIcon>

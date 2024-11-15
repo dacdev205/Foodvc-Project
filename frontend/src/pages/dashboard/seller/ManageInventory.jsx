@@ -281,6 +281,7 @@ const ManageInventory = () => {
                 <th>Giá</th>
                 <th className="text-center">Số lượng tồn kho</th>
                 <th className="text-center">Chỉnh sửa</th>
+
                 <th className="">Xóa</th>
                 <th className="text-center">Trạng thái</th>
               </tr>
@@ -322,11 +323,14 @@ const ManageInventory = () => {
                     </td>
                     <td className="text-center text-black">{item.quantity}</td>
                     <td className="text-center">
-                      <Link to={`/seller/update-item/${item._id}`}>
-                        <button className="btn btn-ghost btn-xs bg-orange-500 text-white">
+                      <button
+                        className="btn btn-ghost btn-xs bg-orange-500 text-white"
+                        disabled={item.transferredToMenu}
+                      >
+                        <Link to={`/seller/update-item/${item._id}`}>
                           <FaEdit />
-                        </button>
-                      </Link>
+                        </Link>
+                      </button>
                     </td>
                     <td>
                       <button

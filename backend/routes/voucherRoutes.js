@@ -7,35 +7,40 @@ const router = require("express").Router();
 router.post(
   "/",
   verifyToken,
-  checkPermission("seller_actions"),
+  checkPermission(["seller_actions"]),
   voucherAPI.createVoucher
 );
-router.get("/:shopId", voucherAPI.getAllVouchers);
-router.get("/user/:shopId", voucherAPI.getVoucher4User);
+router.get(
+  "/:shopId",
+  verifyToken,
+  checkPermission(["seller_actions"]),
+  voucherAPI.getAllVouchers
+);
+router.get("/user/:shopId", verifyToken, voucherAPI.getVoucher4User);
 
 router.get("/:id", verifyToken, voucherAPI.getAllSingleVouchers);
 router.delete(
   "/:id",
   verifyToken,
-  checkPermission("seller_actions"),
+  checkPermission(["seller_actions"]),
   voucherAPI.deleteVoucher
 );
 router.patch(
   "/:id",
   verifyToken,
-  checkPermission("seller_actions"),
+  checkPermission(["seller_actions"]),
   voucherAPI.updateVoucher
 );
 router.patch(
   "/update-quantity/:id",
   verifyToken,
-  checkPermission("seller_actions"),
+  checkPermission(["seller_actions"]),
   voucherAPI.updateQuantityVoucher
 );
 router.post(
   "/apply",
   verifyToken,
-  checkPermission("create"),
+  checkPermission(["create"]),
   voucherAPI.applyVoucherToPayment
 );
 module.exports = router;

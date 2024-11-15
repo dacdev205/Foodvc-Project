@@ -156,12 +156,19 @@ const OrderDetail = () => {
                 <strong>Mã đơn hàng:</strong> {order.orderCode}
               </p>
               <p className="text-gray-700">
+                <strong>Tổng tiền hàng:</strong>{" "}
+                <FormattedPrice price={order.totalProductAmount} />
+              </p>{" "}
+              <p className="text-gray-700">
+                <strong>Phí vận chuyễn:</strong>{" "}
+                <FormattedPrice price={order.shippingFee} />
+              </p>
+              <p className="text-gray-700">
                 <strong>Tổng cộng:</strong>{" "}
                 <FormattedPrice price={order.totalAmount} />
               </p>
               <p className="text-gray-700">
-                <strong>Trạng thái thanh toán:</strong>{" "}
-                {order.paymentStatus ? "Đã thanh toán" : "Chưa thanh toán"}
+                <strong>Phương thức thanh toán:</strong> {order.methodId.name}
               </p>
               <p className="text-gray-700">
                 <strong>Ngày đặt hàng:</strong>{" "}

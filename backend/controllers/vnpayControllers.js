@@ -98,7 +98,7 @@ module.exports = class vnpayAPI {
         vnp_CreateBy: createdBy,
         vnp_CreateDate: refundRequestDate,
         vnp_IpAddr: "127.0.0.1",
-        vnp_OrderInfo: `Hoan tien cho${orderInfo}, Ly do:${reason}`,
+        vnp_OrderInfo: `Hoan tien cho ${orderInfo}, Ly do: ${reason}`,
         vnp_RequestId: transactionId,
         vnp_TransactionDate: orderCreatedAt,
         vnp_TransactionType: VnpTransactionType.FULL_REFUND,
@@ -108,24 +108,30 @@ module.exports = class vnpayAPI {
       };
 
       const response = await vnpay.refund(refundData);
+
       if (response.vnp_ResponseCode === "00") {
-        await Transaction.findOneAndUpdate({ refund: true }, { new: true });
-        res.json({
+        await Transaction.findOneAndUpdate(
+          { txnRef, refund: false },
+          { refund: true },
+          { new: true }
+        );
+        return res.json({
           success: true,
           message: "Refund successful",
           data: response,
         });
       } else {
-        res.status(400).json({
+        return res.status(400).json({
           success: false,
           message: "Refund failed",
           data: response,
         });
       }
-      res.json(response);
     } catch (error) {
       console.error("Refund Error:", error);
-      res.status(500).json({ error: "Refund failed", details: error.message });
+      return res
+        .status(500)
+        .json({ error: "Refund failed", details: error.message });
     }
   }
 

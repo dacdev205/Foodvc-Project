@@ -21,14 +21,14 @@ router.get("/search", verifyToken, usersAPI.getUsers);
 router.get(
   "/",
   verifyToken,
-  checkPermission("admin_actions"),
+  checkPermission(["admin_actions"]),
   usersAPI.getAllUsers
 );
 router.get("/ranking/:id", verifyToken, usersAPI.getUserRank);
 router.post(
   "/admin/create-user",
   verifyToken,
-  checkPermission("admin_actions"),
+  checkPermission(["admin_actions"]),
   usersAPI.createUserAdmin
 );
 
@@ -37,29 +37,31 @@ router.get("/roles/role-detail/:id", verifyToken, usersAPI.getRoleById);
 router.post("/", usersAPI.createUser);
 router.post(
   "/create-user-with-custom-role",
+  verifyToken,
+  checkPermission(["admin_actions"]),
   usersAPI.createUserWithCustomRoles
 );
 router.get("/search-detail", usersAPI.searchUserNShopByName);
-router.get("/:id", usersAPI.getSigleUser);
+router.get("/:id", verifyToken, usersAPI.getSigleUser);
 router.patch(
   "/:id",
   upload,
   verifyToken,
-  checkPermission("update"),
+  checkPermission(["update"]),
   usersAPI.updateUser
 );
 router.get("/getUserByEmail/:email", usersAPI.getUserByEmail);
 router.delete(
   "/:id",
   verifyToken,
-  checkPermission("delete"),
+  checkPermission(["admin_actions"]),
   usersAPI.deleteUser
 );
 router.get("/getPermissions/:email", usersAPI.getPermissions);
 router.patch(
   "/:id/role",
   verifyToken,
-  checkPermission("admin_actions"),
+  checkPermission(["admin_actions"]),
   usersAPI.updateUserRole
 );
 router.get("/roles/getAll", usersAPI.getAllRoles);

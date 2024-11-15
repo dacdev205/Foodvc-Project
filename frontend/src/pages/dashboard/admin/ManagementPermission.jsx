@@ -6,8 +6,13 @@ import ConfirmDeleteModal from "../../../ultis/ConfirmDeleteModal";
 import useAxiosSecure from "../../../hooks/useAxiosSecure";
 import { Bounce, toast } from "react-toastify";
 import useUserCurrent from "../../../hooks/useUserCurrent";
-import EditPermissionModal from "../../../components/Modal/EditPermissonModal";
-import AddPermissionModal from "../../../components/Modal/AddPermissionModal";
+const EditPermissionModal = React.lazy(() =>
+  import("../../../components/Modal/EditPermissonModal")
+);
+
+const AddPermissionModal = React.lazy(() =>
+  import("../../../components/Modal/AddPermissionModal")
+);
 
 const ManagementPermission = () => {
   const axiosSecure = useAxiosSecure();
@@ -52,7 +57,9 @@ const ManagementPermission = () => {
         console.error("Error fetching user roles:", error);
       }
     };
-    fetchUserRoles();
+    if (userData?.email) {
+      fetchUserRoles();
+    }
   }, [axiosSecure, userData?.email]);
 
   const isAdminPermission = (permissionId) => {

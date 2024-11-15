@@ -5,11 +5,11 @@ import axios from "axios";
 import Conversation from "../../components/Chat/Conversations";
 import { io } from "socket.io-client";
 import ChatMessage from "../../components/Chat/ChatMessage";
-import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { CircularProgress } from "@mui/material";
 import userAPI from "../../api/userAPI";
 import shopAPI from "../../api/shopAPI";
+import { toast } from "react-toastify";
 
 const ContactAdmin = () => {
   const [newMessage, setNewMessage] = useState("");
@@ -88,7 +88,6 @@ const ContactAdmin = () => {
         content: content,
         createdAt: Date.now(),
       });
-      toast.success("Bạn có tin nhắn mới từ người dùng!");
     });
 
     socket.on("disconnect", () => {
@@ -176,7 +175,6 @@ const ContactAdmin = () => {
 
   return (
     <div className="flex h-full">
-      <ToastContainer />
       <div className="bg-gray-200 p-4 rounded-lg overflow-y-auto flex-1">
         {loadingConversations ? (
           <div className="flex justify-center items-center">

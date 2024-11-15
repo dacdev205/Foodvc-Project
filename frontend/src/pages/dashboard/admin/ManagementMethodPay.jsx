@@ -4,8 +4,13 @@ import { FaRegPlayCircle, FaSearch, FaTrashAlt, FaEdit } from "react-icons/fa";
 import { CircularProgress, Pagination } from "@mui/material";
 import useAxiosSecure from "../../../hooks/useAxiosSecure";
 import { Bounce, toast } from "react-toastify";
-import EditMethodPayModal from "../../../components/Modal/EditMethodPayModal";
-import AddMethodPayModal from "../../../components/Modal/AddMethodPayModal";
+const EditMethodPayModal = React.lazy(() =>
+  import("../../../components/Modal/EditMethodPayModal")
+);
+
+const AddMethodPayModal = React.lazy(() =>
+  import("../../../components/Modal/AddMethodPayModal")
+);
 
 const ManagementMethodPay = () => {
   const axiosSecure = useAxiosSecure();

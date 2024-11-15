@@ -8,15 +8,11 @@ import {
 import orderAPI from "../../api/orderAPI";
 import conversationAPI from "../../api/conversationAPI";
 import { CircularProgress } from "@mui/material";
-import {
-  FaInfoCircle,
-  FaUser,
-  FaShippingFast,
-  FaSpinner,
-} from "react-icons/fa";
+import { FaInfoCircle, FaUser, FaShippingFast } from "react-icons/fa";
 import useUserCurrent from "../../hooks/useUserCurrent";
 import shopAPI from "../../api/shopAPI";
 import { CiShop } from "react-icons/ci";
+import FormattedPrice from "../../ultis/FormatedPriece";
 
 const UserOrderDetail = () => {
   const { orderId } = useParams();
@@ -81,9 +77,9 @@ const UserOrderDetail = () => {
   };
 
   return (
-    <div className="bg-gray-100 min-h-screen p-6 flex">
+    <div className="bg-gray-100 min-h-screen p-6 flex w-[800px]">
       {orderDetail ? (
-        <div className="max-w-4xl mx-auto p-8 bg-white rounded-lg shadow-md">
+        <div className="max-w-4xl mx-auto p-8 bg-white rounded-lg shadow-md w-full">
           <h1 className="text-3xl font-bold mb-6 text-center">
             Chi tiết đơn hàng
           </h1>
@@ -97,29 +93,37 @@ const UserOrderDetail = () => {
               <p className="mr-10">
                 <strong>Mã đơn hàng:</strong> {orderDetail.orderCode}
               </p>
-              <p>
-                <strong>Ghi chú:</strong>{" "}
-                {orderDetail.note || "Không có ghi chú"}
-              </p>
+              <div>
+                <p>
+                  <strong>Ghi chú:</strong>{" "}
+                  {orderDetail.note || "Không có ghi chú"}
+                </p>
+              </div>
             </div>
             <div className="flex justify-between mb-2">
               <p>
-                <strong>Tổng số tiền:</strong>{" "}
-                {orderDetail.totalAmount.toLocaleString()} VND
+                <strong>Phương thức thanh toán:</strong>{" "}
+                {orderDetail.methodId.name}
               </p>
-              <p>
-                <strong>Trạng thái thanh toán:</strong>
-                <span
-                  className={`font-medium ${
-                    orderDetail.paymentStatus
-                      ? "text-green-600"
-                      : "text-red-600"
-                  }`}
-                >
-                  {orderDetail.paymentStatus
-                    ? "Đã thanh toán"
-                    : "Chưa thanh toán"}
-                </span>
+            </div>
+            <div className=" mb-2">
+              <p className="mb-2">
+                <strong>Tổng tiền hàng:</strong>{" "}
+                <FormattedPrice
+                  price={orderDetail.totalProductAmount}
+                ></FormattedPrice>
+              </p>
+              <p className="mb-2">
+                <strong>Phí vận chuyển:</strong>{" "}
+                <FormattedPrice
+                  price={orderDetail.shippingFee}
+                ></FormattedPrice>
+              </p>
+              <p className="">
+                <strong>Tổng số tiền:</strong>{" "}
+                <FormattedPrice
+                  price={orderDetail.totalAmount}
+                ></FormattedPrice>
               </p>
             </div>
           </div>
@@ -147,10 +151,9 @@ const UserOrderDetail = () => {
             </h2>
             <div className="flex justify-between mb-2">
               <p>
-                <strong>Địa chỉ:</strong> {orderDetail.addressId.street}
-              </p>
-              <p>
-                <strong>Thành phố:</strong>{" "}
+                <strong>Địa chỉ:</strong> {orderDetail.addressId.street},
+                {orderDetail.addressId.ward.wardName},{" "}
+                {orderDetail.addressId.district.districtName},{" "}
                 {orderDetail.addressId.city.cityName}
               </p>
             </div>
@@ -214,10 +217,9 @@ const UserOrderDetail = () => {
                     </div>
                   </div>
                   <p className="font-semibold">
-                    {(
-                      product.productId.price * product.quantity
-                    ).toLocaleString()}{" "}
-                    VND
+                    <FormattedPrice
+                      price={product.productId.price * product.quantity}
+                    ></FormattedPrice>
                   </p>
                 </li>
               ))}

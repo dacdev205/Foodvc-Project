@@ -1,15 +1,18 @@
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { toast } from "react-toastify";
+import { Bounce, toast } from "react-toastify";
 import { CiLocationOn } from "react-icons/ci";
 import useAddress from "../../hooks/useAddress";
 import AddressForm from "../../components/Address/AddressForm";
 import useUserCurrent from "../../hooks/useUserCurrent";
 import SelectAddress from "../../components/Address/SelectAddress";
 import ghnAPI from "../../api/ghnAPI";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
-
+import CommissionPolicyModal from "../../components/Modal/CommissionPolicyModal";
+import useAxiosSecure from "../../hooks/useAxiosSecure";
+import Button from "@mui/material/Button";
+import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+import { styled } from "@mui/material";
 const CreateShop = () => {
   const { register, handleSubmit, reset } = useForm();
   const [addressModalOpen, setAddressModalOpen] = useState(false);
@@ -18,11 +21,13 @@ const CreateShop = () => {
   const userData = useUserCurrent();
   const [shippingPartner, setShippingPartner] = useState(null);
   const [shippingPartnerName, setShippingPartnerName] = useState(null);
-
+  const axiosSecure = useAxiosSecure();
+  const [photo, setPhoto] = useState(null);
   const [isConnected, setIsConnected] = useState(false);
   const [shippingPartners, setShippingPartners] = useState([]);
   const [requiredFields, setRequiredFields] = useState([]);
   const navigate = useNavigate();
+  const [commissionPolicies, setCommissionPolicies] = useState([]);
 
   const [addressUser, setAddress] = useState({
     fullName: "",
@@ -34,7 +39,22 @@ const CreateShop = () => {
   });
   const getToken = () => localStorage.getItem("access-token");
   const token = getToken();
+  useEffect(() => {
+    const fetchCommissionPolicies = async () => {
+      try {
+        const response = await axiosSecure.get("/commissions/for-user");
+        setCommissionPolicies(response.data);
+      } catch (error) {
+        toast.error("Error fetching commission policies", {
+          position: "bottom-right",
+          autoClose: 2000,
+        });
+        console.error("Error fetching commission policies:", error);
+      }
+    };
 
+    fetchCommissionPolicies();
+  }, [axiosSecure]);
   const handleSetAddressWithForm = (newAddress) => {
     setAddress(newAddress);
     setIsModalOpen(false);
@@ -56,9 +76,7 @@ const CreateShop = () => {
   useEffect(() => {
     const fetchShippingPartners = async () => {
       try {
-        const response = await axios.get(
-          "http://localhost:3000/shipping-partners"
-        );
+        const response = await axiosSecure.get("/shipping-partners");
         setShippingPartners(response.data.partners);
       } catch (error) {
         console.error("Error fetching shipping partners:", error);
@@ -72,7 +90,7 @@ const CreateShop = () => {
         setAddress(addressDefault);
       }
     });
-  }, [address]);
+  }, [address, axiosSecure]);
   const connectShippingPartner = async (data) => {
     try {
       const shop = await ghnAPI.getShopById(
@@ -85,6 +103,13 @@ const CreateShop = () => {
         toast.success("Kết nối với đơn vị vận chuyển thành công", {
           position: "bottom-right",
           autoClose: 2000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "colored",
+          transition: Bounce,
         });
       } else {
         throw new Error("Không tìm thấy Shop trên hệ thống GHN");
@@ -93,20 +118,41 @@ const CreateShop = () => {
       toast.error("Xảy ra lỗi khi kết nối với Shop trên GHN", {
         position: "bottom-right",
         autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+        transition: Bounce,
       });
       console.error("Error:", error);
     }
   };
-
+  const handlePhotoChange = (event) => {
+    setPhoto(event.target.files[0]);
+  };
+  const VisuallyHiddenInput = styled("input")({
+    clip: "rect(0 0 0 0)",
+    clipPath: "inset(50%)",
+    height: 1,
+    overflow: "hidden",
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    whiteSpace: "nowrap",
+    width: 1,
+  });
   const onSubmit = async (data) => {
     const formData = new FormData();
     formData.append("shopName", data.shopName);
     formData.append("description", data.description);
     formData.append("ownerId", userData?._id);
-    formData.append("image", data.shopImage[0]);
     formData.append("addresses", addressUser._id);
     formData.append("shippingPartner", shippingPartner);
-
+    if (photo) {
+      formData.append("image", photo);
+    }
     if (shippingPartner) {
       formData.append("shop_id_ghn", data.shopId);
       formData.append("shop_token_ghn", data.apiToken);
@@ -124,16 +170,30 @@ const CreateShop = () => {
       if (!response.ok) {
         throw new Error("Failed to create shop");
       }
-      toast.success("Shop created successfully!", {
+      toast.success("Shop đã được tạo thành công!", {
         position: "bottom-right",
         autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+        transition: Bounce,
       });
       reset();
       navigate("/seller");
     } catch (error) {
-      toast.error("Failed to create shop. Please try again.", {
+      toast.error("Đã xảy ra lỗi khi tạo shop, vui lòng thử lại", {
         position: "bottom-right",
         autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+        transition: Bounce,
       });
       console.error("Error:", error);
     }
@@ -175,11 +235,45 @@ const CreateShop = () => {
             <label className="label">
               <span className="label-text">Ảnh cửa hàng:</span>
             </label>
-            <input
-              type="file"
-              {...register("shopImage", { required: true })}
-              className="file-input w-full"
-            />
+
+            {photo && (
+              <img
+                src={URL.createObjectURL(photo)}
+                alt="Selected preview"
+                style={{
+                  width: "100px",
+                  height: "100px",
+                  objectFit: "cover",
+                  borderRadius: "5px",
+                  marginBottom: "10px",
+                }}
+              />
+            )}
+            <Button
+              component="label"
+              variant="contained"
+              startIcon={<CloudUploadIcon />}
+              sx={{
+                backgroundColor: "#4caf50",
+                color: "white",
+                "&:hover": {
+                  backgroundColor: "#388e3c",
+                },
+                borderRadius: "4px",
+                padding: "5px 10px",
+                fontSize: "0.8rem",
+                marginRight: "8px",
+                textTransform: "none",
+                minWidth: "auto",
+              }}
+            >
+              Chọn ảnh
+              <VisuallyHiddenInput
+                type="file"
+                {...register("image")}
+                onChange={handlePhotoChange}
+              />
+            </Button>
           </div>
           <div className="bg-white shadow-md rounded-lg p-6 mb-3">
             <div className="flex items-center justify-between">
@@ -284,6 +378,12 @@ const CreateShop = () => {
             </div>
           )}
         </div>
+        <span
+          className="cursor-pointer underline italic"
+          onClick={() => setIsModalOpen(true)}
+        >
+          Chính sách hoa hồng
+        </span>
         <button
           type="submit"
           className="btn bg-green text-white w-full py-2 mt-4"
@@ -292,7 +392,11 @@ const CreateShop = () => {
           Tạo cửa hàng
         </button>
       </form>
-
+      <CommissionPolicyModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        policies={commissionPolicies}
+      />
       <AddressForm
         userId={userData?._id}
         setAddress={handleSetAddressWithForm}

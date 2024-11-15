@@ -3,9 +3,10 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { FaGoogle, FaFacebook, FaEye, FaEyeSlash } from "react-icons/fa";
 import { AuthContext } from "../../context/AuthProvider";
-import useAxiosPublic from "../../hooks/useAxiosPublic";
+
 import * as Yup from "yup";
 import { Bounce, toast } from "react-toastify";
+import useAxiosSecure from "../../hooks/useAxiosSecure";
 
 const Register = () => {
   const {
@@ -20,7 +21,7 @@ const Register = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const from = location.state?.from?.pathname || "/";
-  const axiosPublic = useAxiosPublic();
+  const axiosSecure = useAxiosSecure();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
@@ -78,7 +79,7 @@ const Register = () => {
                 photoURL: data.photoURL || null,
                 address: null,
               };
-              axiosPublic.post("/users", userInfor).then((response) => {
+              axiosSecure.post("/users", userInfor).then((response) => {
                 if (userInfor.name) {
                   toast.success("Chào mừng bạn đến với FOODVC", {
                     position: "bottom-right",
@@ -119,7 +120,7 @@ const Register = () => {
         name: result?.user?.displayName,
         email: result?.user?.email,
       };
-      axiosPublic.post("/users", userInfor).then((response) => {
+      axiosSecure.post("/users", userInfor).then((response) => {
         navigate("/");
         toast.success("Chào mừng bạn đến với với FOODVC", {
           position: "bottom-right",

@@ -12,6 +12,7 @@ import { Bounce, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import useUserCurrent from "../../hooks/useUserCurrent";
 import { FaSpinner } from "react-icons/fa";
+import useAxiosSecure from "../../hooks/useAxiosSecure";
 
 const Cards = ({ item }) => {
   const { user } = useContext(AuthContext);
@@ -20,6 +21,8 @@ const Cards = ({ item }) => {
   const [reviews, setReviews] = useState([]);
   const [, refetchCart] = useCart();
   const [, refetchWishList] = useWishList();
+  const axiosSecure = useAxiosSecure();
+
   const [heartFilledIds, setHeartFilledIds] = useState(
     JSON.parse(localStorage.getItem("heartFilledIds")) || []
   );
@@ -190,14 +193,14 @@ const Cards = ({ item }) => {
         <Link to={`/product/${item?.productId?._id}`}>
           <figure>
             {loading && (
-              <div className="flex justify-center items-center h-72">
+              <div className="flex justify-center items-center h-52">
                 <FaSpinner className="animate-spin text-3xl text-green" />
               </div>
             )}
             <img
               src={PF + "/" + item?.productId?.image}
               alt={item?.productId?.name || "Product Image"}
-              className={`md:h-72 cursor-pointer ${
+              className={`md:h-52 cursor-pointer ${
                 loading ? "hidden" : "block"
               }`}
               onLoad={() => setLoading(false)}
@@ -210,7 +213,7 @@ const Cards = ({ item }) => {
           <Link to={`/product/${item?.productId?._id}`}>
             <h2 className="card-title cursor-pointer text-black">
               {item?.productId?.name
-                ? item?.productId?.name.slice(0, 20)
+                ? item?.productId?.name.slice(0, 15)
                 : "Tên sản phẩm"}
               ...
             </h2>

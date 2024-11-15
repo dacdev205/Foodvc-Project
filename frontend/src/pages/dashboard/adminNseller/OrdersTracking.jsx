@@ -6,6 +6,7 @@ import FormattedPrice from "../../../ultis/FormatedPriece";
 import { Bounce, toast } from "react-toastify";
 import { CircularProgress, Pagination } from "@mui/material";
 import useUserCurrent from "../../../hooks/useUserCurrent";
+import usePermission from "../../../hooks/usePermission";
 
 const OrdersTracking = () => {
   const [allOrders, setAllOrders] = useState([]);
@@ -18,7 +19,36 @@ const OrdersTracking = () => {
   const [totalPages, setTotalPages] = useState(1);
   const userData = useUserCurrent();
   const shopId = userData?.shops[0];
-  const isAdmin = userData?.roles.some((role) => role?.name?.includes("admin"));
+
+  const [rolePermission] = usePermission([
+    "admin_pages",
+    "seller_actions",
+    "admin_actions",
+    "duyet_san_pham",
+    "quan_ly_danh_muc",
+    "quan_ly_cua_hang",
+    "quan_ly_phuong_thuc_thanh_toan",
+    "quan_ly_doi_tac_van_chuyen",
+    "quan_ly_cap_bac",
+    "quan_ly_danh_gia",
+  ]);
+  function hasPermission(permission) {
+    const permissionsList = [
+      "admin_pages",
+      "seller_actions",
+      "admin_actions",
+      "duyet_san_pham",
+      "quan_ly_danh_muc",
+      "quan_ly_cua_hang",
+      "quan_ly_phuong_thuc_thanh_toan",
+      "quan_ly_doi_tac_van_chuyen",
+      "quan_ly_cap_bac",
+      "quan_ly_danh_gia",
+    ];
+    const index = permissionsList.indexOf(permission);
+    return rolePermission[index] || false;
+  }
+  const isAdmin = hasPermission("admin_pages");
 
   useEffect(() => {
     const fetchAllOrders = async () => {
@@ -134,7 +164,7 @@ const OrdersTracking = () => {
               <th>Mã đơn hàng</th>
               <th>Ngày đặt hàng</th>
               <th>Tổng đơn hàng</th>
-              <th>Thanh toán</th>
+              <th>Hoa hồng</th>
               <th>Trạng thái</th>
               <th className="text-center">Thao tác</th>
             </tr>
@@ -159,8 +189,8 @@ const OrdersTracking = () => {
                   </td>
                   <td>
                     {order.paymentStatus === true
-                      ? "Đã thanh toán"
-                      : "Chưa thanh toán"}
+                      ? "Đã chiết khấu"
+                      : "Chưa chiết khấu"}
                   </td>
                   <td>
                     <select

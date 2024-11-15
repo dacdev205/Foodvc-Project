@@ -18,10 +18,35 @@ let upload = multer({
 }).single("image");
 //middleware
 router.get("/", shopAPI.getAllShops);
-router.post("/create-shop", upload, verifyToken, shopAPI.createShop);
+router.get("/:shopId/commission", shopAPI.getShopCommissionPolicy);
+
+router.post(
+  "/create-shop",
+  upload,
+  verifyToken,
+  checkPermission(["create"]),
+  shopAPI.createShop
+);
 router.get("/get-shop/:shopId", shopAPI.fetchShopById);
 router.get("/get-shop-detail/:shopId", shopAPI.getShopById);
-router.patch("/update/:shopId", upload, shopAPI.updateShop);
-router.patch("/update-status/:shopId", shopAPI.updateShopStatus);
+router.patch(
+  "/update/:shopId",
+  upload,
+  verifyToken,
+  checkPermission(["update"]),
+  shopAPI.updateShop
+);
+router.patch(
+  "/update-status/:shopId",
+  verifyToken,
+  checkPermission(["update"]),
+  shopAPI.updateShopStatus
+);
+router.put(
+  "/update-commission-policy/:shopId",
+  verifyToken,
+  checkPermission(["update"]),
+  shopAPI.updateShopCommissionPolicy
+);
 
 module.exports = router;

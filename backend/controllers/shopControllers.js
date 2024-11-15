@@ -4,10 +4,14 @@ const User = require("../models/user");
 const Role = require("../models/roles");
 const Review = require("../models/reviews");
 const Product = require("../models/product");
+const CommissionTier = require("../models/comissionTier");
 const fs = require("fs");
 const wishStore = require("../models/wishStore");
 const { encrypt, decrypt } = require("../utils/cryptoUtils");
-
+const {
+  calculateShopRevenue,
+  getShopCommission,
+} = require("../utils/calculateShopRevenue");
 module.exports = class shopAPI {
   static async createShop(req, res) {
     try {
@@ -28,6 +32,16 @@ module.exports = class shopAPI {
 
       const encryptedShopToken = encrypt(req.body.shop_token_ghn);
 
+      const retailCommissionPolicy = await CommissionTier.findOne({
+        name: "Bán lẻ",
+      });
+
+      if (!retailCommissionPolicy) {
+        return res.status(400).json({
+          message: 'Chính sách hoa hồng "Bán lẻ" không tồn tại.',
+        });
+      }
+
       const newShop = new Shop({
         ownerId,
         shopGHN_id: req.body.shopGNN_id,
@@ -42,7 +56,7 @@ module.exports = class shopAPI {
         description: req.body.description,
         inventories: req.body.inventories || [],
         addresses: req.body.addresses || [],
-        shopRank: req.body.shopRank || null,
+        commissionPolicy: retailCommissionPolicy._id,
       });
 
       await newShop.save();
@@ -81,6 +95,8 @@ module.exports = class shopAPI {
       const totalShops = await Shop.countDocuments(searchFilter);
 
       const shops = await Shop.find(searchFilter)
+        .populate("commissionPolicy")
+        .sort({ createdAt: -1 })
         .skip((pageNumber - 1) * limitNumber)
         .limit(limitNumber);
 
@@ -267,7 +283,6 @@ module.exports = class shopAPI {
       description,
       inventories,
       addresses,
-      shopRank,
     } = req.body;
 
     try {
@@ -282,7 +297,6 @@ module.exports = class shopAPI {
       if (description) shop.description = description;
       if (inventories) shop.inventories = inventories;
       if (addresses) shop.addresses = addresses;
-      if (shopRank) shop.shopRank = shopRank;
 
       if (req.file) {
         if (shop.shop_image) {
@@ -339,6 +353,55 @@ module.exports = class shopAPI {
       res.status(204).json({ message: "Đã xóa cửa hàng thành công" });
     } catch (error) {
       res.status(500).json({ message: error.message });
+    }
+  }
+  static async updateShopCommissionPolicy(req, res) {
+    try {
+      const shopId = req.params.shopId;
+      const shop = await Shop.findById(shopId);
+
+      if (!shop) {
+        return res.status(404).json({ message: "Cửa hàng không tồn tại." });
+      }
+
+      const shopRevenue = await calculateShopRevenue(shop._id);
+
+      let newCommissionPolicy;
+
+      if (shopRevenue >= 20000000) {
+        newCommissionPolicy = await CommissionTier.findOne({
+          name: "Bạch kim",
+        });
+      } else if (shopRevenue >= 15000000) {
+        newCommissionPolicy = await CommissionTier.findOne({ name: "Vàng" });
+      } else if (shopRevenue >= 5000000) {
+        newCommissionPolicy = await CommissionTier.findOne({ name: "Bạc" });
+      } else {
+        newCommissionPolicy = await CommissionTier.findOne({ name: "Bán lẻ" });
+      }
+
+      if (!newCommissionPolicy) {
+        return res
+          .status(400)
+          .json({ message: "Không tìm thấy chính sách hoa hồng." });
+      }
+
+      console.log(newCommissionPolicy); // In ra chính sách hoa hồng được áp dụng
+      shop.commissionPolicy = newCommissionPolicy._id;
+      await shop.save();
+
+      res.status(200).json(shop);
+    } catch (error) {
+      res.status(400).json({ message: error.message });
+    }
+  }
+  static async getShopCommissionPolicy(req, res) {
+    try {
+      const { shopId } = req.params;
+      const commissionData = await getShopCommission(shopId);
+      res.status(200).json(commissionData);
+    } catch (error) {
+      res.status(400).json({ message: error.message });
     }
   }
 };

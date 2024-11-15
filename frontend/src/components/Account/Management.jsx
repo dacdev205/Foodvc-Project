@@ -3,9 +3,10 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { FaEyeSlash, FaEye } from "react-icons/fa";
 import { AuthContext } from "../../context/AuthProvider";
-import useAxiosPublic from "../../hooks/useAxiosPublic";
+
 import * as Yup from "yup";
 import { Bounce, toast } from "react-toastify";
+import useAxiosSecure from "../../hooks/useAxiosSecure";
 
 const Login = () => {
   const {
@@ -19,7 +20,7 @@ const Login = () => {
   const location = useLocation();
   const [errorMessage, setErrorMessage] = useState({});
   const [errorMessageSubmit, setErrorMessageSubmit] = useState("");
-  const axiosPublic = useAxiosPublic();
+  const axiosSecure = useAxiosSecure();
   const from = location.state?.from?.pathname || "/";
   const [showPassword, setShowPassword] = useState(false);
 
@@ -62,7 +63,7 @@ const Login = () => {
             email: data.email,
           };
           try {
-            axiosPublic.post("/users", userInfor);
+            axiosSecure.post("/users", userInfor);
             reset();
             toast.success("Chào mừng bạn trở lại!", {
               position: "bottom-right",
@@ -121,7 +122,7 @@ const Login = () => {
           name: result?.user?.displayName,
           email: result?.user?.email,
         };
-        axiosPublic.post("/users", userInfor).then((response) => {
+        axiosSecure.post("/users", userInfor).then((response) => {
           navigate("/");
           toast.success("Chào mừng bạn đến với với FOODVC", {
             position: "bottom-right",

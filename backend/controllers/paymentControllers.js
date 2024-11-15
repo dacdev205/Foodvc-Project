@@ -83,18 +83,24 @@ module.exports = class PaymentAPI {
         });
 
       if (payments.length > 0) {
-        payments.forEach((payment) => {
-          payment.products.forEach((product) => {
+        let firstDecryptedProduct = null;
+        for (const payment of payments) {
+          for (const product of payment.products) {
             if (product.shopId?.shop_token_ghn) {
-              product.shopId.shop_token_ghn = decrypt(
-                product.shopId.shop_token_ghn
-              );
+              const decryptedToken = decrypt(product.shopId.shop_token_ghn);
+              if (decryptedToken) {
+                product.shopId.shop_token_ghn = decryptedToken;
+                firstDecryptedProduct = product;
+                break;
+              }
             }
-          });
-        });
+          }
+          if (firstDecryptedProduct) break;
+        }
 
         return res.status(200).json(payments);
       }
+
       return res
         .status(404)
         .json({ message: "Người dùng không có trang thanh toán nào" });

@@ -9,6 +9,8 @@ import userAPI from "../../../api/userAPI";
 import { CircularProgress, Pagination } from "@mui/material";
 import useUserCurrent from "../../../hooks/useUserCurrent";
 import { Bounce, toast } from "react-toastify";
+import usePermission from "../../../hooks/usePermission";
+import useAxiosSecure from "../../../hooks/useAxiosSecure";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -25,6 +27,8 @@ const ReviewsManagement = () => {
   const [reviewToDelete, setReviewToDelete] = useState(null);
   const [isAnalyzed, setIsAnalyzed] = useState(false);
   const [analyzing, setAnalyzing] = useState(false);
+  const axiosSecure = useAxiosSecure();
+
   const [stats, setStats] = useState({
     totalReviews: 0,
     positiveReviews: 0,
@@ -32,15 +36,43 @@ const ReviewsManagement = () => {
     positivePercentage: 0,
     negativePercentage: 0,
   });
+  const [rolePermission] = usePermission([
+    "admin_pages",
+    "seller_actions",
+    "admin_actions",
+    "duyet_san_pham",
+    "quan_ly_danh_muc",
+    "quan_ly_cua_hang",
+    "quan_ly_phuong_thuc_thanh_toan",
+    "quan_ly_doi_tac_van_chuyen",
+    "quan_ly_cap_bac",
+    "quan_ly_danh_gia",
+  ]);
   const title = "Xóa bình luận";
   const message = "Bạn có chắc muốn xóa bình luận này?";
-  const isAdmin = userData?.roles.some((role) => role?.name?.includes("admin"));
+  function hasPermission(permission) {
+    const permissionsList = [
+      "admin_pages",
+      "seller_actions",
+      "admin_actions",
+      "duyet_san_pham",
+      "quan_ly_danh_muc",
+      "quan_ly_cua_hang",
+      "quan_ly_phuong_thuc_thanh_toan",
+      "quan_ly_doi_tac_van_chuyen",
+      "quan_ly_cap_bac",
+      "quan_ly_danh_gia",
+    ];
+    const index = permissionsList.indexOf(permission);
+    return rolePermission[index] || false;
+  }
+  const isAdmin = hasPermission("admin_pages");
 
   const fetchReviews = useCallback(async () => {
     setLoading(true);
     try {
       const response = isAdmin
-        ? await axios.get("http://localhost:3000/reviews-admin", {
+        ? await axiosSecure.get("/reviews-admin", {
             params: {
               page,
               limit: 5,
@@ -48,7 +80,7 @@ const ReviewsManagement = () => {
               sentiment: filterSentiment,
             },
           })
-        : await axios.get(`http://localhost:3000/reviews`, {
+        : await axiosSecure.get(`/reviews`, {
             params: {
               page,
               limit: 5,
@@ -88,7 +120,7 @@ const ReviewsManagement = () => {
     } finally {
       setLoading(false);
     }
-  }, [filterSentiment, isAdmin, page, searchTerm, shopId]);
+  }, [axiosSecure, filterSentiment, isAdmin, page, searchTerm, shopId]);
 
   useEffect(() => {
     if (userData) {
@@ -160,7 +192,7 @@ const ReviewsManagement = () => {
 
         const sentiment = response.data.sentiment;
 
-        await axios.post("http://localhost:3000/reviews/update-sentiment", {
+        await axiosSecure.post("/reviews/update-sentiment", {
           reviewId: review._id,
           sentiment,
         });

@@ -24,7 +24,7 @@ import orderRequestAPI from "../api/orderRequest";
 import useUserCurrent from "../hooks/useUserCurrent";
 
 const SellerLayout = () => {
-  const [rolePermission, isPermissionLoading] = usePermission("seller_pages");
+  const [rolePermission, isPermissionLoading] = usePermission(["seller_pages"]);
   const [promotionsOpen, setPromotionsOpen] = useState(false);
   const [inventoryOpen, setInventoryOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -69,13 +69,19 @@ const SellerLayout = () => {
 
     fetchOrderReq();
   }, [limit, page, searchTerm, shopId]);
-
   const handleOrderRequestsClick = () => {
     setOrderRequests(0);
   };
+  function hasPermission(permission) {
+    const permissionsList = ["seller_pages"];
+    const index = permissionsList.indexOf(permission);
+    return rolePermission[index] || false;
+  }
+  const isSeller = hasPermission("seller_pages");
+
   return (
     <div>
-      {rolePermission ? (
+      {isSeller ? (
         <div className="drawer sm:drawer-open">
           <input id="my-drawer-2" type="checkbox" className="drawer-toggle" />
           <div className="drawer-content flex flex-col sm:items-start sm:justify-start my-2 bg-white">
@@ -143,6 +149,19 @@ const SellerLayout = () => {
                 >
                   <FaRegMoneyBillAlt />
                   Quản lý giao dịch
+                </Link>
+              </li>
+              <li>
+                <Link
+                  className={`active-link-2 ${
+                    location.pathname === "/commission-policy"
+                      ? "text-green"
+                      : ""
+                  }`}
+                  to={`/seller/commission-policy`}
+                >
+                  <FaRegMoneyBillAlt />
+                  Quản lý phí hoa hồng cửa hàng
                 </Link>
               </li>
               <li>

@@ -61,6 +61,10 @@ app.use("/transfer-req", require("./routes/transferRequest"));
 app.use("/permissions", require("./routes/permissionRoutes"));
 app.use("/roles", require("./routes/rolesRoutes"));
 app.use("/shipping-partners", require("./routes/shippingPartnersRoutes"));
+app.use("/commissions", require("./routes/commissionsRoutes"));
+app.use("/zalo-pay", require("./routes/zaloPayRoutes"));
+app.use("/recommended", require("./routes/recommendedRoutes"));
+app.use("/user-ranks", require("./routes/userRankRoutes"));
 app.post("/jwt", async (req, res) => {
   const user = req.body;
   const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {

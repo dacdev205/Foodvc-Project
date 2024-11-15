@@ -18,7 +18,15 @@ const AddressSearchBar = ({
   const searchBarRef = useRef(null);
 
   useEffect(() => {
-    setSearchTerm(`${selectedCity}, ${selectedDistrict}, ${selectedWard}`);
+    if (selectedCity || selectedDistrict || selectedWard || selectedStreet) {
+      setSearchTerm(
+        `${selectedCity || ""}, ${selectedDistrict || ""}, ${
+          selectedWard || ""
+        }`.trim()
+      );
+    } else {
+      setSearchTerm("");
+    }
   }, [selectedCity, selectedDistrict, selectedWard, selectedStreet]);
 
   const handleInputChange = (e) => {
@@ -67,7 +75,6 @@ const AddressSearchBar = ({
         placeholder={"Tỉnh/Thành Phố, Quận/Huyện, Phường/Xã"}
         value={searchTerm}
         onChange={handleInputChange}
-        onClick={handleInputChange}
         className="input input-bordered w-full text-black"
       />
       {filteredResults.length > 0 && (

@@ -13,7 +13,7 @@ const AddRoleModal = ({ open, onClose, onAddRole }) => {
   useEffect(() => {
     const fetchPermissions = async () => {
       try {
-        const res = await axiosSecure.get("/permissions");
+        const res = await axiosSecure.get("/permissions/zz");
         setAllPermissions(res.data.permissions);
         setLoadingPermissions(false);
       } catch (error) {

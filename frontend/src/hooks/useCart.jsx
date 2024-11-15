@@ -1,16 +1,12 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import useUserCurrent from "./useUserCurrent";
-import useAxiosPublic from "./useAxiosPublic";
-import { responsiveProperty } from "@mui/material/styles/cssUtils";
+import useAxiosSecure from "./useAxiosSecure";
 
 const useCart = () => {
   const userData = useUserCurrent();
   const id = userData?._id || "";
   const queryClient = useQueryClient();
-  const getToken = () => localStorage.getItem("access-token");
-  const token = getToken();
-  const axiosPublic = useAxiosPublic();
-
+  const axiosSecure = useAxiosSecure();
   const refetchCart = async () => {
     if (!id) {
       return;
@@ -26,11 +22,7 @@ const useCart = () => {
       }
 
       try {
-        const res = await axiosPublic.get(`/cart/user/${id}`, {
-          headers: {
-            authorization: `Bearer ${token}`,
-          },
-        });
+        const res = await axiosSecure.get(`/cart/user/${id}`);
 
         return res.data;
       } catch (error) {

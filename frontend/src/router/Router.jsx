@@ -36,9 +36,9 @@ const SellerDashboardLazyLoading = lazy(() =>
 const UsersLazyLoading = lazy(() => import("../pages/dashboard/admin/Users"));
 const NotFoundPageLazyLoading = lazy(() => import("../ultis/NotFoundPage"));
 
-// const AddInventory = React.lazy(() =>
-//   import("../pages/dashboard/seller/AddInventory")
-// );
+const AddInventory = React.lazy(() =>
+  import("../pages/dashboard/seller/AddInventory")
+);
 
 const WishListPageLazyLoading = lazy(() =>
   import("../pages/menuPage/WishListPage")
@@ -151,10 +151,16 @@ const ManagementShippingParners = lazy(() =>
 const CreateVoucherLazyLoading = lazy(() =>
   import("../pages/dashboard/seller/CreateVoucher")
 );
+const ManagementComissionPolicyAdmin = lazy(() =>
+  import("../pages/dashboard/admin/ManagementComissionPolicy")
+);
+const ManagementCommissionPolicy = lazy(() =>
+  import("../pages/dashboard/seller/ManagementCommissionPolicy")
+);
 import LoadingSpinner from "../ultis/LoadingSpinner";
 import PrivateRouter from "../PrivateRouter/PrivateRouter";
 import ProtectedRoute from "../context/ProtectedRoute";
-import AddInventory from "../pages/dashboard/seller/AddInventory";
+import ManagementUserRank from "../pages/dashboard/seller/ManagementUserRank";
 
 const router = createBrowserRouter([
   {
@@ -425,6 +431,16 @@ const router = createBrowserRouter([
           </Suspense>
         ),
       },
+
+      {
+        path: "user-rank",
+        element: (
+          <Suspense>
+            <ManagementUserRank />
+          </Suspense>
+        ),
+      },
+
       {
         path: "shipping-partners",
         element: (
@@ -433,6 +449,15 @@ const router = createBrowserRouter([
           </Suspense>
         ),
       },
+      {
+        path: "comission-policy",
+        element: (
+          <Suspense>
+            <ManagementComissionPolicyAdmin />
+          </Suspense>
+        ),
+      },
+
       {
         path: "management-transactions",
         element: (
@@ -642,7 +667,14 @@ const router = createBrowserRouter([
           </Suspense>
         ),
       },
-
+      {
+        path: "commission-policy",
+        element: (
+          <Suspense>
+            <ManagementCommissionPolicy />
+          </Suspense>
+        ),
+      },
       {
         path: "manage-inventory",
         element: (

@@ -2,7 +2,7 @@
 import React, { useContext, useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { AuthContext } from "../../context/AuthProvider";
-import useAxiosPublic from "../../hooks/useAxiosPublic";
+
 import * as Yup from "yup";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import axios from "axios";
@@ -33,13 +33,14 @@ const AddUserModal = ({
       return res.data;
     },
   });
+  console.log("Fetched roles:", roles);
+  console.log({ addUserModalOpen, roles });
 
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm();
-
   useEffect(() => {
     const modal = document.getElementById("addUserModal");
     if (addUserModalOpen) {
@@ -223,7 +224,9 @@ const AddUserModal = ({
                 </label>
                 <select
                   value={role}
-                  onChange={(e) => setRole(e.target.value)}
+                  onChange={(e) => {
+                    setRole(e.target.value);
+                  }}
                   className="input input-sm input-bordered text-black"
                 >
                   {roles
@@ -235,11 +238,7 @@ const AddUserModal = ({
                     )
                     .map((role) => (
                       <option key={role._id} value={role._id}>
-                        {role.name === "user"
-                          ? "Người dùng"
-                          : role.name === "seller"
-                          ? "Người bán"
-                          : role.name}
+                        {role.name}
                       </option>
                     ))}
                 </select>

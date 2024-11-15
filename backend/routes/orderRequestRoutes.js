@@ -7,31 +7,31 @@ const router = express.Router();
 router.post(
   "/cancel-request",
   verifyToken,
-  checkPermission("create"),
+  checkPermission(["create"]),
   orderRequestAPI.createCancelRequest
 );
 router.get(
   "/all-requests",
   verifyToken,
-  checkPermission("read"),
+  checkPermission(["read"]),
   orderRequestAPI.getAllRequests
 );
 router.get(
   "/cancel-request/:id",
   verifyToken,
-  checkPermission("read"),
+  checkPermission(["read"]),
   orderRequestAPI.getRequestById
 );
 router.put(
   "/cancel-request/:id",
   verifyToken,
-  checkPermission("update"),
+  checkPermission(["update"]),
   orderRequestAPI.updateRequestStatus
 );
 router.delete(
   "/cancel-request/:id",
   verifyToken,
-  checkPermission("delete"),
+  checkPermission(["delete"]),
   orderRequestAPI.deleteRequest
 );
 module.exports = router;

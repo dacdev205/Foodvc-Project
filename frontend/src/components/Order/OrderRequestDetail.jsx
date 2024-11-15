@@ -5,6 +5,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { FaClipboardList, FaBoxOpen } from "react-icons/fa";
 import ghnAPI from "../../api/ghnAPI";
 import { Bounce, toast } from "react-toastify";
+import FormattedPrice from "../../ultis/FormatedPriece";
 
 const OrderRequestDetail = () => {
   const { id } = useParams();
@@ -134,11 +135,19 @@ const OrderRequestDetail = () => {
 
         {/* User Details */}
         <div className="flex items-center mb-8">
-          <img
-            src={userId.photoURL}
-            alt="Ảnh đại diện"
-            className="w-16 h-16 rounded-full border-2 border-green"
-          />
+          {userId.photoURL ? (
+            <img
+              alt="avatar"
+              className="w-16 h-16 rounded-full border-2 border-green"
+              src={userId.photoURL}
+            />
+          ) : (
+            <img
+              alt="avatar"
+              className="w-16 h-16 rounded-full border-2 border-green"
+              src="/images/user.png"
+            />
+          )}
           <div className="ml-4">
             <h2 className="text-xl font-semibold ">{userId.name}</h2>
             <p className="text-green-600">{userId.email}</p>
@@ -199,7 +208,9 @@ const OrderRequestDetail = () => {
             </div>
             <div className="bg-white p-2 rounded-md shadow-sm">
               <h3 className=" mb-1">Tổng tiền</h3>
-              <p className="">{orderId.totalAmount.toLocaleString()} VND</p>
+              <p className="">
+                <FormattedPrice price={orderId.totalAmount}></FormattedPrice>
+              </p>
             </div>
             <div className="bg-white p-2 rounded-md shadow-sm">
               <h3 className=" mb-1">Trạng thái thanh toán</h3>

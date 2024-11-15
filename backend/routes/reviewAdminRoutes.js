@@ -4,6 +4,11 @@ const reviewAPI = require("../controllers/reviewControllers");
 const checkPermission = require("../middleware/checkPermission");
 const verifyToken = require("../middleware/verifyToken");
 
-router.get("/", reviewAPI.getAllReviewsAdmin);
+router.get(
+  "/",
+  verifyToken,
+  checkPermission(["admin_pages"]),
+  reviewAPI.getAllReviewsAdmin
+);
 
 module.exports = router;

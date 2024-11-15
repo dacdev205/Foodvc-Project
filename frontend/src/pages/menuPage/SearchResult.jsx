@@ -5,6 +5,8 @@ import reviewAPI from "../../api/reviewAPI";
 import { CircularProgress, Pagination } from "@mui/material";
 import ShopFavoriteButton from "../../components/ShopFavoriteButton";
 import useUserCurrent from "../../hooks/useUserCurrent";
+import FormattedPrice from "../../ultis/FormatedPriece";
+import useAxiosSecure from "../../hooks/useAxiosSecure";
 
 const SearchResult = () => {
   const { id } = useParams();
@@ -22,22 +24,19 @@ const SearchResult = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [favoriteUserIds, setFavoriteUserIds] = useState([]);
   const userData = useUserCurrent();
+  const axiosSecure = useAxiosSecure();
 
   useEffect(() => {
-    const fetchShopMenuDetails = async (page = 1) => {
+    const fetchShopMenuDetails = async () => {
+      if (!id) return;
+      setLoading(true);
       try {
-        const response = await fetch(
-          `http://localhost:3000/shop/get-shop/${result._id}`,
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
-          }
+        const response = await axiosSecure.post(
+          `/shop/get-shop/${id}?page=${page}&limit=5&searchTerm=${searchTerm}`
         );
         const reviewsData = await reviewAPI.getProductById(id);
         setReviews(reviewsData);
         const data = await response.json();
-        console.log(data);
 
         if (response.ok) {
           setMenuDetails(data.menuDetails);
@@ -59,22 +58,12 @@ const SearchResult = () => {
     } else {
       setLoading(false);
     }
-  }, [page, id, isShop, result]);
+  }, [page, id, isShop, result, searchTerm, axiosSecure]);
 
   const handleSearch = (e) => {
     setSearchTerm(e.target.value.toLowerCase());
+    setPage(1);
   };
-
-  const filteredMenuDetails = menuDetails.filter((item) =>
-    item.product.name.toLowerCase().includes(searchTerm)
-  );
-
-  if (loading)
-    return (
-      <div className="fixed inset-0 flex items-center justify-center z-50">
-        <CircularProgress color="success" />
-      </div>
-    );
 
   const calculateAverageRating = (reviews) => {
     if (!reviews || reviews.length === 0) {
@@ -129,14 +118,6 @@ const SearchResult = () => {
     description,
     createdAt,
   } = result;
-
-  if (loading) {
-    return (
-      <div className="text-center text-lg text-gray-500">
-        Đang tải dữ liệu...
-      </div>
-    );
-  }
 
   const handleProductClick = (productId) => {
     navigate(`/product/${productId}`);
@@ -266,39 +247,50 @@ const SearchResult = () => {
                       onChange={handleSearch}
                     />
                   </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                    {filteredMenuDetails.map((item, index) => (
-                      <div
-                        key={index}
-                        className="bg-white shadow-md rounded-lg overflow-hidden transition-transform duration-200 ease-in-out hover:scale-105 hover:bg-slate-100 cursor-pointer"
-                        onClick={() => handleProductClick(item.product._id)}
-                      >
-                        <img
-                          src={PF + "/" + item.product.image}
-                          alt={item.product.name}
-                          className="w-full h-40 object-cover"
-                        />
-                        <div className="p-4">
-                          <h4 className="font-semibold text-md">
-                            {item.product.name}
-                          </h4>
-                          <p className="text-gray-600 mt-2">
-                            Giá: {item.product.price.toLocaleString()} đ
-                          </p>
-                          <div className="flex items-center mt-2 ">
-                            <span className="mr-2 underline ">
-                              {calculateAverageRating(item.reviews).toFixed(1)}
-                            </span>
-                            <span className="flex items-center justify-center">
-                              {renderRating(
-                                calculateAverageRating(item.reviews)
-                              )}
-                            </span>
+                  {loading ? (
+                    <div className="flex items-center justify-center">
+                      <CircularProgress color="success" />
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                      {menuDetails.map((item, index) => (
+                        <div
+                          key={index}
+                          className="bg-white shadow-md rounded-lg overflow-hidden transition-transform duration-200 ease-in-out hover:scale-105 hover:bg-slate-100 cursor-pointer"
+                          onClick={() => handleProductClick(item.product._id)}
+                        >
+                          <img
+                            src={PF + "/" + item.product.image}
+                            alt={item.product.name}
+                            className="w-full h-40 object-cover"
+                          />
+                          <div className="p-4">
+                            <h4 className="font-semibold text-md">
+                              {item.product.name}
+                            </h4>
+                            <p className="text-gray-600 mt-2">
+                              Giá:{" "}
+                              <FormattedPrice
+                                price={item.product.price}
+                              ></FormattedPrice>
+                            </p>
+                            <div className="flex items-center mt-2 ">
+                              <span className="mr-2 underline ">
+                                {calculateAverageRating(item.reviews).toFixed(
+                                  1
+                                )}
+                              </span>
+                              <span className="flex items-center justify-center">
+                                {renderRating(
+                                  calculateAverageRating(item.reviews)
+                                )}
+                              </span>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    ))}
-                  </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </>
             ) : (

@@ -4,7 +4,13 @@ module.exports = class FavoritePdAPI {
     try {
       const userId = req.params.userId;
       const wishList = await WishList.find({ userId }).populate("product");
-      res.status(200).json(wishList);
+      if (wishList) {
+        res.status(200).json(wishList);
+      } else {
+        res
+          .status(404)
+          .json({ message: "Sản phẩm không tìm thấy trong wishList" });
+      }
     } catch (err) {
       res.status(500).json({ message: err.message });
     }

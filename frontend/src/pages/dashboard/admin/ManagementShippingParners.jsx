@@ -5,9 +5,13 @@ import { CircularProgress, Pagination } from "@mui/material";
 import ConfirmDeleteModal from "../../../ultis/ConfirmDeleteModal";
 import useAxiosSecure from "../../../hooks/useAxiosSecure";
 import { Bounce, toast } from "react-toastify";
-import EditShippingPartnerModal from "../../../components/Modal/EditShippingPartnerModal";
-import AddShippingPartnerModal from "../../../components/Modal/AddShippingPartnerModal";
 
+const EditShippingPartnerModal = React.lazy(() =>
+  import("../../../components/Modal/EditShippingPartnerModal")
+);
+const AddShippingPartnerModal = React.lazy(() =>
+  import("../../../components/Modal/AddShippingPartnerModal")
+);
 const ManagementShippingPartners = () => {
   const axiosSecure = useAxiosSecure();
   const [page, setPage] = useState(1);

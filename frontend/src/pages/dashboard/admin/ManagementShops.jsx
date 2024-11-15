@@ -100,6 +100,7 @@ const ManagementShop = () => {
               <th>Mô tả</th>
               <th>Trạng thái</th>
               <th>Hoạt động</th>
+              <th>Chính sách hoa hồng</th>
               <th>Thao tác</th>
             </tr>
           </thead>
@@ -138,6 +139,8 @@ const ManagementShop = () => {
                   <td>
                     {shop.shop_isActive ? "Đang hoạt động" : "Dừng hoạt động"}
                   </td>
+                  <td className="text-center">{shop.commissionPolicy?.name}</td>
+
                   <td>
                     {shop.shop_isActive ? (
                       <button

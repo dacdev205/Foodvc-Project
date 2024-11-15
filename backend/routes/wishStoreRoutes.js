@@ -12,19 +12,19 @@ router.get("/:shopId", verifyToken, wishStoreAPI.fetchStoreWishStoreByShopId);
 router.post(
   "/",
   verifyToken,
-  //   checkPermission("create"),
+  checkPermission(["create"]),
   wishStoreAPI.postShopToWishShop
 );
 router.put(
   "/:id",
   verifyToken,
-  checkPermission("update"),
+  checkPermission(["update"]),
   wishStoreAPI.updateShopWishStore
 );
 router.delete(
   "/:id",
   verifyToken,
-  checkPermission("delete"),
+  checkPermission(["delete"]),
   wishStoreAPI.deleteShopInWishStore
 );
 

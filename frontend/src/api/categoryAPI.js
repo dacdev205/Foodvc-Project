@@ -21,7 +21,7 @@ export default class categoryAPI {
     });
     return res.data;
   }
-  static async getAllCategory(searchTerm = "", page = 1, limit = 5) {
+  static async getAllCategory(searchTerm = "", page = 1, limit = 20) {
     const token = getToken();
     const res = await axios.get(`${url}/get-all`, {
       headers: {

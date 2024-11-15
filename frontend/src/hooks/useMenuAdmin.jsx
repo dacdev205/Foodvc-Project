@@ -1,5 +1,6 @@
 import useAxiosPublic from "./useAxiosPublic";
 import { useQuery } from "@tanstack/react-query";
+import useAxiosSecure from "./useAxiosSecure";
 
 const useMenuSeller = (
   searchTerm = "",
@@ -10,7 +11,7 @@ const useMenuSeller = (
   priceRange = [0, 1000000],
   ratingRange = [0, 5]
 ) => {
-  const axiosPublic = useAxiosPublic();
+  const axiosSecure = useAxiosSecure();
 
   const getToken = () => localStorage.getItem("access-token");
   const token = getToken();
@@ -32,7 +33,7 @@ const useMenuSeller = (
       ratingRange,
     ],
     queryFn: async () => {
-      const res = await axiosPublic.get("/api/foodvc/admin", {
+      const res = await axiosSecure.get("/api/foodvc/admin", {
         headers: {
           authorization: `Bearer ${token}`,
         },

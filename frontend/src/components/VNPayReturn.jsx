@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import moment from "moment";
@@ -6,7 +7,6 @@ import orderAPI from "../api/orderAPI";
 import cartAPI from "../api/cartAPI";
 import useCart from "../hooks/useCart";
 import LoadingSpinner from "../ultis/LoadingSpinner";
-import ghnAPI from "../api/ghnAPI";
 import useUserCurrent from "../hooks/useUserCurrent";
 import { sendEmailToUser } from "../ultis/helpers";
 
@@ -19,7 +19,8 @@ const VNPayReturn = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const orderData = JSON.parse(localStorage.getItem("orderData"));
   const shopId = orderData.shopId;
-
+  const getToken = () => localStorage.getItem("access-token");
+  const token = getToken();
   const formattedDate = paymentResult.payDate
     ? moment(paymentResult.payDate, "YYYYMMDDHHmmss").format(
         "DD/MM/YYYY HH:mm:ss"
@@ -27,7 +28,11 @@ const VNPayReturn = () => {
     : "";
   const saveTransaction = async (transactionData) => {
     try {
-      await axios.post("http://localhost:3000/transactions", transactionData);
+      await axios.post("http://localhost:3000/transactions", transactionData, {
+        headers: {
+          authorization: `Bearer ${token}`,
+        },
+      });
     } catch (error) {
       console.error("Lỗi khi lưu giao dịch:", error);
     }
@@ -54,13 +59,20 @@ const VNPayReturn = () => {
         orderCode: orderData?.orderCode,
       };
 
-      setPaymentResult(result);
-
-      if (result.transactionNo) {
-        saveTransaction(result);
+      if (
+        result.transactionNo &&
+        result.transactionNo !== paymentResult.transactionNo
+      ) {
+        setPaymentResult(result);
       }
     }
-  }, [orderData.orderCode, searchParams, shopId, user?._id]);
+  }, [
+    orderData?.orderCode,
+    searchParams,
+    shopId,
+    user?._id,
+    paymentResult.transactionNo,
+  ]);
 
   const isPaymentSuccessful = paymentResult.responseCode === "00";
 
@@ -81,13 +93,11 @@ const VNPayReturn = () => {
           vnp_TxnRef: searchParams.get("vnp_TxnRef"),
           vnp_SecureHash: searchParams.get("vnp_SecureHash"),
         };
-        console.log(result);
 
         const response = await axios.get(
           "http://localhost:3000/method-deli/vnpay_ipn",
           { params: result }
         );
-        console.log(response);
 
         if (response.data.RspCode === "00") {
           localStorage.setItem("RspCode", response.data.RspCode);
@@ -114,7 +124,10 @@ const VNPayReturn = () => {
           shopId: orderData.shopId,
           products: orderData.products,
           totalAmount: orderData.totalAmount,
+          totalProductAmount: orderData.totalProductAmount,
+          shippingFee: orderData.shippingFee,
           note: orderData.note,
+          expected_delivery_time: orderData.expected_delivery_time,
           orderCode: orderData.orderCode,
           addressId: orderData.addressId,
           methodId: orderData.methodId,
@@ -144,6 +157,7 @@ const VNPayReturn = () => {
     } catch (error) {
       console.error("Error processing payment:", error);
     } finally {
+      saveTransaction(paymentResult);
       setIsSubmitting(false);
       refetchCart();
       navigate("/user/orders");

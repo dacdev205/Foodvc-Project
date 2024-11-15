@@ -4,7 +4,6 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import Slider from "react-slick";
 import Cards from "../../components/CardProduct/Cards";
-import menuAPI from "../../api/menuAPI";
 import { FaAngleRight, FaAngleLeft } from "react-icons/fa6";
 import useMenu from "../../hooks/useMenu";
 
@@ -39,7 +38,7 @@ const SpecialDishes = () => {
   const slider = React.useRef(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterType, setFilterType] = useState("name");
-  const [category, setCategory] = useState("popular");
+  const [category, setCategory] = useState("NỔI BẬT");
   const [page, setPage] = useState(1);
   const [menu, totalPages, refetch, isLoading, error] = useMenu(
     searchTerm,
@@ -48,21 +47,21 @@ const SpecialDishes = () => {
     page,
     8
   );
+
   useEffect(() => {
     const fetchDataPopular = async () => {
-      try {
-        const specials = menu.filter(
-          (item) => item.productId.category === "popular"
-        );
-        if (JSON.stringify(specials) !== JSON.stringify(recipes)) {
-          setRecipes(specials);
-        }
-      } catch (error) {
-        console.error("Error fetching data:", error);
+      const specials = menu.filter(
+        (item) => item.productId.category.name === "NỔI BẬT"
+      );
+
+      if (JSON.stringify(specials) !== JSON.stringify(recipes)) {
+        setRecipes(specials);
       }
     };
 
-    fetchDataPopular();
+    if (menu && menu.length > 0) {
+      fetchDataPopular();
+    }
   }, [menu, recipes]);
 
   const settings = {
@@ -101,6 +100,7 @@ const SpecialDishes = () => {
     nextArrow: <SampleNextArrow />,
     prevArrow: <SamplePrevArrow />,
   };
+
   return (
     <div className="max-w-screen-2xl container mx-auto xl:px-24 px-4 my-20 relative ">
       <div className="text-left">

@@ -8,7 +8,7 @@ const Banner = () => {
         {/* images */}
         <div className="">
           <video className="w-full h-auto" autoPlay loop muted playsInline>
-            <source src="/public/video.mp4" />
+            <source src="/video.mp4" />
           </video>
         </div>
         {/* texts */}

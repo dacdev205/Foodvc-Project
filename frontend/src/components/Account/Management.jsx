@@ -113,33 +113,6 @@ const Login = () => {
     }
   };
 
-  //goole signin
-  const handleLogin = () => {
-    signUpWithGmail()
-      .then((result) => {
-        const user = result.user;
-        const userInfor = {
-          name: result?.user?.displayName,
-          email: result?.user?.email,
-        };
-        axiosSecure.post("/users", userInfor).then((response) => {
-          navigate("/");
-          toast.success("Chào mừng bạn đến với với FOODVC", {
-            position: "bottom-right",
-            autoClose: 2000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: "colored",
-            transition: Bounce,
-          });
-        });
-      })
-      .catch((error) => console.log(""));
-  };
-
   return (
     <div>
       {!user ? (

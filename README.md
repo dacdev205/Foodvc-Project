@@ -9,18 +9,13 @@ quyền, admin page. Phân chia component một cách tối ưu để tái sử 
 code với giao diện bắt mắt, dễ sử dụng.
 
 • Trang web được thiết kế theo mô hình MERN.
+
 - Frontend: sử dụng HTML, CSS, framework ReacJS + ViteJS, Tailwind
   CSS, daisyui để làm giao diện người dùng.
 - Backend: sử dụng NodeJS, ExpressJS, MongoDB để lưu trữ dữ liệu,
   JWT để phân quyền, dùng firebase để quản lý người dùng
 
 # Một số hình ảnh của website
-
-![alt text](image-1.png)
-![alt text](image-2.png)
-![alt text](image.png)
-![alt text](image-4.png)
-![alt text](image-3.png)
 
 ## Cài Đặt
 

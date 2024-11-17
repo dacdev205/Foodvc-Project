@@ -58,7 +58,7 @@ code với giao diện bắt mắt, dễ sử dụng.
       yarn dev
       ```
 
-      Ứng dụng sẽ được chạy trên `http://localhost:3001`.
+      Ứng dụng sẽ được chạy trên `http://localhost:5173`.
 
     - Đối với thư mục backend => cd Foodvc/backend
       Sử dụng npm:
